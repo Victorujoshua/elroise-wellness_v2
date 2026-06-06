@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { ShoppingBag } from 'lucide-react'
+import { useCartStore } from '@/lib/cart'
 
 const navLinks = [
   { name: 'Home', path: '/' },
@@ -15,7 +17,13 @@ const navLinks = [
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [mounted, setMounted] = useState(false)
   const pathname = usePathname()
+
+  const openCart = useCartStore((s) => s.openCart)
+  const itemCount = useCartStore((s) => s.items.reduce((sum, i) => sum + i.qty, 0))
+
+  useEffect(() => setMounted(true), [])
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 50)
@@ -57,20 +65,36 @@ export default function Navbar() {
           ))}
         </div>
 
-        <Link
-          href="/booking"
-          className="hidden md:block text-[10px] uppercase tracking-widest border border-charcoal px-6 py-3 hover:bg-charcoal hover:text-white transition-colors font-medium"
-        >
-          Book Session
-        </Link>
+        <div className="flex items-center gap-4">
+          {/* Cart icon */}
+          <button
+            onClick={openCart}
+            aria-label="Open cart"
+            className="relative p-1 text-charcoal hover:text-gold transition-colors"
+          >
+            <ShoppingBag size={20} />
+            {mounted && itemCount > 0 && (
+              <span className="absolute -top-1 -right-1 w-4 h-4 bg-gold rounded-full text-white text-[8px] flex items-center justify-center font-bold leading-none">
+                {itemCount > 9 ? '9+' : itemCount}
+              </span>
+            )}
+          </button>
 
-        <button
-          className="md:hidden text-charcoal text-xl"
-          onClick={() => setMenuOpen(!menuOpen)}
-          aria-label="Toggle menu"
-        >
-          {menuOpen ? '✕' : '☰'}
-        </button>
+          <Link
+            href="/booking"
+            className="hidden md:block text-[10px] uppercase tracking-widest border border-charcoal px-6 py-3 hover:bg-charcoal hover:text-white transition-colors font-medium"
+          >
+            Book Session
+          </Link>
+
+          <button
+            className="md:hidden text-charcoal text-xl"
+            onClick={() => setMenuOpen(!menuOpen)}
+            aria-label="Toggle menu"
+          >
+            {menuOpen ? '✕' : '☰'}
+          </button>
+        </div>
       </div>
 
       {menuOpen && (
