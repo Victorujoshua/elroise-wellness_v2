@@ -1,0 +1,51 @@
+@import "tailwindcss";
+
+@theme {
+  --color-gold: #C5A059;
+  --color-charcoal: #2D2926;
+  --color-sand: #F3EFEA;
+  --color-bg: #F9F6F2;
+
+  --font-display: var(--font-playfair);
+  --font-body: var(--font-montserrat);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+.serif {
+  font-family: var(--font-playfair), serif;
+}
+
+.fade-in {
+  animation: fadeIn 1.2s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.soft-mask {
+  -webkit-mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+  mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+}
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #F9F6F2; }
+::-webkit-scrollbar-thumb { background: #D1CDC7; border-radius: 10px; }
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+input[type="date"] {
+  -webkit-appearance: none;
+  appearance: none;
+}
