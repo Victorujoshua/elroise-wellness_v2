@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { Clock, Sparkles, ArrowRight, ChevronLeft } from 'lucide-react'
 import { getSupabaseServerClient } from '@/lib/supabase/server'
+import ServiceViewTracker from './ServiceViewTracker'
 
 export const revalidate = 3600
 
@@ -82,6 +83,11 @@ export default async function ServiceDetailPage({ params }: Props) {
 
   return (
     <div className="bg-bg min-h-screen">
+      <ServiceViewTracker
+        serviceName={service.name}
+        serviceCategory={service.category}
+        serviceSlug={service.slug}
+      />
       <div className="max-w-5xl mx-auto px-6 pt-36 pb-32">
 
         {/* Back */}

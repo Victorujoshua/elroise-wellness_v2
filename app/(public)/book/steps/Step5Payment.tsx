@@ -3,6 +3,7 @@
 import { useState, useTransition } from 'react'
 import { createAppointment } from '../actions'
 import type { BookingService, ClientDetails } from '../BookingFlow'
+import { trackEvent } from '@/lib/analytics'
 
 const fmt = (n: number) => new Intl.NumberFormat('en-NG').format(n)
 
@@ -64,6 +65,12 @@ export default function Step5Payment({
     setPayError(null)
     const ref = `booking_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`
 
+    trackEvent('booking_payment_initiated', {
+      service_name: service.name,
+      amount_ngn: amount,
+      pricing_tier: pricingTier,
+    })
+
     const handler = window.PaystackPop.setup({
       key: process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY!,
       email: clientDetails.email,
@@ -85,6 +92,12 @@ export default function Step5Payment({
             client:             clientDetails,
           })
           if (result.success) {
+            trackEvent('booking_payment_completed', {
+              service_name: service.name,
+              amount_ngn: amount,
+              pricing_tier: pricingTier,
+              appointment_id: result.appointmentId,
+            })
             onConfirmed(result.appointmentId)
           } else {
             setPayError(result.error)

@@ -7,6 +7,7 @@ import { toast } from 'sonner'
 import { CheckCircle } from 'lucide-react'
 import { contactSchema, type ContactFormValues } from './schema'
 import { submitContactForm } from './actions'
+import { trackEvent } from '@/lib/analytics'
 
 const inputClass =
   'w-full border-b border-sand py-4 text-sm font-light focus:border-gold outline-none transition-colors bg-transparent placeholder:text-gray-300'
@@ -29,6 +30,7 @@ export default function ContactForm() {
     startTransition(async () => {
       const result = await submitContactForm(values)
       if (result.success) {
+        trackEvent('contact_form_submitted')
         toast.success('Message sent! Our team will be in touch shortly.')
         setSubmitted(true)
         reset()
