@@ -43,7 +43,8 @@ export default function RootLayout({
       lang="en"
       className={cn("h-full", "antialiased", playfair.variable, montserrat.variable, "font-sans", geist.variable)}
     >
-      <body className="min-h-full flex flex-col font-body bg-bg text-charcoal">
+      {/* suppressHydrationWarning: browser extensions add attributes to body that don't exist in SSR HTML */}
+      <body className="min-h-full flex flex-col font-body bg-bg text-charcoal" suppressHydrationWarning>
         {children}
         <Toaster position="bottom-right" richColors />
       </body>
