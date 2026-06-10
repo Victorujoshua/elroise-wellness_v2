@@ -70,15 +70,22 @@ export async function inviteTeamMember(data: InviteFormData): Promise<ActionResu
   // Send Loops email — non-blocking
   const templateId = process.env.LOOPS_TEAM_INVITATION_TEMPLATE_ID
   if (templateId) {
+    const { data: inviter } = await db
+      .from('users')
+      .select('full_name')
+      .eq('id', user.id)
+      .single()
     try {
       const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
       await sendTransactional({
         templateId,
         email: parsed.data.email,
         dataVariables: {
-          first_name: parsed.data.full_name.split(' ')[0],
-          role:       parsed.data.role,
-          accept_url: `${appUrl}/admin/accept-invite/${invite.token}`,
+          recipientName: parsed.data.full_name,
+          inviterName:   inviter?.full_name ?? 'The Elroisè team',
+          role:          parsed.data.role,
+          acceptLink:    `${appUrl}/admin/accept-invite/${invite.token}`,
+          expiresIn:     '7 days',
         },
       })
     } catch (err) {
