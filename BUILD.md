@@ -4,9 +4,9 @@
 
 ## STATUS
 
-**Week 3, Day 6** — 3.6 Clients CRUD complete: searchable client directory (name/email/phone, paginated), side drawer with editable details (name, phone, notes) + full appointment history. Migration 0008 adds `clients.notes`. Build clean (30 routes, 0 type errors).
+**Week 4, in progress** — 4A clients detail + 4B Sentry shipped on `week4/clients-and-observability` (commits `2e36be9` + `b793f44`). PR open; awaiting review + merge before starting 4.1 package credits.
 
-**Immediate next:** `supabase db push` all pending migrations (0006–0008), create first admin user, end-to-end test. Then Week 4.
+**Immediate next:** Review and merge the open PR. `supabase db push` migrations 0006–0009. Add `NEXT_PUBLIC_SENTRY_DSN`, `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT` to Vercel env. Point an uptime monitor at `/api/health`.
 
 ---
 
@@ -43,18 +43,30 @@ Format: `[✓]` done · `[→]` in progress · `[ ]` pending · `[!]` blocked
 - [✓] 3.6 Clients CRUD — search, view history, manual notes
 
 ### Week 4 — Package Credits, Polish, Launch
+- [✓] 4A Clients detail — `get_clients_with_stats` RPC (migration 0009), 7-col sortable table, `/admin/clients/[id]` detail page with inline edit + 3-tab history panel
+- [✓] 4B Sentry — `@sentry/nextjs@10.57.0` three-file config + `instrumentation.ts` + `withSentryConfig` in `next.config.ts` + `/api/health` edge route
 - [ ] 4.1 Package credits — buy pack, credit ledger, apply at booking
 - [ ] 4.2 Paystack webhook — `/api/paystack/webhook` for async payment confirmation
-- [ ] 4.3 Sentry + GA4 instrumentation
-- [ ] 4.4 Admin export / basic reports
-- [ ] 4.5 QA pass — golden path + edge cases
-- [ ] 4.6 Vercel production deploy + DNS cutover
+- [ ] 4.3 GA4 — `NEXT_PUBLIC_GA4_MEASUREMENT_ID` + `<GoogleAnalytics>` in root layout
+- [ ] 4.4 Appointments admin — `/admin/appointments` list + `/admin/appointments/[id]` detail (reschedule, cancel, refund dialogs)
+- [ ] 4.5 Admin export / basic reports
+- [ ] 4.6 QA pass — golden path + edge cases
+- [ ] 4.7 Vercel production deploy + DNS cutover
 
 ---
 
 ## SCHEMA
 
 > `[✓]` = migration written + pushed · `[~]` = migration written, push unconfirmed · `[ ]` = design only
+
+### get_clients_with_stats `[~]` — `0009_client_stats.sql`
+```sql
+-- plpgsql function; SECURITY DEFINER; GRANT EXECUTE TO service_role
+-- Returns: id, full_name, email, phone, notes, created_at, lifetime_bookings,
+--          lifetime_spend_kobo, last_booking, row_count (window function for pagination)
+-- Params:  p_q (text search), p_sort, p_dir, p_limit, p_offset
+-- Dynamic ORDER BY via format() + %I; sort column validated against allowlist
+```
 
 ### users `[~]` — `0001_foundation.sql`
 ```sql
@@ -251,7 +263,12 @@ components/public/CheckoutModal.tsx  Shop checkout — address form + Paystack i
 components/public/CartDrawer.tsx     Cart drawer — checkout now wired (was disabled)
 
 scripts/test-availability.ts     7-case integration test; run: npx tsx scripts/test-availability.ts
-supabase/migrations/             0001–0005 written; 0001–0003 seeded 11 services
+supabase/migrations/             0001–0009 written; 0001–0003 seeded 11 services
+sentry.client.config.ts          Browser Sentry init (replays enabled)
+sentry.server.config.ts          Node Sentry init
+sentry.edge.config.ts            Edge runtime Sentry init
+instrumentation.ts               register() + onRequestError hook (Next.js App Router)
+app/api/health/route.ts          Edge route → { status: 'ok', ts } for uptime monitors
 
 proxy.ts                         Auth proxy (was middleware.ts) — guards /admin/* except /admin/login
 
@@ -298,8 +315,8 @@ components/admin/
     AppointmentCard.tsx          Absolute-positioned card + AppointmentDetail Dialog (status update)
     AddBookingSheet.tsx          3-step Sheet: details → slot → payment; exports ServiceOption type
   clients/
-    ClientTable.tsx              Search form (router.push), paginated table, opens ClientDrawer
-    ClientDrawer.tsx             Sheet: editable details (name/phone/notes) + lazy appointment history
+    ClientTable.tsx              7-col sortable table; row click → /admin/clients/[id]; URL-driven filters
+    ClientDetail.tsx             Inline edit + 3-tab panel (appointments / credits / orders)
 ```
 
 ---
@@ -349,6 +366,10 @@ All writes go through server actions or Edge Functions using `SUPABASE_SERVICE_R
 | 2026-06-08 | Auto-refund only on slot conflict + inactive service; not on amount mismatch | Amount mismatch is likely fraud/tampering — needs manual review, not auto-refund |
 | 2026-06-08 | create_appointment_atomic RPC wraps client upsert + appointment + credits | Prevents partial writes if credits insert fails after appointment is created |
 | 2026-06-08 | Shop order checks payments table for duplicate reference before inserting | Prevents orphaned orders from double-submit; DB unique constraint is the final backstop |
+| 2026-06-10 | ClientDrawer removed; row click → `/admin/clients/[id]` | Detail page gives full space for history panels; drawer was too narrow for 3-tab layout |
+| 2026-06-10 | `get_clients_with_stats` plpgsql RPC for clients list | Single query for paginated list + lifetime stats + row count via window function |
+| 2026-06-10 | `@sentry/nextjs` v10 three-file pattern (client/server/edge) + `instrumentation.ts` | v10 dropped the single `sentry.config.ts` pattern; `instrumentation.ts` is the only way to wire `onRequestError` in App Router |
+| 2026-06-10 | `sourcemaps.deleteSourcemapsAfterUpload` replaces `hideSourceMaps` | `hideSourceMaps` is invalid in `withSentryConfig` v10; new key is nested under `sourcemaps` object |
 
 ---
 
@@ -356,11 +377,8 @@ All writes go through server actions or Edge Functions using `SUPABASE_SERVICE_R
 
 | Branch | Purpose | Status |
 |---|---|---|
-| `master` | All work through Week 3 — stabilization committed 2026-06-10 | Active |
-
-> Note: all work was committed directly to `master` during development. The branch names
-> in session notes (week1/*, week2/*, week3/*) were planning labels, not actual git branches.
-> Week 4 features should be branched off master before starting.
+| `master` | All work through Week 3 | Stable baseline |
+| `week4/clients-and-observability` | 4A clients detail + 4B Sentry | PR open — awaiting merge |
 
 ---
 
@@ -368,10 +386,12 @@ All writes go through server actions or Edge Functions using `SUPABASE_SERVICE_R
 
 - [ ] Create first admin user — Supabase Dashboard → Auth → Add user, then SQL: `INSERT INTO public.users (id, full_name, role, is_active) VALUES ('<uuid>', 'Name', 'owner', true);`
 - [ ] Create first admin user — Supabase Dashboard → Auth → Add user, then SQL: `INSERT INTO public.users (id, full_name, role, is_active) VALUES ('<uuid>', 'Victor Joshua', 'owner', true);`
-- [ ] Confirm `supabase db push` succeeded for 0004–0008 — run these in the SQL editor to verify:
+- [ ] Add Sentry env vars to Vercel + `.env.local`: `NEXT_PUBLIC_SENTRY_DSN`, `SENTRY_AUTH_TOKEN`, `SENTRY_ORG` (default: `elroise-wellness`), `SENTRY_PROJECT` (default: `elroise-wellness-web`)
+- [ ] Point BetterStack / UptimeRobot monitor at `<your-domain>/api/health` (200 = healthy)
+- [ ] Confirm `supabase db push` succeeded for 0004–0009 — run these in the SQL editor to verify:
   - `SELECT migration FROM supabase_migrations.schema_migrations ORDER BY migration;`
   - `SELECT tablename FROM pg_tables WHERE schemaname = 'public' ORDER BY tablename;`
-  - `SELECT proname FROM pg_proc WHERE pronamespace = 'public'::regnamespace ORDER BY proname;` (expect: create_appointment_atomic, update_timestamp)
+  - `SELECT proname FROM pg_proc WHERE pronamespace = 'public'::regnamespace ORDER BY proname;` (expect: create_appointment_atomic, get_clients_with_stats, update_timestamp)
 - [ ] Regenerate types after confirmed push: `supabase gen types typescript --linked > lib/database.types.ts`
 - [✓] All Loops template IDs set in `.env.local` — contact, booking confirmed, shop order, team invitation all wired
 - [✓] Step 5 "Pay" button — Paystack popup wired, `createAppointment` server action writes all rows
@@ -404,4 +424,4 @@ All writes go through server actions or Edge Functions using `SUPABASE_SERVICE_R
 
 ## LAST UPDATED
 
-2026-06-10 — Stabilization pass: fixed stale BUILD.md items, committed all Week 2 + Week 3 work to master
+2026-06-10 — Week 4 in flight: 4A clients detail + 4B Sentry committed to `week4/clients-and-observability`, PR open
