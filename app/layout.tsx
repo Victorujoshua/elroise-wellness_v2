@@ -1,7 +1,10 @@
 import type { Metadata } from 'next'
-import { Playfair_Display, Montserrat } from 'next/font/google'
+import { Playfair_Display, Montserrat, Geist } from 'next/font/google'
 import { Toaster } from 'sonner'
 import './globals.css'
+import { cn } from "@/lib/utils";
+
+const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 const playfair = Playfair_Display({
   variable: '--font-playfair',
@@ -38,7 +41,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${playfair.variable} ${montserrat.variable} h-full antialiased`}
+      className={cn("h-full", "antialiased", playfair.variable, montserrat.variable, "font-sans", geist.variable)}
     >
       <body className="min-h-full flex flex-col font-body bg-bg text-charcoal">
         {children}
