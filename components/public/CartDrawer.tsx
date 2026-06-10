@@ -1,6 +1,8 @@
 'use client'
 
+import { useState } from 'react'
 import { useCartStore } from '@/lib/cart'
+import CheckoutModal from './CheckoutModal'
 
 const fmt = (n: number) => n.toLocaleString('en-US')
 
@@ -13,8 +15,10 @@ export default function CartDrawer() {
 
   const total = items.reduce((sum, i) => sum + i.price * i.qty, 0)
   const itemCount = items.reduce((sum, i) => sum + i.qty, 0)
+  const [checkoutOpen, setCheckoutOpen] = useState(false)
 
   return (
+    <>
     <div
       aria-modal="true"
       aria-label="Shopping cart"
@@ -124,20 +128,21 @@ export default function CartDrawer() {
               <p className="text-xl font-light text-charcoal">₦{fmt(total)}</p>
             </div>
 
-            {/* Disabled checkout — Week 2 */}
             <button
-              disabled
-              title="Checkout coming in Week 2"
-              className="w-full py-4 bg-charcoal/20 text-charcoal/40 text-[10px] uppercase tracking-[0.4em] font-bold rounded-sm cursor-not-allowed"
+              onClick={() => {
+                closeCart()
+                setCheckoutOpen(true)
+              }}
+              className="w-full py-4 bg-charcoal text-white text-[10px] uppercase tracking-[0.4em] font-bold rounded-sm hover:bg-gold transition-all duration-500"
             >
               Proceed to Checkout
             </button>
-            <p className="text-[9px] text-charcoal/35 text-center font-light tracking-wide">
-              Paystack integration arriving in Week 2
-            </p>
           </div>
         )}
       </div>
     </div>
+
+    <CheckoutModal open={checkoutOpen} onClose={() => setCheckoutOpen(false)} />
+  </>
   )
 }

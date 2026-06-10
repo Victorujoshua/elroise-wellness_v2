@@ -12,6 +12,7 @@ const navLinks = [
   { name: 'Services', path: '/services' },
   { name: 'Shop', path: '/shop' },
   { name: 'Contact', path: '/contact' },
+  { name: 'My Bookings', path: '/my-bookings' },
 ]
 
 export default function Navbar() {
@@ -81,7 +82,7 @@ export default function Navbar() {
           </button>
 
           <Link
-            href="/booking"
+            href="/book"
             className="hidden md:block text-[10px] uppercase tracking-widest border border-charcoal px-6 py-3 hover:bg-charcoal hover:text-white transition-colors font-medium"
           >
             Book Session
@@ -108,7 +109,7 @@ export default function Navbar() {
               {link.name}
             </Link>
           ))}
-          <Link href="/booking" className="text-2xl serif italic text-gold">
+          <Link href="/book" className="text-2xl serif italic text-gold">
             Book Session
           </Link>
         </div>
