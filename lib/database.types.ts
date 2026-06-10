@@ -363,6 +363,27 @@ export type Database = {
         }
         Returns: string // uuid
       }
+      get_clients_with_stats: {
+        Args: {
+          p_q?:      string
+          p_sort?:   string
+          p_dir?:    string
+          p_limit?:  number
+          p_offset?: number
+        }
+        Returns: {
+          id:                  string
+          full_name:           string
+          email:               string
+          phone:               string
+          notes:               string | null
+          created_at:          string
+          lifetime_bookings:   number
+          lifetime_spend_kobo: number
+          last_booking:        string | null
+          row_count:           number
+        }[]
+      }
     }
     Enums: Record<never, never>
     CompositeTypes: Record<never, never>
