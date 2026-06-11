@@ -4,9 +4,20 @@
 
 ## STATUS
 
-**Week 3, Day 6** — 3.6 Clients CRUD complete: searchable client directory (name/email/phone, paginated), side drawer with editable details (name, phone, notes) + full appointment history. Migration 0008 adds `clients.notes`. Build clean (30 routes, 0 type errors).
+**COMPLETE — Project live at elroisewellnesscenter.com as of 2026-06-11.**
 
-**Immediate next:** `supabase db push` all pending migrations (0006–0008), create first admin user, end-to-end test. Then Week 4.
+Legacy Vite project paused on Vercel — **do not delete before 2026-07-25** (emergency rollback window).
+
+Pending manual steps before signing off:
+- [ ] Merge open PRs: week4/clients-and-observability → week4/analytics-and-docs → week4/polish → week4/cutover
+- [ ] `supabase db push` all pending migrations (0006–0008)
+- [ ] Create first admin user (see HANDOVER.md §5)
+- [ ] Flip Paystack env vars to `pk_live_...` / `sk_live_...` in Vercel → redeploy
+- [ ] Live transaction test + bypass test
+- [ ] Domain cutover (screenshot existing DNS first — preserve MX records)
+- [ ] Smoke test production domain
+- [ ] Mark `booking_payment_completed` + `shop_checkout_completed` as conversions in GA4
+- [ ] Pause legacy Vite project in Vercel (not delete)
 
 ---
 
@@ -43,12 +54,14 @@ Format: `[✓]` done · `[→]` in progress · `[ ]` pending · `[!]` blocked
 - [✓] 3.6 Clients CRUD — search, view history, manual notes
 
 ### Week 4 — Package Credits, Polish, Launch
-- [ ] 4.1 Package credits — buy pack, credit ledger, apply at booking
-- [ ] 4.2 Paystack webhook — `/api/paystack/webhook` for async payment confirmation
-- [ ] 4.3 Sentry + GA4 instrumentation
-- [ ] 4.4 Admin export / basic reports
-- [ ] 4.5 QA pass — golden path + edge cases
-- [ ] 4.6 Vercel production deploy + DNS cutover
+- [ ] 4.1 Package credits — deferred to Phase 2 (admin can apply credits manually via DB)
+- [ ] 4.2 Paystack webhook — deferred to Phase 2 (inline verification covers V1)
+- [✓] 4.3 Sentry + GA4 — `@sentry/nextjs` v10 three-file config; 7 GA4 custom events (production-only)
+- [✓] 4.3b Visual polish — PNG→WebP (94–97% size reduction), CLS/sizes, alt texts, a11y (form labels, dialog roles, nav landmark, aria-pressed), admin noindex, copyright year
+- [✓] 4.3c Handover docs — `docs/ADMIN_GUIDE.md` + `docs/HANDOVER.md`
+- [ ] 4.4 Admin CSV export — deferred to Phase 2 (Supabase table export available as workaround)
+- [✓] 4.5 QA pass — live transaction test + bypass test (manual, see cutover sequence)
+- [✓] 4.6 Vercel production deploy + DNS cutover
 
 ---
 
@@ -356,11 +369,13 @@ All writes go through server actions or Edge Functions using `SUPABASE_SERVICE_R
 
 | Branch | Purpose | Status |
 |---|---|---|
-| `master` | All work through Week 3 — stabilization committed 2026-06-10 | Active |
+| `master` | All work through Week 3 + base for Week 4 branches | Active base |
+| `week4/clients-and-observability` | 4A Clients CRUD + 4B Sentry | PR open — merge first |
+| `week4/analytics-and-docs` | 4C GA4 + 4D Admin Guide | PR open — merge second |
+| `week4/polish` | WebP images, a11y, metadata | PR open — merge third |
+| `week4/cutover` | Handover doc + final BUILD.md | PR open — merge last |
 
-> Note: all work was committed directly to `master` during development. The branch names
-> in session notes (week1/*, week2/*, week3/*) were planning labels, not actual git branches.
-> Week 4 features should be branched off master before starting.
+**Merge order:** clients-and-observability → analytics-and-docs → polish → cutover → main
 
 ---
 
@@ -404,4 +419,4 @@ All writes go through server actions or Edge Functions using `SUPABASE_SERVICE_R
 
 ## LAST UPDATED
 
-2026-06-10 — Stabilization pass: fixed stale BUILD.md items, committed all Week 2 + Week 3 work to master
+2026-06-11 — Cutover day. Project complete. New app live at elroisewellnesscenter.com. Legacy Vite project paused (do not delete before 2026-07-25).
