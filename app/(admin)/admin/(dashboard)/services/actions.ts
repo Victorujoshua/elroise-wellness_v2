@@ -2,7 +2,8 @@
 
 import { revalidatePath } from 'next/cache'
 import { createAuthClient, getSupabaseServiceClient } from '@/lib/supabase/server'
-import { serviceSchema, type ServiceFormData } from '@/components/admin/services/serviceSchema'
+import { serviceSchema } from '@/components/admin/services/serviceSchema'
+import type { ServiceFormData } from '@/components/admin/services/serviceSchema'
 import type { Json, ServiceRow, UserRow } from '@/lib/database.types'
 
 export type ServiceWithPractitioners = ServiceRow & { practitioner_ids: string[] }

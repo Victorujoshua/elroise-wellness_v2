@@ -25,7 +25,8 @@ import {
 } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
-import { serviceSchema, slugify, type ServiceFormData } from './serviceSchema'
+import { serviceSchema, slugify } from './serviceSchema'
+import type { ServiceFormData } from './serviceSchema'
 import { saveService } from '@/app/(admin)/admin/(dashboard)/services/actions'
 import type { ServiceWithPractitioners, PractitionerOption } from '@/app/(admin)/admin/(dashboard)/services/actions'
 
