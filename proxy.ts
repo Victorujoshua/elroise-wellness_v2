@@ -28,8 +28,9 @@ export async function proxy(request: NextRequest) {
 
   const path = request.nextUrl.pathname
   const isLoginPath = path === '/admin/login'
+  const isAcceptInvitePath = path.startsWith('/admin/accept-invite')
 
-  if (!isLoginPath && !user) {
+  if (!isLoginPath && !isAcceptInvitePath && !user) {
     return NextResponse.redirect(new URL('/admin/login', request.url))
   }
 

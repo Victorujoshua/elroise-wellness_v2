@@ -194,7 +194,7 @@
 | **0.2** Env accounts (Supabase, Paystack, Loops, Vercel) | DONE-UNVERIFIED | Accounts exist; whether all env vars are set in Vercel production is unverified |
 | **1.1** Services DB table + RSC read | DONE | `/services` reads live from Supabase |
 | **1.2** Service detail `/services/[slug]` with ISR | DONE | `revalidate = 3600` |
-| **1.3** Auth — Supabase Auth, admin login, proxy guard | **DRIFTED** | See Part 4 — `proxy.ts` is NOT active as Edge middleware |
+| **1.3** Auth — Supabase Auth, admin login, proxy guard | DONE (matcher gap) | `proxy.ts` IS active as Next.js 16 Edge middleware. 307 redirects confirmed live. Gap: matcher covers `/admin/accept-invite/:path*` — see Part 3D and M1. |
 | **1.4** App scaffold, layouts, Tailwind tokens, fonts | DONE | |
 | **1.5** Static public pages | DONE | Home, About, Privacy, Terms, Refund Policy |
 | **1.6** Contact page + Loops | DONE-UNVERIFIED | Code wired; no confirmed human test that email arrives |
@@ -275,12 +275,13 @@ These are all correct by design: Loops failures must not fail the primary operat
 
 ### D. Auth & Authorization — GAPS
 
-**Middleware coverage:** **CRITICAL FINDING.** There is no `middleware.ts` at the project root. The file `proxy.ts` exports a `proxy` function and a `config` with `matcher: ['/admin/:path*']`. In Next.js, the middleware file **must** be named `middleware.ts` (or `middleware.js`). `proxy.ts` is never invoked by the framework as middleware.
+**Middleware coverage:** `proxy.ts` at the project root is the correct Next.js 16 middleware file. Next.js 16 reversed the naming convention from prior versions — `proxy.ts` (exporting `proxy`) is what the framework invokes as Edge middleware; `middleware.ts` is deprecated in this version. This was verified live against the dev server: `GET /admin` (unauthenticated) returns HTTP 307 → `/admin/login` before any RSC runs. `GET /admin/dashboard` likewise returns 307. `GET /admin/login` returns 200 with no redirect loop.
 
-The admin routes are protected by the RSC layout guard in `app/(admin)/admin/(dashboard)/layout.tsx`, which calls `auth.auth.getUser()` and redirects if no session. This provides functional auth protection for all dashboard page routes. However:
-- There is no Edge-level protection (the intended architecture)
-- If any admin API routes were added, they would have no middleware guard
-- The `is_active` check (deactivated user) is correctly in the layout, not the proxy — this part works regardless
+**Matcher gap — MUST FIX:** The matcher `['/admin/:path*']` covers `/admin/accept-invite/[token]`, which is the route new staff navigate to when accepting a team invitation. An unauthenticated user hitting that path will be redirected to `/admin/login` before the accept-invite page can render — breaking the onboarding flow entirely. The matcher must explicitly exclude `/admin/accept-invite/:path*`.
+
+The `isLoginPath` guard (`path === '/admin/login'`) correctly prevents redirect loops: authenticated users on `/admin/login` go to `/admin/calendar`; unauthenticated users stay on `/admin/login`.
+
+**No admin API routes exist on master** (confirmed: zero `route.ts` files under `app/`), so there are no currently unprotected API surface areas beyond the matcher gap above.
 
 **RLS posture:** ✓ CORRECT. All 13 tables have RLS enabled. No INSERT/UPDATE/DELETE policies exist for any role. The anon role can read only: `services` (active only), `shifts` (active only), `shift_overrides`, `time_off`. No PII-containing tables are readable by anon.
 
@@ -350,7 +351,7 @@ The admin routes are protected by the RSC layout guard in `app/(admin)/admin/(da
 
 | Drift | Severity | Assessment |
 |---|---|---|
-| `proxy.ts` instead of `middleware.ts` — admin routes have no Edge middleware | CRITICAL | **Regression.** The proxy function exists and is correct but is never invoked by Next.js because the file name is wrong. Admin protection falls back to the RSC layout guard, which works but is not the intended architecture and doesn't cover API routes. |
+| `proxy.ts` naming is CORRECT for Next.js 16; middleware IS active — but matcher covers `/admin/accept-invite/:path*` | HIGH | **Partial regression.** Next.js 16 reversed the naming: `proxy.ts` exporting `proxy` is the correct middleware file (verified live: HTTP 307 on unauthenticated `/admin`). However the matcher `['/admin/:path*']` also matches the invite-acceptance route, blocking new staff from accepting invitations. The matcher must exclude `/admin/accept-invite/:path*`. |
 | Sentry + GA4 on feature branches, not merged into master | HIGH | **Operational regression.** Putting observability on separate PRs is fine during development, but shipping to production before merging means zero visibility on day 1. The plan expected 4.3 to be complete before 4.6. |
 | `NEXT_PUBLIC_APP_URL` used but never declared in env var inventory | HIGH | **Regression.** Not in CLAUDE.md, not in HANDOVER.md. Production invitations generate `localhost:3000` links. |
 | `create_appointment_atomic` RPC used consistently by both booking paths | — | **Improvement over plan.** Plan described general atomicity; implementation goes further with explicit `SLOT_TAKEN` error code and compensating refund on conflict. |
@@ -418,7 +419,7 @@ None found in application code.
 
 | # | Issue | Severity | Time |
 |---|---|---|---|
-| **M1** | Rename `proxy.ts` → `middleware.ts` (or create `middleware.ts` that re-exports). Admin routes must have Edge middleware protection as designed. RSC-only protection is functional but not the production architecture. | CRITICAL | S |
+| **M1** | Fix `proxy.ts` to skip auth redirect for `/admin/accept-invite` paths. Add `const isAcceptInvitePath = path.startsWith('/admin/accept-invite')` and include it in the `!isLoginPath && !user` guard. Without this fix, any new staff member clicking their invitation link is redirected to the login page and cannot accept the invite. Note: `proxy.ts` naming is correct for Next.js 16 and must NOT be renamed. **FIXED — applied to `week4/cutover`.** | HIGH | S |
 | **M2** | Merge `week4/clients-and-observability` → `week4/analytics-and-docs` → `week4/polish` → `week4/cutover` into master **before** pointing DNS. Without these merges, Sentry and GA4 are absent and ~10MB PNG images serve instead of WebP. | CRITICAL | S |
 | **M3** | Add `NEXT_PUBLIC_APP_URL` to Vercel environment variables (e.g., `https://elroisewellnesscenter.com`). Without it, all team invitation emails link to `localhost:3000`. New staff cannot accept invites. | CRITICAL | S |
 | **M4** | Confirm `supabase db push` has been run and all 8 migrations (0001–0008) are applied to the production Supabase project. Run: `supabase migration list` and verify. Without 0006 specifically, the `create_appointment_atomic` RPC does not exist — every booking attempt will 500. | CRITICAL | S |
@@ -457,8 +458,8 @@ None found in application code.
 
 ## Summary
 
-**Most important finding:** The file `proxy.ts` is never invoked by Next.js as Edge middleware — there is no `middleware.ts`. Admin dashboard protection relies entirely on the RSC layout guard. This is functional (admin pages are protected) but is not the designed architecture and would leave any future admin API routes unprotected. This is a 5-minute fix (rename the file).
+**Most important finding (corrected):** `proxy.ts` IS active as Next.js 16 Edge middleware — HTTP tests confirm 307 redirects firing before RSC runs. The original audit finding (M1: "rename proxy.ts → middleware.ts") was incorrect; Next.js 16 reversed the naming convention and `proxy.ts` is right. The real issue is narrower: the matcher `['/admin/:path*']` inadvertently covers `/admin/accept-invite/[token]`, which blocks unauthenticated new staff from accepting invitations. The fix is a one-line matcher change, not a rename.
 
-**MUST FIX count:** 6 items. M1 (rename), M2 (merge PRs), M3 (env var), M4 (db push confirm), M5 (admin user), M6 (Loops test).
+**MUST FIX count:** 6 items. M1 (fix matcher), M2 (merge PRs), M3 (env var), M4 (db push confirm), M5 (admin user), M6 (Loops test).
 
 **Honest verdict:** This project is **not ready to cut DNS today.** The blocker is procedural, not architectural: the observability PRs must be merged first, `supabase db push` must be confirmed, `NEXT_PUBLIC_APP_URL` must be set, and at least one Loops template must be smoke-tested end-to-end. None of the M1–M6 items require significant engineering work — they are configuration, renaming, and confirmation steps. Estimated time to resolve all MUST FIX items: **2–4 hours**, assuming Supabase migrations are not already applied (which could add time if schema conflicts exist). The underlying booking and payment code is solid.
