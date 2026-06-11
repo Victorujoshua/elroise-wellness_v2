@@ -63,8 +63,9 @@ export default function ContactForm() {
       </h3>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
         <div>
-          <label className={labelClass}>Your Name</label>
+          <label htmlFor="contact-name" className={labelClass}>Your Name</label>
           <input
+            id="contact-name"
             {...register('name')}
             className={inputClass}
             placeholder="Full name"
@@ -73,8 +74,9 @@ export default function ContactForm() {
         </div>
 
         <div>
-          <label className={labelClass}>Email Address</label>
+          <label htmlFor="contact-email" className={labelClass}>Email Address</label>
           <input
+            id="contact-email"
             {...register('email')}
             type="email"
             className={inputClass}
@@ -84,11 +86,12 @@ export default function ContactForm() {
         </div>
 
         <div>
-          <label className={labelClass}>
+          <label htmlFor="contact-phone" className={labelClass}>
             Phone{' '}
             <span className="normal-case tracking-normal font-light text-gray-300">(optional)</span>
           </label>
           <input
+            id="contact-phone"
             {...register('phone')}
             type="tel"
             className={inputClass}
@@ -97,8 +100,9 @@ export default function ContactForm() {
         </div>
 
         <div>
-          <label className={labelClass}>Message</label>
+          <label htmlFor="contact-message" className={labelClass}>Message</label>
           <textarea
+            id="contact-message"
             {...register('message')}
             rows={5}
             className={`${inputClass} resize-none`}

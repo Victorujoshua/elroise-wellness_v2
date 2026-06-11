@@ -20,6 +20,7 @@ export default function CartDrawer() {
   return (
     <>
     <div
+      role="dialog"
       aria-modal="true"
       aria-label="Shopping cart"
       className={`fixed inset-0 z-50 flex justify-end transition-opacity duration-300 ${

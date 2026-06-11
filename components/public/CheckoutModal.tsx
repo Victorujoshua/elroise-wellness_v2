@@ -39,17 +39,19 @@ const inputClass =
   'w-full border border-charcoal/15 rounded-lg px-4 py-3 text-sm font-light text-charcoal placeholder:text-charcoal/30 focus:outline-none focus:border-gold transition-colors bg-white'
 
 function Field({
+  id,
   label,
   error,
   children,
 }: {
+  id: string
   label: string
   error?: string
   children: React.ReactNode
 }) {
   return (
     <div>
-      <label className="block text-[9px] uppercase tracking-[0.4em] text-charcoal/50 font-semibold mb-2">
+      <label htmlFor={id} className="block text-[9px] uppercase tracking-[0.4em] text-charcoal/50 font-semibold mb-2">
         {label}
       </label>
       {children}
@@ -115,6 +117,7 @@ export default function CheckoutModal({
 
   return (
     <div
+      role="dialog"
       aria-modal="true"
       aria-label="Checkout"
       className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center"
@@ -152,15 +155,17 @@ export default function CheckoutModal({
         <div className="overflow-y-auto flex-1 px-8 py-6">
           <form id="checkout-form" onSubmit={handleSubmit(onValid)} noValidate className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <Field label="Full Name" error={errors.full_name?.message}>
+              <Field id="co-full-name" label="Full Name" error={errors.full_name?.message}>
                 <input
+                  id="co-full-name"
                   {...register('full_name')}
                   placeholder="Your full name"
                   className={inputClass}
                 />
               </Field>
-              <Field label="Phone" error={errors.phone?.message}>
+              <Field id="co-phone" label="Phone" error={errors.phone?.message}>
                 <input
+                  id="co-phone"
                   {...register('phone')}
                   type="tel"
                   placeholder="+234 000 000 0000"
@@ -169,8 +174,9 @@ export default function CheckoutModal({
               </Field>
             </div>
 
-            <Field label="Email" error={errors.email?.message}>
+            <Field id="co-email" label="Email" error={errors.email?.message}>
               <input
+                id="co-email"
                 {...register('email')}
                 type="email"
                 placeholder="your@email.com"
@@ -178,8 +184,9 @@ export default function CheckoutModal({
               />
             </Field>
 
-            <Field label="Street Address" error={errors.address_line1?.message}>
+            <Field id="co-address" label="Street Address" error={errors.address_line1?.message}>
               <input
+                id="co-address"
                 {...register('address_line1')}
                 placeholder="15 Ademola Adetokunbo, Victoria Island"
                 className={inputClass}
@@ -187,15 +194,17 @@ export default function CheckoutModal({
             </Field>
 
             <div className="grid grid-cols-2 gap-4">
-              <Field label="City" error={errors.city?.message}>
+              <Field id="co-city" label="City" error={errors.city?.message}>
                 <input
+                  id="co-city"
                   {...register('city')}
                   placeholder="Lagos"
                   className={inputClass}
                 />
               </Field>
-              <Field label="State" error={errors.state?.message}>
+              <Field id="co-state" label="State" error={errors.state?.message}>
                 <input
+                  id="co-state"
                   {...register('state')}
                   placeholder="Lagos State"
                   className={inputClass}

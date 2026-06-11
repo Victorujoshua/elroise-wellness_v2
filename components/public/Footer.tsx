@@ -108,7 +108,7 @@ export default function Footer() {
 
         {/* Bottom bar */}
         <div className="pt-12 border-t border-sand flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0 text-[10px] uppercase tracking-widest text-gray-300">
-          <p>© 2025 Elroisè Wellness Center. All Rights Reserved.</p>
+          <p>© 2026 Elroisè Wellness Center. All Rights Reserved.</p>
           <div className="flex space-x-8">
             <Link href="/privacy" className="hover:text-gold transition-colors">Privacy</Link>
             <Link href="/terms" className="hover:text-gold transition-colors">Terms</Link>
