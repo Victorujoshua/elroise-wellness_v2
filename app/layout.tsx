@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Playfair_Display, Montserrat, Geist } from 'next/font/google'
+import Script from 'next/script'
 import { Toaster } from 'sonner'
 import './globals.css'
 import { cn } from "@/lib/utils";
@@ -47,6 +48,20 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col font-body bg-bg text-charcoal" suppressHydrationWarning>
         {children}
         <Toaster position="bottom-right" richColors />
+        {process.env.NODE_ENV === 'production' && process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID && (
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID}`}
+              strategy="afterInteractive"
+            />
+            <Script id="ga4-init" strategy="afterInteractive">{`
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', '${process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID}');
+            `}</Script>
+          </>
+        )}
       </body>
     </html>
   )

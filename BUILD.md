@@ -54,14 +54,59 @@ Format: `[✓]` done · `[→]` in progress · `[ ]` pending · `[!]` blocked
 - [✓] 3.6 Clients CRUD — search, view history, manual notes
 
 ### Week 4 — Package Credits, Polish, Launch
-- [ ] 4.1 Package credits — deferred to Phase 2 (admin can apply credits manually via DB)
-- [ ] 4.2 Paystack webhook — deferred to Phase 2 (inline verification covers V1)
-- [✓] 4.3 Sentry + GA4 — `@sentry/nextjs` v10 three-file config; 7 GA4 custom events (production-only)
-- [✓] 4.3b Visual polish — PNG→WebP (94–97% size reduction), CLS/sizes, alt texts, a11y (form labels, dialog roles, nav landmark, aria-pressed), admin noindex, copyright year
-- [✓] 4.3c Handover docs — `docs/ADMIN_GUIDE.md` + `docs/HANDOVER.md`
-- [ ] 4.4 Admin CSV export — deferred to Phase 2 (Supabase table export available as workaround)
-- [✓] 4.5 QA pass — live transaction test + bypass test (manual, see cutover sequence)
-- [✓] 4.6 Vercel production deploy + DNS cutover
+- [✓] 4A. Clients section with detail page
+        - Migration 0009 client_stats RPC
+        - /admin/clients with lifetime stats columns
+        - /admin/clients/[id] detail with appointments + credits + orders tabs
+        - ClientDrawer disconnected from table (Phase 2: delete if unused after 60 days)
+
+- [✓] 4B. Sentry + observability
+        - Sentry client/server/edge configs
+        - instrumentation.ts hook
+        - Source maps uploaded via withSentryConfig
+
+- [✓] 4C. GA4 analytics
+        - Page view tracking
+        - Booking conversion events
+        - lib/analytics.ts helper
+
+- [✓] 4D. Admin handover guide
+        - docs/ADMIN_GUIDE.md
+        - HANDOVER.md (11 sections covering stack, env vars, ops)
+
+- [✓] 4.1. Appointments admin
+        - /admin/appointments list with filters, search, CSV export
+        - /admin/appointments/[id] detail with three columns
+        - Status changes via StatusDialog
+        - Reschedule via RescheduleDialog (shared availability engine,
+          Calendar extracted from Step2Date with maxDays prop)
+        - Refunds via RefundDialog (partial refunds supported, Loops
+          notification, audit log)
+        - Cancel without refund requires reason (CancelDialog)
+        - Consolidated updateAppointmentStatus into
+          appointments/actions.ts; calendar/actions.ts re-exports
+
+- [✓] 4.5. Pre-cutover audit + remediation
+        - docs/PROJECT_AUDIT_PRE_CUTOVER.md
+        - M1 fixed (proxy.ts matcher gap — accept-invite excluded)
+        - M2 in progress (merging week4/cutover via this PR)
+        - M3 NEXT_PUBLIC_APP_URL set in Vercel — VERIFY
+        - M4 migrations confirmed applied — VERIFIED
+        - M5 first admin user created — VERIFIED
+        - M6 Loops template smoke test — PENDING
+
+DEFERRED to Phase 2:
+- 4.2 Paystack webhook (async payment confirmation)
+- Package credits flow (buy pack, ledger, apply at booking)
+- email_send_log table for Loops observability
+- Materialize client_stats if client count exceeds ~2000
+
+PENDING (cutover sequence):
+- [ ] 4.6 DNS cutover
+      - Domain release from previous developer's Vercel account
+      - Add elroisewellnesscenter.com to new Vercel project
+      - Smoke test on production domain
+      - Pause (don't delete) old Vite project in Vercel
 
 ---
 
@@ -263,8 +308,11 @@ app/(public)/my-bookings/        Email lookup — pure RSC GET form, upcoming/pa
 components/public/CheckoutModal.tsx  Shop checkout — address form + Paystack inline popup
 components/public/CartDrawer.tsx     Cart drawer — checkout now wired (was disabled)
 
+lib/analytics.ts                 trackEvent(name, params?) — guards window/gtag; import in client components only
+
 scripts/test-availability.ts     7-case integration test; run: npx tsx scripts/test-availability.ts
-supabase/migrations/             0001–0005 written; 0001–0003 seeded 11 services
+supabase/migrations/             0001–0009 written; 0001–0003 seeded 11 services
+docs/ADMIN_GUIDE.md              Plain-language staff guide (login → calendar → ADD → status → refunds → shifts → services → team → troubleshooting)
 
 proxy.ts                         Auth proxy (was middleware.ts) — guards /admin/* except /admin/login
 
@@ -362,6 +410,9 @@ All writes go through server actions or Edge Functions using `SUPABASE_SERVICE_R
 | 2026-06-08 | Auto-refund only on slot conflict + inactive service; not on amount mismatch | Amount mismatch is likely fraud/tampering — needs manual review, not auto-refund |
 | 2026-06-08 | create_appointment_atomic RPC wraps client upsert + appointment + credits | Prevents partial writes if credits insert fails after appointment is created |
 | 2026-06-08 | Shop order checks payments table for duplicate reference before inserting | Prevents orphaned orders from double-submit; DB unique constraint is the final backstop |
+| 2026-06-11 | GA4 via direct `gtag.js` Script, not `next/third-parties` | `next/third-parties` absent from Next.js 16.2.7 build; `next/script` afterInteractive achieves the same result |
+| 2026-06-11 | trackEvent guards `typeof window.gtag !== 'function'` | Safe to import in any client component; no-ops on server, during SSR, or before script loads |
+| 2026-06-11 | `booking_payment_completed` fires only after `createAppointment` server action succeeds | Avoids false conversion events for Paystack popups that succeed but whose server verification fails |
 
 ---
 
@@ -381,12 +432,13 @@ All writes go through server actions or Edge Functions using `SUPABASE_SERVICE_R
 
 ## OPEN QUESTIONS
 
-- [ ] Create first admin user — Supabase Dashboard → Auth → Add user, then SQL: `INSERT INTO public.users (id, full_name, role, is_active) VALUES ('<uuid>', 'Name', 'owner', true);`
 - [ ] Create first admin user — Supabase Dashboard → Auth → Add user, then SQL: `INSERT INTO public.users (id, full_name, role, is_active) VALUES ('<uuid>', 'Victor Joshua', 'owner', true);`
-- [ ] Confirm `supabase db push` succeeded for 0004–0008 — run these in the SQL editor to verify:
+- [ ] Add `NEXT_PUBLIC_GA4_MEASUREMENT_ID` to Vercel env + `.env.local` — format: `G-XXXXXXXXXX`
+- [ ] Mark `booking_payment_completed` and `shop_checkout_completed` as conversions in GA4 > Admin > Conversions
+- [ ] Confirm `supabase db push` succeeded for 0004–0009 — run these in the SQL editor to verify:
   - `SELECT migration FROM supabase_migrations.schema_migrations ORDER BY migration;`
   - `SELECT tablename FROM pg_tables WHERE schemaname = 'public' ORDER BY tablename;`
-  - `SELECT proname FROM pg_proc WHERE pronamespace = 'public'::regnamespace ORDER BY proname;` (expect: create_appointment_atomic, update_timestamp)
+  - `SELECT proname FROM pg_proc WHERE pronamespace = 'public'::regnamespace ORDER BY proname;` (expect: create_appointment_atomic, get_clients_with_stats, update_timestamp)
 - [ ] Regenerate types after confirmed push: `supabase gen types typescript --linked > lib/database.types.ts`
 - [✓] All Loops template IDs set in `.env.local` — contact, booking confirmed, shop order, team invitation all wired
 - [✓] Step 5 "Pay" button — Paystack popup wired, `createAppointment` server action writes all rows

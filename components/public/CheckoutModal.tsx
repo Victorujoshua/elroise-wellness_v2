@@ -7,6 +7,7 @@ import { z } from 'zod'
 import { toast } from 'sonner'
 import { useCartStore } from '@/lib/cart'
 import { verifyAndCreateShopOrder } from '@/app/(public)/shop/actions'
+import { trackEvent } from '@/lib/analytics'
 
 declare global {
   interface Window {
@@ -96,6 +97,11 @@ export default function CheckoutModal({
         startTransition(async () => {
           const result = await verifyAndCreateShopOrder(items, values, txn.reference)
           if (result.success) {
+            trackEvent('shop_checkout_completed', {
+              order_id: result.orderId,
+              value: total,
+              item_count: items.reduce((sum, i) => sum + i.qty, 0),
+            })
             clearCart()
             onClose()
             toast.success('Order confirmed! Check your email for details.')

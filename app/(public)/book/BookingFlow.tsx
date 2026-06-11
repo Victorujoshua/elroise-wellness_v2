@@ -4,6 +4,7 @@ import { useReducer, useTransition } from 'react'
 import Link from 'next/link'
 import type { PractitionerSlots } from '@/lib/availability'
 import { getAvailability } from './actions'
+import { trackEvent } from '@/lib/analytics'
 import Step1Service from './steps/Step1Service'
 import Step2Date from './steps/Step2Date'
 import Step3Slot from './steps/Step3Slot'
@@ -315,7 +316,13 @@ export default function BookingFlow({
         {state.step === 1 && (
           <Step1Service
             services={services}
-            onSelect={service => dispatch({ type: 'SELECT_SERVICE', service })}
+            onSelect={service => {
+              trackEvent('booking_form_started', {
+                service_name: service.name,
+                service_id: service.id,
+              })
+              dispatch({ type: 'SELECT_SERVICE', service })
+            }}
           />
         )}
         {state.step === 2 && state.service && (

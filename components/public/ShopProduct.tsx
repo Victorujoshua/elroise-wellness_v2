@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Image from 'next/image'
 import { ShoppingBag, Check } from 'lucide-react'
 import { useCartStore } from '@/lib/cart'
+import { trackEvent } from '@/lib/analytics'
 
 const PRICE = 7500
 
@@ -71,6 +72,13 @@ export default function ShopProduct() {
       size: selectedSize,
       qty,
       price: PRICE,
+    })
+    trackEvent('shop_add_to_cart', {
+      item_name: 'Elroisè Grip Socks',
+      color: selectedColor.color,
+      size: selectedSize,
+      quantity: qty,
+      value: PRICE * qty,
     })
     setAdded(true)
     setTimeout(() => setAdded(false), 2000)
