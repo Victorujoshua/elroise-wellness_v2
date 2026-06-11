@@ -7,8 +7,6 @@ import type { Json, ServiceRow, UserRow } from '@/lib/database.types'
 
 export type ServiceWithPractitioners = ServiceRow & { practitioner_ids: string[] }
 export type PractitionerOption = Pick<UserRow, 'id' | 'full_name' | 'role'>
-export type { ServiceFormData }
-
 export async function saveService(
   id: string | null,
   data: ServiceFormData,
