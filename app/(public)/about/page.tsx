@@ -31,7 +31,7 @@ export default function AboutPage() {
               src="/about.jpeg"
               fill
               className="object-cover grayscale-[30%]"
-              alt="Atmosphere"
+              alt="Elroisè Wellness Center studio interior"
             />
           </div>
         </div>

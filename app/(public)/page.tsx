@@ -35,7 +35,7 @@ export default function HomePage() {
             </p>
             <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-8">
               <Link
-                href="/booking"
+                href="/book"
                 className="bg-charcoal text-white px-10 py-4 text-[9px] uppercase tracking-[0.4em] font-bold hover:bg-gold transition-all duration-500 rounded-sm"
               >
                 Book a Session
@@ -56,8 +56,9 @@ export default function HomePage() {
               <Image
                 src="/hero.jpeg"
                 fill
+                sizes="48vw"
                 className="object-cover scale-105 hover:scale-100 transition-transform duration-[10s]"
-                alt="Elroisè Reformer Pilates Studio"
+                alt="Elroisè Reformer Pilates Studio — Lekki, Lagos"
                 priority
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
@@ -132,8 +133,9 @@ export default function HomePage() {
             <Image
               src="/pilates.jpeg"
               fill
+              sizes="(max-width: 1024px) 100vw, 50vw"
               className="object-cover grayscale-[10%] hover:grayscale-0 transition-all duration-1000"
-              alt="Pilates Reformer Session"
+              alt="Client on a Pilates Reformer at Elroisè Wellness Center"
             />
           </div>
         </div>
@@ -144,8 +146,9 @@ export default function HomePage() {
             <Image
               src="/laser.jpeg"
               fill
+              sizes="(max-width: 1024px) 100vw, 50vw"
               className="object-cover grayscale-[10%] hover:grayscale-0 transition-all duration-1000"
-              alt="Laser Hair Reduction Treatment"
+              alt="Laser Hair Reduction treatment at Elroisè Wellness Center"
             />
           </div>
           <div>
@@ -177,7 +180,7 @@ export default function HomePage() {
               src={src}
               fill
               className="object-cover hover:scale-110 transition-transform duration-[3s]"
-              alt="Ritual Texture"
+              alt=""
             />
           </div>
         ))}
@@ -216,7 +219,7 @@ export default function HomePage() {
             src="https://images.unsplash.com/photo-1596178065887-1198b6148b2b?q=80&w=2070&auto=format&fit=crop"
             fill
             className="object-cover brightness-50"
-            alt="Final CTA Background"
+            alt=""
           />
         </div>
         <div className="relative z-10 px-6 max-w-4xl mx-auto">
@@ -225,7 +228,7 @@ export default function HomePage() {
             Begin your wellness flow today.
           </p>
           <Link
-            href="/booking"
+            href="/book"
             className="bg-white text-charcoal px-12 py-5 text-[10px] uppercase tracking-[0.3em] font-bold hover:bg-gold hover:text-white transition-all duration-500 rounded-sm inline-block shadow-2xl"
           >
             Book Your Session

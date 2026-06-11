@@ -15,7 +15,7 @@ const colorways = [
     border: '#D9D4CC',
     description:
       'Crisp and clean. The perfect studio staple that pairs effortlessly with any Pilates fit.',
-    image: '/socks-white.png',
+    image: '/socks-white.webp',
     tag: 'Best Seller',
   },
   {
@@ -25,7 +25,7 @@ const colorways = [
     border: '#2D2926',
     description:
       'Sleek, timeless, effortless. Our most versatile colorway for the modern reformer.',
-    image: '/socks-black.png',
+    image: '/socks-black.webp',
     tag: 'Most Popular',
   },
   {
@@ -35,7 +35,7 @@ const colorways = [
     border: '#B5A086',
     description:
       'Warm, earthy, refined. A nod to soft luxury and understated elegance on the reformer.',
-    image: '/socks-khaki.png',
+    image: '/socks-khaki.webp',
     tag: 'New Arrival',
   },
 ] as const
@@ -193,6 +193,7 @@ export default function ShopProduct() {
                   <button
                     key={size}
                     onClick={() => setSelectedSize(size)}
+                    aria-pressed={selectedSize === size}
                     className={`px-5 py-3 text-[9px] uppercase tracking-widest font-semibold border rounded-sm transition-all duration-300 ${
                       selectedSize === size
                         ? 'bg-charcoal text-white border-charcoal'
