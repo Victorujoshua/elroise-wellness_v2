@@ -17,19 +17,21 @@ function toDateStr(d: Date): string {
   ].join('-')
 }
 
-function Calendar({
+export function Calendar({
   selectedDate,
   onSelect,
   disabled,
+  maxDays = 90,
 }: {
   selectedDate: string | null
   onSelect: (date: string) => void
   disabled: boolean
+  maxDays?: number
 }) {
   const today = new Date()
   today.setHours(0, 0, 0, 0)
   const maxDate = new Date(today)
-  maxDate.setDate(maxDate.getDate() + 90)
+  maxDate.setDate(maxDate.getDate() + maxDays)
 
   const [viewYear, setViewYear] = useState(today.getFullYear())
   const [viewMonth, setViewMonth] = useState(today.getMonth())

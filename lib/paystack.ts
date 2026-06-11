@@ -1,8 +1,14 @@
 const PAYSTACK_BASE = 'https://api.paystack.co'
 
-export async function refundPaystackPayment(reference: string): Promise<void> {
+export async function refundPaystackPayment(
+  reference: string,
+  amountKobo?: number,
+): Promise<void> {
   const secret = process.env.PAYSTACK_SECRET_KEY
   if (!secret) throw new Error('PAYSTACK_SECRET_KEY is not set')
+
+  const body: Record<string, unknown> = { transaction: reference }
+  if (amountKobo !== undefined) body.amount = amountKobo
 
   const res = await fetch(`${PAYSTACK_BASE}/refund`, {
     method: 'POST',
@@ -10,7 +16,7 @@ export async function refundPaystackPayment(reference: string): Promise<void> {
       Authorization: `Bearer ${secret}`,
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ transaction: reference }),
+    body: JSON.stringify(body),
     cache: 'no-store',
   })
 

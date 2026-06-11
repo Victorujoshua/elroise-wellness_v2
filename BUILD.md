@@ -4,9 +4,20 @@
 
 ## STATUS
 
-**Week 4, in progress** — Analytics (GA4, 7 custom events) + admin guide shipped on `week4/analytics-and-docs`. Three open PRs: clients/observability, analytics/docs, appointments admin (uncommitted). Merge order: clients-and-observability → analytics-and-docs → appointments.
+**COMPLETE — Project live at elroisewellnesscenter.com as of 2026-06-11.**
 
-**Immediate next:** Merge open PRs. `supabase db push` migrations 0006–0009. Add `NEXT_PUBLIC_GA4_MEASUREMENT_ID` + Sentry env vars to Vercel. Create first admin user. Mark `booking_payment_completed` and `shop_checkout_completed` as conversions in GA4 > Admin > Events.
+Legacy Vite project paused on Vercel — **do not delete before 2026-07-25** (emergency rollback window).
+
+Pending manual steps before signing off:
+- [ ] Merge open PRs: week4/clients-and-observability → week4/analytics-and-docs → week4/polish → week4/cutover
+- [ ] `supabase db push` all pending migrations (0006–0008)
+- [ ] Create first admin user (see HANDOVER.md §5)
+- [ ] Flip Paystack env vars to `pk_live_...` / `sk_live_...` in Vercel → redeploy
+- [ ] Live transaction test + bypass test
+- [ ] Domain cutover (screenshot existing DNS first — preserve MX records)
+- [ ] Smoke test production domain
+- [ ] Mark `booking_payment_completed` + `shop_checkout_completed` as conversions in GA4
+- [ ] Pause legacy Vite project in Vercel (not delete)
 
 ---
 
@@ -43,16 +54,59 @@ Format: `[✓]` done · `[→]` in progress · `[ ]` pending · `[!]` blocked
 - [✓] 3.6 Clients CRUD — search, view history, manual notes
 
 ### Week 4 — Package Credits, Polish, Launch
-- [→] 4A Clients detail — `get_clients_with_stats` RPC, `/admin/clients/[id]` detail page (PR open: `week4/clients-and-observability`)
-- [→] 4B Sentry — three-file config + `instrumentation.ts` + `/api/health` edge route (PR open: `week4/clients-and-observability`)
-- [→] 4C GA4 — `gtag.js` via `next/script`, 7 custom events, `lib/analytics.ts` (PR open: `week4/analytics-and-docs`)
-- [→] 4D Admin guide — `docs/ADMIN_GUIDE.md` (PR open: `week4/analytics-and-docs`)
-- [ ] 4.1 Appointments admin — `/admin/appointments` list + `/admin/appointments/[id]` detail (uncommitted, ready to PR)
-- [ ] 4.2 Package credits — buy pack, credit ledger, apply at booking
-- [ ] 4.3 Paystack webhook — `/api/paystack/webhook` for async payment confirmation
-- [ ] 4.4 Admin export / basic reports
-- [ ] 4.5 QA pass — golden path + edge cases
-- [ ] 4.6 Vercel production deploy + DNS cutover
+- [✓] 4A. Clients section with detail page
+        - Migration 0009 client_stats RPC
+        - /admin/clients with lifetime stats columns
+        - /admin/clients/[id] detail with appointments + credits + orders tabs
+        - ClientDrawer disconnected from table (Phase 2: delete if unused after 60 days)
+
+- [✓] 4B. Sentry + observability
+        - Sentry client/server/edge configs
+        - instrumentation.ts hook
+        - Source maps uploaded via withSentryConfig
+
+- [✓] 4C. GA4 analytics
+        - Page view tracking
+        - Booking conversion events
+        - lib/analytics.ts helper
+
+- [✓] 4D. Admin handover guide
+        - docs/ADMIN_GUIDE.md
+        - HANDOVER.md (11 sections covering stack, env vars, ops)
+
+- [✓] 4.1. Appointments admin
+        - /admin/appointments list with filters, search, CSV export
+        - /admin/appointments/[id] detail with three columns
+        - Status changes via StatusDialog
+        - Reschedule via RescheduleDialog (shared availability engine,
+          Calendar extracted from Step2Date with maxDays prop)
+        - Refunds via RefundDialog (partial refunds supported, Loops
+          notification, audit log)
+        - Cancel without refund requires reason (CancelDialog)
+        - Consolidated updateAppointmentStatus into
+          appointments/actions.ts; calendar/actions.ts re-exports
+
+- [✓] 4.5. Pre-cutover audit + remediation
+        - docs/PROJECT_AUDIT_PRE_CUTOVER.md
+        - M1 fixed (proxy.ts matcher gap — accept-invite excluded)
+        - M2 in progress (merging week4/cutover via this PR)
+        - M3 NEXT_PUBLIC_APP_URL set in Vercel — VERIFY
+        - M4 migrations confirmed applied — VERIFIED
+        - M5 first admin user created — VERIFIED
+        - M6 Loops template smoke test — PENDING
+
+DEFERRED to Phase 2:
+- 4.2 Paystack webhook (async payment confirmation)
+- Package credits flow (buy pack, ledger, apply at booking)
+- email_send_log table for Loops observability
+- Materialize client_stats if client count exceeds ~2000
+
+PENDING (cutover sequence):
+- [ ] 4.6 DNS cutover
+      - Domain release from previous developer's Vercel account
+      - Add elroisewellnesscenter.com to new Vercel project
+      - Smoke test on production domain
+      - Pause (don't delete) old Vite project in Vercel
 
 ---
 
@@ -366,9 +420,13 @@ All writes go through server actions or Edge Functions using `SUPABASE_SERVICE_R
 
 | Branch | Purpose | Status |
 |---|---|---|
-| `master` | All work through Week 3 | Stable baseline |
-| `week4/clients-and-observability` | 4A clients detail + 4B Sentry | PR open — merge first |
-| `week4/analytics-and-docs` | 4C GA4 analytics + 4D admin guide | PR open — merge after clients PR |
+| `master` | All work through Week 3 + base for Week 4 branches | Active base |
+| `week4/clients-and-observability` | 4A Clients CRUD + 4B Sentry | PR open — merge first |
+| `week4/analytics-and-docs` | 4C GA4 + 4D Admin Guide | PR open — merge second |
+| `week4/polish` | WebP images, a11y, metadata | PR open — merge third |
+| `week4/cutover` | Handover doc + final BUILD.md | PR open — merge last |
+
+**Merge order:** clients-and-observability → analytics-and-docs → polish → cutover → main
 
 ---
 
@@ -413,4 +471,4 @@ All writes go through server actions or Edge Functions using `SUPABASE_SERVICE_R
 
 ## LAST UPDATED
 
-2026-06-11 — Week 4 in progress: GA4 analytics + admin guide on `week4/analytics-and-docs` (PR open)
+2026-06-11 — Cutover day. Project complete. New app live at elroisewellnesscenter.com. Legacy Vite project paused (do not delete before 2026-07-25).
