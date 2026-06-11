@@ -4,9 +4,14 @@
 
 ## STATUS
 
-**Week 3, Day 6** — 3.6 Clients CRUD complete: searchable client directory (name/email/phone, paginated), side drawer with editable details (name, phone, notes) + full appointment history. Migration 0008 adds `clients.notes`. Build clean (30 routes, 0 type errors).
+**Week 4, Day 3** — three Week 4 branches merged/open:
+- `week4/clients-and-observability` — 4A Clients CRUD + 4B Sentry (PR open)
+- `week4/analytics-and-docs` — 4C GA4 (7 custom events, prod-only) + 4D `docs/ADMIN_GUIDE.md` (PR open)
+- `week4/polish` — image optimisation (PNG→WebP, 94–97% size reduction), CLS fixes, alt texts, a11y (form labels, dialog roles, nav landmark, aria-pressed), metadata (admin noindex, copyright year, shop og:image) — **PR open**
 
-**Immediate next:** `supabase db push` all pending migrations (0006–0008), create first admin user, end-to-end test. Then Week 4.
+Build clean on all branches. Uncommitted appointments admin work (appointments page, dialogs, calendar/actions.ts, Step2Date.tsx) lives in the working tree on master.
+
+**Immediate next:** merge open PRs → `supabase db push` migrations 0006–0009 → create first admin user → then 4.1 Package credits.
 
 ---
 
@@ -45,7 +50,9 @@ Format: `[✓]` done · `[→]` in progress · `[ ]` pending · `[!]` blocked
 ### Week 4 — Package Credits, Polish, Launch
 - [ ] 4.1 Package credits — buy pack, credit ledger, apply at booking
 - [ ] 4.2 Paystack webhook — `/api/paystack/webhook` for async payment confirmation
-- [ ] 4.3 Sentry + GA4 instrumentation
+- [✓] 4.3 Sentry + GA4 instrumentation — `@sentry/nextjs` v10, 7 GA4 custom events, production-only
+- [✓] 4.3b Visual polish — WebP images, CLS fixes, a11y (labels/ARIA/roles), metadata
+- [✓] 4.3c Admin guide — `docs/ADMIN_GUIDE.md`
 - [ ] 4.4 Admin export / basic reports
 - [ ] 4.5 QA pass — golden path + edge cases
 - [ ] 4.6 Vercel production deploy + DNS cutover
@@ -356,11 +363,12 @@ All writes go through server actions or Edge Functions using `SUPABASE_SERVICE_R
 
 | Branch | Purpose | Status |
 |---|---|---|
-| `master` | All work through Week 3 — stabilization committed 2026-06-10 | Active |
+| `master` | All work through Week 3 — stabilization committed 2026-06-10 | Active base |
+| `week4/clients-and-observability` | 4A Clients CRUD + 4B Sentry | PR open — awaiting merge |
+| `week4/analytics-and-docs` | 4C GA4 + 4D Admin Guide | PR open — merge after clients PR |
+| `week4/polish` | Image WebP, a11y, metadata | PR open — merge after analytics PR |
 
-> Note: all work was committed directly to `master` during development. The branch names
-> in session notes (week1/*, week2/*, week3/*) were planning labels, not actual git branches.
-> Week 4 features should be branched off master before starting.
+> Merge order: clients-and-observability → analytics-and-docs → polish
 
 ---
 
@@ -404,4 +412,4 @@ All writes go through server actions or Edge Functions using `SUPABASE_SERVICE_R
 
 ## LAST UPDATED
 
-2026-06-10 — Stabilization pass: fixed stale BUILD.md items, committed all Week 2 + Week 3 work to master
+2026-06-11 — Week 4 polish complete: WebP images, a11y fixes, GA4, Sentry, Admin Guide. Three PRs open.
