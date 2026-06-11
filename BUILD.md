@@ -4,9 +4,9 @@
 
 ## STATUS
 
-**Week 3, Day 6** — 3.6 Clients CRUD complete: searchable client directory (name/email/phone, paginated), side drawer with editable details (name, phone, notes) + full appointment history. Migration 0008 adds `clients.notes`. Build clean (30 routes, 0 type errors).
+**Week 4, in progress** — Analytics (GA4, 7 custom events) + admin guide shipped on `week4/analytics-and-docs`. Three open PRs: clients/observability, analytics/docs, appointments admin (uncommitted). Merge order: clients-and-observability → analytics-and-docs → appointments.
 
-**Immediate next:** `supabase db push` all pending migrations (0006–0008), create first admin user, end-to-end test. Then Week 4.
+**Immediate next:** Merge open PRs. `supabase db push` migrations 0006–0009. Add `NEXT_PUBLIC_GA4_MEASUREMENT_ID` + Sentry env vars to Vercel. Create first admin user. Mark `booking_payment_completed` and `shop_checkout_completed` as conversions in GA4 > Admin > Events.
 
 ---
 
@@ -43,9 +43,13 @@ Format: `[✓]` done · `[→]` in progress · `[ ]` pending · `[!]` blocked
 - [✓] 3.6 Clients CRUD — search, view history, manual notes
 
 ### Week 4 — Package Credits, Polish, Launch
-- [ ] 4.1 Package credits — buy pack, credit ledger, apply at booking
-- [ ] 4.2 Paystack webhook — `/api/paystack/webhook` for async payment confirmation
-- [ ] 4.3 Sentry + GA4 instrumentation
+- [→] 4A Clients detail — `get_clients_with_stats` RPC, `/admin/clients/[id]` detail page (PR open: `week4/clients-and-observability`)
+- [→] 4B Sentry — three-file config + `instrumentation.ts` + `/api/health` edge route (PR open: `week4/clients-and-observability`)
+- [→] 4C GA4 — `gtag.js` via `next/script`, 7 custom events, `lib/analytics.ts` (PR open: `week4/analytics-and-docs`)
+- [→] 4D Admin guide — `docs/ADMIN_GUIDE.md` (PR open: `week4/analytics-and-docs`)
+- [ ] 4.1 Appointments admin — `/admin/appointments` list + `/admin/appointments/[id]` detail (uncommitted, ready to PR)
+- [ ] 4.2 Package credits — buy pack, credit ledger, apply at booking
+- [ ] 4.3 Paystack webhook — `/api/paystack/webhook` for async payment confirmation
 - [ ] 4.4 Admin export / basic reports
 - [ ] 4.5 QA pass — golden path + edge cases
 - [ ] 4.6 Vercel production deploy + DNS cutover
@@ -250,8 +254,11 @@ app/(public)/my-bookings/        Email lookup — pure RSC GET form, upcoming/pa
 components/public/CheckoutModal.tsx  Shop checkout — address form + Paystack inline popup
 components/public/CartDrawer.tsx     Cart drawer — checkout now wired (was disabled)
 
+lib/analytics.ts                 trackEvent(name, params?) — guards window/gtag; import in client components only
+
 scripts/test-availability.ts     7-case integration test; run: npx tsx scripts/test-availability.ts
-supabase/migrations/             0001–0005 written; 0001–0003 seeded 11 services
+supabase/migrations/             0001–0009 written; 0001–0003 seeded 11 services
+docs/ADMIN_GUIDE.md              Plain-language staff guide (login → calendar → ADD → status → refunds → shifts → services → team → troubleshooting)
 
 proxy.ts                         Auth proxy (was middleware.ts) — guards /admin/* except /admin/login
 
@@ -349,6 +356,9 @@ All writes go through server actions or Edge Functions using `SUPABASE_SERVICE_R
 | 2026-06-08 | Auto-refund only on slot conflict + inactive service; not on amount mismatch | Amount mismatch is likely fraud/tampering — needs manual review, not auto-refund |
 | 2026-06-08 | create_appointment_atomic RPC wraps client upsert + appointment + credits | Prevents partial writes if credits insert fails after appointment is created |
 | 2026-06-08 | Shop order checks payments table for duplicate reference before inserting | Prevents orphaned orders from double-submit; DB unique constraint is the final backstop |
+| 2026-06-11 | GA4 via direct `gtag.js` Script, not `next/third-parties` | `next/third-parties` absent from Next.js 16.2.7 build; `next/script` afterInteractive achieves the same result |
+| 2026-06-11 | trackEvent guards `typeof window.gtag !== 'function'` | Safe to import in any client component; no-ops on server, during SSR, or before script loads |
+| 2026-06-11 | `booking_payment_completed` fires only after `createAppointment` server action succeeds | Avoids false conversion events for Paystack popups that succeed but whose server verification fails |
 
 ---
 
@@ -356,22 +366,21 @@ All writes go through server actions or Edge Functions using `SUPABASE_SERVICE_R
 
 | Branch | Purpose | Status |
 |---|---|---|
-| `master` | All work through Week 3 — stabilization committed 2026-06-10 | Active |
-
-> Note: all work was committed directly to `master` during development. The branch names
-> in session notes (week1/*, week2/*, week3/*) were planning labels, not actual git branches.
-> Week 4 features should be branched off master before starting.
+| `master` | All work through Week 3 | Stable baseline |
+| `week4/clients-and-observability` | 4A clients detail + 4B Sentry | PR open — merge first |
+| `week4/analytics-and-docs` | 4C GA4 analytics + 4D admin guide | PR open — merge after clients PR |
 
 ---
 
 ## OPEN QUESTIONS
 
-- [ ] Create first admin user — Supabase Dashboard → Auth → Add user, then SQL: `INSERT INTO public.users (id, full_name, role, is_active) VALUES ('<uuid>', 'Name', 'owner', true);`
 - [ ] Create first admin user — Supabase Dashboard → Auth → Add user, then SQL: `INSERT INTO public.users (id, full_name, role, is_active) VALUES ('<uuid>', 'Victor Joshua', 'owner', true);`
-- [ ] Confirm `supabase db push` succeeded for 0004–0008 — run these in the SQL editor to verify:
+- [ ] Add `NEXT_PUBLIC_GA4_MEASUREMENT_ID` to Vercel env + `.env.local` — format: `G-XXXXXXXXXX`
+- [ ] Mark `booking_payment_completed` and `shop_checkout_completed` as conversions in GA4 > Admin > Conversions
+- [ ] Confirm `supabase db push` succeeded for 0004–0009 — run these in the SQL editor to verify:
   - `SELECT migration FROM supabase_migrations.schema_migrations ORDER BY migration;`
   - `SELECT tablename FROM pg_tables WHERE schemaname = 'public' ORDER BY tablename;`
-  - `SELECT proname FROM pg_proc WHERE pronamespace = 'public'::regnamespace ORDER BY proname;` (expect: create_appointment_atomic, update_timestamp)
+  - `SELECT proname FROM pg_proc WHERE pronamespace = 'public'::regnamespace ORDER BY proname;` (expect: create_appointment_atomic, get_clients_with_stats, update_timestamp)
 - [ ] Regenerate types after confirmed push: `supabase gen types typescript --linked > lib/database.types.ts`
 - [✓] All Loops template IDs set in `.env.local` — contact, booking confirmed, shop order, team invitation all wired
 - [✓] Step 5 "Pay" button — Paystack popup wired, `createAppointment` server action writes all rows
@@ -404,4 +413,4 @@ All writes go through server actions or Edge Functions using `SUPABASE_SERVICE_R
 
 ## LAST UPDATED
 
-2026-06-10 — Stabilization pass: fixed stale BUILD.md items, committed all Week 2 + Week 3 work to master
+2026-06-11 — Week 4 in progress: GA4 analytics + admin guide on `week4/analytics-and-docs` (PR open)
