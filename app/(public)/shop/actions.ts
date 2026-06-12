@@ -1,9 +1,9 @@
 'use server'
 
-import { z } from 'zod'
 import { createClient } from '@supabase/supabase-js'
 import type { Database } from '@/lib/database.types'
 import type { CartItem } from '@/lib/cart'
+import { addressSchema, type ShippingAddress } from './schema'
 import { verifyPaystackPayment } from '@/lib/paystack'
 import { sendTransactional } from '@/lib/loops'
 
@@ -14,17 +14,6 @@ function createServiceClient() {
     { auth: { autoRefreshToken: false, persistSession: false } },
   )
 }
-
-export const addressSchema = z.object({
-  full_name:    z.string().min(2),
-  email:        z.string().email(),
-  phone:        z.string().min(7),
-  address_line1: z.string().min(3),
-  city:         z.string().min(1),
-  state:        z.string().min(1),
-})
-
-export type ShippingAddress = z.infer<typeof addressSchema>
 
 type OrderResult =
   | { success: true; orderId: string }
