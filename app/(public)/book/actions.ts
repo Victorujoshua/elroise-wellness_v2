@@ -38,6 +38,7 @@ export async function getAvailability(
 const createAppointmentSchema = z.object({
   service_id:         z.string().uuid(),
   service_name:       z.string().min(1),
+  practitioner_name:  z.string().min(1),
   appointment_date:   z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   start_time:         z.string().regex(/^\d{2}:\d{2}$/),
   end_time:           z.string().regex(/^\d{2}:\d{2}$/),
@@ -62,17 +63,30 @@ type AppointmentResult =
 export async function createAppointment(
   input: CreateAppointmentInput,
 ): Promise<AppointmentResult> {
+  console.log('[booking] === createAppointment START ===')
+  console.log('[booking] Input received:', JSON.stringify(input, null, 2))
+
   const parsed = createAppointmentSchema.safeParse(input)
-  if (!parsed.success) return { success: false, error: 'Invalid booking details.' }
+  if (!parsed.success) {
+    console.log('[booking] ✗ Zod validation FAILED:', parsed.error.issues)
+    return { success: false, error: 'Invalid booking details.' }
+  }
+  console.log('[booking] ✓ Zod validation passed')
 
   const {
-    service_id, service_name, appointment_date, start_time, end_time,
+    service_id, service_name, practitioner_name, appointment_date, start_time, end_time,
     practitioner_id, pricing_tier, amount_naira, paystack_reference, client,
   } = parsed.data
 
   try {
     // 1. Verify with Paystack
+    console.log('[booking] Calling verifyPaystackPayment for reference:', paystack_reference)
     const verified = await verifyPaystackPayment(paystack_reference)
+    console.log('[booking] ✓ Paystack verified:', {
+      amount_kobo: verified.amount_kobo,
+      channel:     verified.channel,
+      reference:   verified.reference,
+    })
 
     // 2. Amount security check — potential tampering, no auto-refund
     const expectedKobo = amount_naira * 100
@@ -86,11 +100,13 @@ export async function createAppointment(
     const db = getSupabaseServiceClient()
 
     // PH-1: Guard against service being deactivated mid-session
-    const { data: svc } = await db
+    console.log('[booking] Fetching service:', service_id)
+    const { data: svc, error: svcError } = await db
       .from('services')
-      .select('is_active, package_session_count')
+      .select('is_active, package_session_count, duration_minutes')
       .eq('id', service_id)
       .single()
+    console.log('[booking] Service fetch result:', { svc, svcError })
 
     if (!svc?.is_active) {
       console.error(`[booking] Service ${service_id} is inactive — refunding ${verified.reference}`)
@@ -108,6 +124,19 @@ export async function createAppointment(
 
     // PH-5: Atomic RPC — slot overlap check (PH-2) + client upsert + appointment
     // + client_credits all run in a single Postgres transaction.
+    console.log('[booking] Calling create_appointment_atomic with:', {
+      p_full_name:             client.full_name,
+      p_email:                 client.email,
+      p_phone:                 client.phone,
+      p_notes:                 client.notes || null,
+      p_service_id:            service_id,
+      p_practitioner_id:       practitioner_id,
+      p_appointment_date:      appointment_date,
+      p_start_time:            start_time,
+      p_end_time:              end_time,
+      p_pricing_tier:          pricing_tier,
+      p_package_session_count: packageSessionCount,
+    })
     const { data: appointmentId, error: rpcErr } = await db.rpc(
       'create_appointment_atomic',
       {
@@ -124,6 +153,7 @@ export async function createAppointment(
         p_package_session_count: packageSessionCount,
       },
     )
+    console.log('[booking] RPC result:', { data: appointmentId, error: rpcErr })
 
     if (rpcErr) {
       // PH-4: Slot conflict — refund automatically (our fault, not theirs)
@@ -164,33 +194,74 @@ export async function createAppointment(
       console.error('[booking] Payment row insert failed (non-fatal):', paymentErr)
     }
 
-    // Loops confirmation email — non-blocking
+    // Loops emails — non-fatal (errors are caught individually)
+    console.log('[booking] About to send Loops emails')
+    const [ey, em, ed] = appointment_date.split('-').map(Number)
+    const dateLabel = new Date(ey, em - 1, ed).toLocaleDateString('en-GB', {
+      weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
+    })
+
     const templateId = process.env.LOOPS_BOOKING_CONFIRMED_TEMPLATE_ID
     if (templateId) {
       try {
-        const [y, m, d] = appointment_date.split('-').map(Number)
-        const dateLabel = new Date(y, m - 1, d).toLocaleDateString('en-GB', {
-          weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
-        })
         await sendTransactional({
           templateId,
           email: client.email,
           dataVariables: {
-            first_name:   client.full_name.split(' ')[0],
-            service_name,
-            date:         dateLabel,
-            start_time,
-            reference:    apptId.slice(0, 8).toUpperCase(),
+            clientName:         client.full_name,
+            serviceName:        service_name,
+            practitionerName:   practitioner_name,
+            bookingDate:        dateLabel,
+            startTime:          start_time,
+            endTime:            end_time,
+            duration:           `${svc.duration_minutes ?? 0} min`,
+            pricePaid:          `₦${new Intl.NumberFormat('en-NG').format(amount_naira)}`,
+            pricingTier:        pricing_tier === 'package' ? 'Package' : 'Single session',
+            reference:          apptId.slice(0, 8).toUpperCase(),
+            locationAddress:    process.env.NEXT_PUBLIC_LOCATION_ADDRESS ?? '',
+            cancellationNotice: process.env.NEXT_PUBLIC_CANCELLATION_NOTICE ?? '',
           },
         })
       } catch (err) {
-        console.warn('[booking] Loops email failed (non-fatal):', err)
+        console.warn('[booking] Loops client email failed (non-fatal):', err)
       }
     }
 
-    return { success: true, appointmentId: apptId }
+    const staffTemplateId = process.env.LOOPS_BOOKING_NOTIFICATION_TEMPLATE_ID
+    const staffEmail      = process.env.STAFF_NOTIFICATION_EMAIL
+    if (staffTemplateId && staffEmail) {
+      try {
+        await sendTransactional({
+          templateId: staffTemplateId,
+          email: staffEmail,
+          dataVariables: {
+            clientName:       client.full_name,
+            clientEmail:      client.email,
+            clientPhone:      client.phone,
+            serviceName:      service_name,
+            practitionerName: practitioner_name,
+            bookingDate:      dateLabel,
+            startTime:        start_time,
+            endTime:          end_time,
+            duration:         `${svc.duration_minutes ?? 0} min`,
+            pricePaid:        `₦${new Intl.NumberFormat('en-NG').format(amount_naira)}`,
+            pricingTier:      pricing_tier === 'package' ? 'Package' : 'Single session',
+            reference:        apptId.slice(0, 8).toUpperCase(),
+            notes:            client.notes ?? '',
+          },
+        })
+      } catch (err) {
+        console.warn('[booking] Loops staff notification failed (non-fatal):', err)
+      }
+    }
+
+    const result = { success: true as const, appointmentId: apptId }
+    console.log('[booking] === Returning to client ===', result)
+    return result
   } catch (err) {
-    console.error('[booking] createAppointment error:', err)
+    console.error('[booking] === EXCEPTION CAUGHT ===', err)
+    console.error('[booking] Error message:', (err as Error)?.message)
+    console.error('[booking] Error stack:', (err as Error)?.stack)
     return {
       success: false,
       error: 'Something went wrong. Please contact us if you were charged.',

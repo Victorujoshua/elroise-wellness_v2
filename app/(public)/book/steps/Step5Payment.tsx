@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useState, useTransition, useRef, useEffect } from 'react'
 import { createAppointment } from '../actions'
 import type { BookingService, ClientDetails } from '../BookingFlow'
 import { trackEvent } from '@/lib/analytics'
@@ -46,6 +46,16 @@ export default function Step5Payment({
 }) {
   const [isPending, startTransition] = useTransition()
   const [payError, setPayError] = useState<string | null>(null)
+  const [paystackReady, setPaystackReady] = useState(false)
+  const formRef = useRef<HTMLFormElement>(null)
+
+  useEffect(() => {
+    if (window.PaystackPop) { setPaystackReady(true); return }
+    const script = document.createElement('script')
+    script.src = 'https://js.paystack.co/v1/inline.js'
+    script.onload = () => setPaystackReady(true)
+    formRef.current?.appendChild(script)
+  }, [])
 
   const amount =
     pricingTier === 'package' && service.package_price_naira != null
@@ -57,6 +67,8 @@ export default function Step5Payment({
   const endTime = `${String(Math.floor(endMin / 60)).padStart(2, '0')}:${String(endMin % 60).padStart(2, '0')}`
 
   function handlePay() {
+    console.log('[STEP5] handlePay called')
+
     if (!window.PaystackPop) {
       setPayError('Payment system not ready. Please refresh and try again.')
       return
@@ -71,17 +83,27 @@ export default function Step5Payment({
       pricing_tier: pricingTier,
     })
 
-    const handler = window.PaystackPop.setup({
-      key: process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY!,
-      email: clientDetails.email,
-      amount: amount * 100,
-      currency: 'NGN',
-      ref,
-      onSuccess(txn) {
-        startTransition(async () => {
+    // Guard against double-invoke if both callback (v1) and onSuccess (v2) fire
+    let called = false
+    function handleSuccess(txn: { reference: string }) {
+      if (called) return
+      called = true
+      console.log('[STEP5] handleSuccess called with:', txn)
+      console.log('[STEP5] About to call startTransition')
+      startTransition(async () => {
+        console.log('[STEP5] Inside transition, about to call createAppointment')
+        console.log('[STEP5] Calling createAppointment with:', {
+          service_id:         service.id,
+          appointment_date:   date,
+          start_time:         slot,
+          paystack_reference: txn.reference,
+          client:             clientDetails,
+        })
+        try {
           const result = await createAppointment({
             service_id:         service.id,
             service_name:       service.name,
+            practitioner_name:  practitioner.name,
             appointment_date:   date,
             start_time:         slot,
             end_time:           endTime,
@@ -91,6 +113,7 @@ export default function Step5Payment({
             paystack_reference: txn.reference,
             client:             clientDetails,
           })
+          console.log('[STEP5] createAppointment returned:', result)
           if (result.success) {
             trackEvent('booking_payment_completed', {
               service_name: service.name,
@@ -102,10 +125,37 @@ export default function Step5Payment({
           } else {
             setPayError(result.error)
           }
-        })
+        } catch (err) {
+          console.error('[STEP5] === EXCEPTION in createAppointment call ===', err)
+          setPayError('An unexpected error occurred. Please contact us if you were charged.')
+        }
+      })
+    }
+
+    console.log('[STEP5] About to call PaystackPop.setup', { ref, amount })
+    const handler = window.PaystackPop.setup({
+      key: process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY!,
+      email: clientDetails.email,
+      amount: amount * 100,
+      currency: 'NGN',
+      ref,
+      callback(response) {                 // v1 inline.js success prop
+        console.log('[STEP5] callback FIRED', response)
+        handleSuccess(response)
       },
-      onCancel() {},
+      onSuccess(response) {                // v2 forward-compat
+        console.log('[STEP5] onSuccess FIRED', response)
+        handleSuccess(response)
+      },
+      onClose() {                          // v1 inline.js close prop
+        console.log('[STEP5] onClose fired')
+      },
+      onCancel() {                         // v2 forward-compat
+        console.log('[STEP5] onCancel fired')
+      },
     })
+    console.log('[STEP5] PaystackPop.setup returned handler:', handler)
+    console.log('[STEP5] Opening Paystack iframe')
     handler.openIframe()
   }
 
@@ -142,33 +192,35 @@ export default function Step5Payment({
       </div>
 
       {/* Payment */}
-      <div className="bg-white rounded-2xl border border-charcoal/8 p-6">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <p className="text-[9px] uppercase tracking-widest text-charcoal/40 font-semibold">Total</p>
-            <p className="text-3xl font-light serif italic text-charcoal mt-0.5">₦{fmt(amount)}</p>
+      <form ref={formRef} onSubmit={e => { e.preventDefault(); handlePay() }}>
+        <div className="bg-white rounded-2xl border border-charcoal/8 p-6">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <p className="text-[9px] uppercase tracking-widest text-charcoal/40 font-semibold">Total</p>
+              <p className="text-3xl font-light serif italic text-charcoal mt-0.5">₦{fmt(amount)}</p>
+            </div>
+            <div className="text-right">
+              <p className="text-[9px] text-charcoal/30 font-light">Secured by</p>
+              <p className="text-[10px] uppercase tracking-widest text-charcoal/50 font-semibold">Paystack</p>
+            </div>
           </div>
-          <div className="text-right">
-            <p className="text-[9px] text-charcoal/30 font-light">Secured by</p>
-            <p className="text-[10px] uppercase tracking-widest text-charcoal/50 font-semibold">Paystack</p>
-          </div>
+
+          {payError && (
+            <p className="text-sm text-red-400 font-light mb-4 text-center">{payError}</p>
+          )}
+
+          <button
+            type="submit"
+            disabled={isPending || !paystackReady}
+            className="w-full py-5 bg-gold text-white text-[10px] uppercase tracking-[0.4em] font-bold rounded-lg hover:bg-charcoal transition-all duration-500 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {!paystackReady ? 'Loading payment…' : isPending ? 'Processing…' : `Pay ₦${fmt(amount)}`}
+          </button>
+          <p className="text-[9px] text-charcoal/30 text-center mt-4 font-light">
+            Your card is never stored. Secured by Paystack.
+          </p>
         </div>
-
-        {payError && (
-          <p className="text-sm text-red-400 font-light mb-4 text-center">{payError}</p>
-        )}
-
-        <button
-          onClick={handlePay}
-          disabled={isPending}
-          className="w-full py-5 bg-gold text-white text-[10px] uppercase tracking-[0.4em] font-bold rounded-lg hover:bg-charcoal transition-all duration-500 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {isPending ? 'Processing…' : `Pay ₦${fmt(amount)}`}
-        </button>
-        <p className="text-[9px] text-charcoal/30 text-center mt-4 font-light">
-          Your card is never stored. Secured by Paystack.
-        </p>
-      </div>
+      </form>
 
       <button
         onClick={onBack}

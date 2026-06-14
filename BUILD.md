@@ -450,6 +450,14 @@ All writes go through server actions or Edge Functions using `SUPABASE_SERVICE_R
 
 ## PHASE 2 BACKLOG
 
+### Loops observability
+- `lib/loops-templates.ts` — typed interfaces per template (variable names, required fields); replaces the current untyped `Record<string, string>` in `dataVariables`
+- Remove all `catch { console.warn }` around Loops sends; replace with proper error handling that writes to `audit_log` and surfaces to Sentry
+- `email_send_log` table — every Loops API call writes a row: recipient, template_id, status, error message, timestamp
+- Admin section (e.g. `/admin/settings`) showing recent send failures with re-send option
+- Smoke-test ritual: every new Loops template requires a real test send before being marked complete
+
+### Other
 - Practitioner self-service login (filtered view — own appointments only)
 - Cancel / reschedule from My Bookings (currently contact-us redirect)
 - Waitlist
@@ -472,3 +480,9 @@ All writes go through server actions or Edge Functions using `SUPABASE_SERVICE_R
 ## LAST UPDATED
 
 2026-06-11 — Cutover day. Project complete. New app live at elroisewellnesscenter.com. Legacy Vite project paused (do not delete before 2026-07-25).
+
+Env var values: trailing whitespace in .env.local breaks API auth 
+silently. Symptoms look like a real API error but the cause is the 
+client. When debugging "API rejected my key," check the raw value 
+with hex dump or .length first. Vercel trims on save; .env.local 
+does not.
