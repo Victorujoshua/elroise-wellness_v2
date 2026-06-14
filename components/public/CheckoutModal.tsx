@@ -1,6 +1,6 @@
 'use client'
 
-import { useTransition } from 'react'
+import { useTransition, useRef, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -18,8 +18,10 @@ declare global {
         amount: number
         currency: string
         ref: string
-        onSuccess(txn: { reference: string }): void
-        onCancel(): void
+        callback?(txn: { reference: string }): void   // v1 success
+        onSuccess?(txn: { reference: string }): void  // v2 forward-compat
+        onClose?(): void                              // v1 close
+        onCancel?(): void                             // v2 forward-compat
       }): { openIframe(): void }
     }
   }
@@ -72,6 +74,15 @@ export default function CheckoutModal({
   const totalKobo = total * 100
 
   const [isPending, startTransition] = useTransition()
+  const formRef = useRef<HTMLFormElement>(null)
+
+  useEffect(() => {
+    if (!open || window.PaystackPop) return
+    if (!formRef.current) return
+    const script = document.createElement('script')
+    script.src = 'https://js.paystack.co/v1/inline.js'
+    formRef.current.appendChild(script)
+  }, [open])
 
   const {
     register,
@@ -87,32 +98,38 @@ export default function CheckoutModal({
 
     const ref = `shop_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`
 
+    // Guard against double-invoke if both callback (v1) and onSuccess (v2) fire
+    let called = false
+    function handleSuccess(txn: { reference: string }) {
+      if (called) return
+      called = true
+      startTransition(async () => {
+        const result = await verifyAndCreateShopOrder(items, values, txn.reference)
+        if (result.success) {
+          trackEvent('shop_checkout_completed', {
+            order_id: result.orderId,
+            value: total,
+            item_count: items.reduce((sum, i) => sum + i.qty, 0),
+          })
+          clearCart()
+          onClose()
+          toast.success('Order confirmed! Check your email for details.')
+        } else {
+          toast.error(result.error)
+        }
+      })
+    }
+
     const handler = window.PaystackPop.setup({
       key: process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY!,
       email: values.email,
       amount: totalKobo,
       currency: 'NGN',
       ref,
-      onSuccess(txn) {
-        startTransition(async () => {
-          const result = await verifyAndCreateShopOrder(items, values, txn.reference)
-          if (result.success) {
-            trackEvent('shop_checkout_completed', {
-              order_id: result.orderId,
-              value: total,
-              item_count: items.reduce((sum, i) => sum + i.qty, 0),
-            })
-            clearCart()
-            onClose()
-            toast.success('Order confirmed! Check your email for details.')
-          } else {
-            toast.error(result.error)
-          }
-        })
-      },
-      onCancel() {
-        // User closed Paystack popup — no action needed
-      },
+      callback(response) { handleSuccess(response) },   // v1 inline.js success prop
+      onSuccess(response) { handleSuccess(response) },  // v2 forward-compat
+      onClose() {},                                     // v1 close prop
+      onCancel() {},                                    // v2 forward-compat
     })
     handler.openIframe()
   }
@@ -156,7 +173,7 @@ export default function CheckoutModal({
 
         {/* Scrollable form */}
         <div className="overflow-y-auto flex-1 px-8 py-6">
-          <form id="checkout-form" onSubmit={handleSubmit(onValid)} noValidate className="space-y-4">
+          <form ref={formRef} id="checkout-form" onSubmit={handleSubmit(onValid)} noValidate className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Field label="Full Name" error={errors.full_name?.message}>
                 <input
