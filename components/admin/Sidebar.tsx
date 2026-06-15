@@ -37,8 +37,8 @@ function NavContent({ user, onNavigate }: Props & { onNavigate?: () => void }) {
   const pathname = usePathname()
 
   return (
-    <div className="flex flex-col h-full overflow-hidden">
-      {/* Brand */}
+    <div className="flex flex-col h-full">
+      {/* Brand — fixed top */}
       <div className="px-5 py-4 border-b border-border shrink-0">
         <span className="font-display text-xl text-charcoal tracking-wide">Elroisè</span>
         <p className="text-[10px] text-muted-foreground mt-0.5 uppercase tracking-widest">
@@ -46,32 +46,33 @@ function NavContent({ user, onNavigate }: Props & { onNavigate?: () => void }) {
         </p>
       </div>
 
-      {/* Nav */}
-      <nav className="flex-1 px-3 py-3 space-y-0.5 overflow-y-auto min-h-0">
-        {NAV_ITEMS.map(({ href, label, icon: Icon }) => (
-          <Link
-            key={href}
-            href={href}
-            onClick={onNavigate}
-            className={cn(
-              'flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors',
-              pathname.startsWith(href)
-                ? 'bg-charcoal text-white'
-                : 'text-muted-foreground hover:text-foreground hover:bg-muted',
-            )}
-          >
-            <Icon className="size-4 shrink-0" />
-            {label}
-          </Link>
-        ))}
-      </nav>
+      {/* Scrollable middle — calendar first, nav below */}
+      <div className="flex-1 overflow-y-auto min-h-0 [scrollbar-width:thin] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-track]:bg-transparent">
+        <div className="px-3 py-3 border-b border-border">
+          <MiniCalendar />
+        </div>
 
-      {/* Mini Calendar */}
-      <div className="px-3 py-2 border-t border-border shrink-0">
-        <MiniCalendar />
+        <nav className="px-3 py-3 space-y-0.5">
+          {NAV_ITEMS.map(({ href, label, icon: Icon }) => (
+            <Link
+              key={href}
+              href={href}
+              onClick={onNavigate}
+              className={cn(
+                'flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors',
+                pathname.startsWith(href)
+                  ? 'bg-charcoal text-white'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-muted',
+              )}
+            >
+              <Icon className="size-4 shrink-0" />
+              {label}
+            </Link>
+          ))}
+        </nav>
       </div>
 
-      {/* User + Sign out */}
+      {/* User + Sign out — fixed bottom */}
       <div className="px-4 py-3 border-t border-border shrink-0">
         <div className="flex items-center gap-2 mb-2.5">
           <div className="size-7 rounded-full bg-gold/20 flex items-center justify-center text-xs font-semibold text-gold shrink-0">
