@@ -243,11 +243,11 @@ export async function createAppointment(
             bookingDate:      dateLabel,
             startTime:        start_time,
             endTime:          end_time,
-            duration:         `${svc.duration_minutes ?? 0} min`,
             pricePaid:        `₦${new Intl.NumberFormat('en-NG').format(amount_naira)}`,
             pricingTier:      pricing_tier === 'package' ? 'Package' : 'Single session',
             reference:        apptId.slice(0, 8).toUpperCase(),
             notes:            client.notes ?? '',
+            adminUrl:         `${process.env.NEXT_PUBLIC_APP_URL}/admin/appointments/${apptId}`,
           },
         })
       } catch (err) {
