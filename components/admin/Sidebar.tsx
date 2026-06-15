@@ -67,7 +67,7 @@ function NavContent({ user, onNavigate }: Props & { onNavigate?: () => void }) {
       </nav>
 
       {/* Mini Calendar */}
-      <div className="px-1 py-2 border-t border-border shrink-0">
+      <div className="px-3 py-2 border-t border-border shrink-0">
         <MiniCalendar />
       </div>
 
@@ -102,7 +102,7 @@ export default function Sidebar({ user }: Props) {
   return (
     <>
       {/* Desktop */}
-      <aside className="hidden lg:flex w-56 shrink-0 flex-col border-r border-border bg-background h-screen sticky top-0">
+      <aside className="hidden lg:flex w-[280px] shrink-0 flex-col border-r border-border bg-background h-screen sticky top-0">
         <NavContent user={user} />
       </aside>
 
@@ -117,7 +117,7 @@ export default function Sidebar({ user }: Props) {
 
       {/* Mobile Sheet */}
       <Sheet open={open} onOpenChange={setOpen}>
-        <SheetContent side="left" className="w-56 p-0" showCloseButton={false}>
+        <SheetContent side="left" className="w-[280px] p-0" showCloseButton={false}>
           <NavContent user={user} onNavigate={() => setOpen(false)} />
         </SheetContent>
       </Sheet>
