@@ -227,31 +227,48 @@ export async function createAppointment(
       }
     }
 
-    const staffTemplateId = process.env.LOOPS_BOOKING_NOTIFICATION_TEMPLATE_ID
-    const staffEmail      = process.env.STAFF_NOTIFICATION_EMAIL
-    if (staffTemplateId && staffEmail) {
-      try {
-        await sendTransactional({
-          templateId: staffTemplateId,
-          email: staffEmail,
-          dataVariables: {
-            clientName:       client.full_name,
-            clientEmail:      client.email,
-            clientPhone:      client.phone,
-            serviceName:      service_name,
-            practitionerName: practitioner_name,
-            bookingDate:      dateLabel,
-            startTime:        start_time,
-            endTime:          end_time,
-            pricePaid:        `₦${new Intl.NumberFormat('en-NG').format(amount_naira)}`,
-            pricingTier:      pricing_tier === 'package' ? 'Package' : 'Single session',
-            reference:        apptId.slice(0, 8).toUpperCase(),
-            notes:            client.notes ?? '',
-            adminUrl:         `${process.env.NEXT_PUBLIC_APP_URL}/admin/appointments/${apptId}`,
-          },
-        })
-      } catch (err) {
-        console.warn('[booking] Loops staff notification failed (non-fatal):', err)
+    const notifTemplateId = process.env.LOOPS_BOOKING_NOTIFICATION_TEMPLATE_ID
+    if (notifTemplateId) {
+      const notifVariables = {
+        clientName:       client.full_name,
+        clientEmail:      client.email,
+        clientPhone:      client.phone,
+        serviceName:      service_name,
+        practitionerName: practitioner_name,
+        bookingDate:      dateLabel,
+        startTime:        start_time,
+        endTime:          end_time,
+        pricePaid:        `₦${new Intl.NumberFormat('en-NG').format(amount_naira)}`,
+        pricingTier:      pricing_tier === 'package' ? 'Package' : 'Single session',
+        reference:        apptId.slice(0, 8).toUpperCase(),
+        notes:            client.notes ?? '',
+        adminUrl:         `${process.env.NEXT_PUBLIC_APP_URL}/admin/appointments/${apptId}`,
+      }
+
+      // Practitioner notification
+      const { data: practitionerAuth, error: practitionerLookupErr } =
+        await db.auth.admin.getUserById(practitioner_id)
+      const practitionerEmail = practitionerAuth?.user?.email
+      if (practitionerLookupErr || !practitionerEmail) {
+        console.warn('[booking] Could not resolve practitioner email (non-fatal):', practitionerLookupErr)
+      } else {
+        try {
+          await sendTransactional({ templateId: notifTemplateId, email: practitionerEmail, dataVariables: notifVariables })
+          console.log('[booking] Practitioner notification sent to:', practitionerEmail)
+        } catch (err) {
+          console.warn('[booking] Practitioner notification failed (non-fatal):', err)
+        }
+      }
+
+      // Admin backup notification
+      const adminBackupEmail = process.env.STAFF_NOTIFICATION_EMAIL
+      if (adminBackupEmail) {
+        try {
+          await sendTransactional({ templateId: notifTemplateId, email: adminBackupEmail, dataVariables: notifVariables })
+          console.log('[booking] Admin backup notification sent to:', adminBackupEmail)
+        } catch (err) {
+          console.warn('[booking] Admin backup notification failed (non-fatal):', err)
+        }
       }
     }
 
