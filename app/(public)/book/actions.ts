@@ -245,29 +245,14 @@ export async function createAppointment(
         adminUrl:         `${process.env.NEXT_PUBLIC_APP_URL}/admin/appointments/${apptId}`,
       }
 
-      // Practitioner notification
-      const { data: practitionerAuth, error: practitionerLookupErr } =
-        await db.auth.admin.getUserById(practitioner_id)
-      const practitionerEmail = practitionerAuth?.user?.email
-      if (practitionerLookupErr || !practitionerEmail) {
-        console.warn('[booking] Could not resolve practitioner email (non-fatal):', practitionerLookupErr)
-      } else {
+      // Admin notification
+      const adminEmail = process.env.STAFF_NOTIFICATION_EMAIL
+      if (adminEmail) {
         try {
-          await sendTransactional({ templateId: notifTemplateId, email: practitionerEmail, dataVariables: notifVariables })
-          console.log('[booking] Practitioner notification sent to:', practitionerEmail)
+          await sendTransactional({ templateId: notifTemplateId, email: adminEmail, dataVariables: notifVariables })
+          console.log('[booking] Admin notification sent to:', adminEmail)
         } catch (err) {
-          console.warn('[booking] Practitioner notification failed (non-fatal):', err)
-        }
-      }
-
-      // Admin backup notification
-      const adminBackupEmail = process.env.STAFF_NOTIFICATION_EMAIL
-      if (adminBackupEmail) {
-        try {
-          await sendTransactional({ templateId: notifTemplateId, email: adminBackupEmail, dataVariables: notifVariables })
-          console.log('[booking] Admin backup notification sent to:', adminBackupEmail)
-        } catch (err) {
-          console.warn('[booking] Admin backup notification failed (non-fatal):', err)
+          console.warn('[booking] Admin notification failed (non-fatal):', err)
         }
       }
     }
