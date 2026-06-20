@@ -5,13 +5,15 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  --color-gold: #C5A059;
   --color-charcoal: #2D2926;
   --color-sand: #F3EFEA;
   --color-bg: #F9F6F2;
+  --color-green-primary: #636B2F;
+  --color-green-secondary: #98A869;
 
   --font-display: var(--font-playfair);
   --font-body: var(--font-montserrat);
+  --font-sora: var(--font-sora);
 }
 
 html {

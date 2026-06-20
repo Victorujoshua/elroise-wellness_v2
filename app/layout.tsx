@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Playfair_Display, Montserrat, Geist } from 'next/font/google'
+import { Playfair_Display, Montserrat, Geist, Sora } from 'next/font/google'
 import Script from 'next/script'
 import { Toaster } from 'sonner'
 import './globals.css'
@@ -18,6 +18,12 @@ const montserrat = Montserrat({
   variable: '--font-montserrat',
   subsets: ['latin'],
   weight: ['300', '400', '500', '600'],
+})
+
+const sora = Sora({
+  variable: '--font-sora',
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700'],
 })
 
 export const metadata: Metadata = {
@@ -42,7 +48,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={cn("h-full", "antialiased", playfair.variable, montserrat.variable, "font-sans", geist.variable)}
+      className={cn("h-full", "antialiased", playfair.variable, montserrat.variable, sora.variable, "font-sans", geist.variable)}
     >
       {/* suppressHydrationWarning: browser extensions add attributes to body that don't exist in SSR HTML */}
       <body className="min-h-full flex flex-col font-body bg-bg text-charcoal" suppressHydrationWarning>
