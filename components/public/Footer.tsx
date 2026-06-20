@@ -26,97 +26,120 @@ function TwitterIcon() {
   )
 }
 
+const QUICK_LINKS = [
+  { name: 'Home',        path: '/' },
+  { name: 'About',       path: '/about' },
+  { name: 'Services',    path: '/services' },
+  { name: 'Shop',        path: '/shop' },
+  { name: 'Contact',     path: '/contact' },
+  { name: 'My Bookings', path: '/my-bookings' },
+]
+
+const LEGAL_LINKS = [
+  { name: 'Privacy Policy',   path: '/privacy' },
+  { name: 'Terms of Service', path: '/terms' },
+  { name: 'Refund Policy',    path: '/refund-policy' },
+]
+
 export default function Footer() {
   return (
-    <footer className="bg-white pt-24 pb-12 px-6 border-t border-sand">
+    <footer className="bg-[#2D2926] py-16 md:py-24 px-6">
       <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-16 mb-24">
+
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 md:gap-8 mb-16 md:mb-20">
 
           {/* Brand */}
-          <div className="md:col-span-1">
+          <div>
             <Link
               href="/"
-              className="text-2xl tracking-[0.3em] font-light text-charcoal mb-8 block"
+              className="font-sora font-light tracking-[0.2em] text-white text-lg block mb-6 hover:opacity-70 transition-opacity duration-200"
             >
-              ELROISÈ <span className="text-xs italic serif">EWC</span>
+              ELROISÈ
             </Link>
-            <p className="text-gray-400 text-sm leading-relaxed font-light mb-8 italic">
+            <p className="font-sora font-light text-sm text-white/70 leading-relaxed mb-8 italic">
               Omnia flunnt. A luxury wellness sanctuary in the heart of Lekki.
             </p>
-            <div className="flex space-x-6 text-gray-400">
-              <a href="#" className="hover:text-gold transition-colors" aria-label="Instagram">
+            <div className="flex gap-5 text-white/50">
+              <a href="#" aria-label="Instagram" className="hover:text-white transition-colors duration-200">
                 <InstagramIcon />
               </a>
-              <a href="#" className="hover:text-gold transition-colors" aria-label="Facebook">
+              <a href="#" aria-label="Facebook" className="hover:text-white transition-colors duration-200">
                 <FacebookIcon />
               </a>
-              <a href="#" className="hover:text-gold transition-colors" aria-label="Twitter">
+              <a href="#" aria-label="Twitter" className="hover:text-white transition-colors duration-200">
                 <TwitterIcon />
               </a>
             </div>
           </div>
 
-          {/* Sanctuary */}
+          {/* Quick Links */}
           <div>
-            <h4 className="text-[10px] uppercase tracking-widest text-gray-400 mb-8 font-semibold">
-              Sanctuary
+            <h4 className="font-sora text-[10px] uppercase tracking-[0.3em] font-semibold text-white mb-6">
+              Quick Links
             </h4>
-            <ul className="space-y-4 text-xs uppercase tracking-widest font-medium">
-              <li>
-                <Link href="/about" className="hover:text-gold transition-colors">
-                  Experience
-                </Link>
-              </li>
-              <li>
-                <Link href="/#services" className="hover:text-gold transition-colors">
-                  Services
-                </Link>
-              </li>
-              <li>
-                <Link href="/book" className="hover:text-gold transition-colors">
-                  Book Session
-                </Link>
-              </li>
+            <ul className="space-y-3">
+              {QUICK_LINKS.map(({ name, path }) => (
+                <li key={path}>
+                  <Link
+                    href={path}
+                    className="font-sora text-sm font-light text-white/70 hover:text-white hover:underline underline-offset-4 transition-colors duration-200"
+                  >
+                    {name}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
-          {/* Location */}
+          {/* Legal */}
           <div>
-            <h4 className="text-[10px] uppercase tracking-widest text-gray-400 mb-8 font-semibold">
-              Location
+            <h4 className="font-sora text-[10px] uppercase tracking-[0.3em] font-semibold text-white mb-6">
+              Legal
             </h4>
-            <p className="text-sm text-gray-500 leading-relaxed font-light">
-              8 Itumo Ogbonna Road,<br />
-              Lekki Phase 1, Lagos<br />
-              Nigeria
-            </p>
+            <ul className="space-y-3">
+              {LEGAL_LINKS.map(({ name, path }) => (
+                <li key={path}>
+                  <Link
+                    href={path}
+                    className="font-sora text-sm font-light text-white/70 hover:text-white hover:underline underline-offset-4 transition-colors duration-200"
+                  >
+                    {name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
           </div>
 
-          {/* Connect */}
+          {/* Contact */}
           <div>
-            <h4 className="text-[10px] uppercase tracking-widest text-gray-400 mb-8 font-semibold">
-              Connect
+            <h4 className="font-sora text-[10px] uppercase tracking-[0.3em] font-semibold text-white mb-6">
+              Contact
             </h4>
-            <p className="text-sm text-gray-500 leading-relaxed font-light mb-2">
-              08067014037
-            </p>
-            <p className="text-sm text-gray-500 font-light truncate">
-              Elroisèwellnesscenter@gmail.com
-            </p>
+            <div className="space-y-4 font-sora text-sm font-light text-white/70 leading-relaxed">
+              <p>
+                8 Itumo Ogbonna Road,<br />
+                Lekki Phase 1, Lagos<br />
+                Nigeria
+              </p>
+              <p>08067014037</p>
+              <p className="break-all">Elroisèwellnesscenter@gmail.com</p>
+            </div>
           </div>
+
         </div>
 
         {/* Bottom bar */}
-        <div className="pt-12 border-t border-sand flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0 text-[10px] uppercase tracking-widest text-gray-300">
-          <p>© 2025 Elroisè Wellness Center. All Rights Reserved.</p>
-          <div className="flex space-x-8">
-            <Link href="/privacy" className="hover:text-gold transition-colors">Privacy</Link>
-            <Link href="/terms" className="hover:text-gold transition-colors">Terms</Link>
-            <Link href="/refund-policy" className="hover:text-gold transition-colors">
-              Refund Policy
-            </Link>
+        <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4">
+          <p className="font-sora text-[10px] text-white/50">
+            © 2026 Elroisè Wellness Center. All rights reserved.
+          </p>
+          <div className="flex gap-8">
+            <Link href="/privacy"       className="font-sora text-[10px] text-white/50 hover:text-white/80 transition-colors duration-200">Privacy</Link>
+            <Link href="/terms"         className="font-sora text-[10px] text-white/50 hover:text-white/80 transition-colors duration-200">Terms</Link>
+            <Link href="/refund-policy" className="font-sora text-[10px] text-white/50 hover:text-white/80 transition-colors duration-200">Refund Policy</Link>
           </div>
         </div>
+
       </div>
     </footer>
   )
