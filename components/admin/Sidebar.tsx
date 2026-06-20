@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
+  LayoutDashboard,
   CalendarDays,
   ClipboardList,
   Clock,
@@ -20,6 +21,7 @@ import { signOut } from '@/app/(admin)/admin/(dashboard)/actions'
 import { cn } from '@/lib/utils'
 
 const NAV_ITEMS = [
+  { href: '/admin', label: 'Dashboard', icon: LayoutDashboard, exact: true },
   { href: '/admin/calendar', label: 'Calendar', icon: CalendarDays },
   { href: '/admin/appointments', label: 'Appointments', icon: ClipboardList },
   { href: '/admin/shifts', label: 'Shifts', icon: Clock },
@@ -53,14 +55,14 @@ function NavContent({ user, onNavigate }: Props & { onNavigate?: () => void }) {
         </div>
 
         <nav className="px-3 py-3 space-y-0.5">
-          {NAV_ITEMS.map(({ href, label, icon: Icon }) => (
+          {NAV_ITEMS.map(({ href, label, icon: Icon, exact }) => (
             <Link
               key={href}
               href={href}
               onClick={onNavigate}
               className={cn(
                 'flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors',
-                pathname.startsWith(href)
+                (exact ? pathname === href : pathname.startsWith(href))
                   ? 'bg-charcoal text-white'
                   : 'text-muted-foreground hover:text-foreground hover:bg-muted',
               )}
