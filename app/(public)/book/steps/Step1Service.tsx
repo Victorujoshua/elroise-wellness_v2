@@ -36,11 +36,6 @@ function ServiceCard({
         <span className="text-[9px] text-charcoal/40 uppercase tracking-widest">/ session</span>
       </div>
 
-      {service.package_price_naira != null && service.package_session_count != null && (
-        <p className="text-[10px] text-charcoal/40 font-light">
-          Package: ₦{fmt(service.package_price_naira)} · {service.package_session_count} sessions
-        </p>
-      )}
     </button>
   )
 }

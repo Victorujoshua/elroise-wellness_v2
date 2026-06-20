@@ -1,27 +1,9 @@
-'use client'
-
-import { useState } from 'react'
 import Link from 'next/link'
 import { Sparkles, ArrowRight } from 'lucide-react'
 import type { Service } from '@/lib/data/services'
 
 export default function ServiceCard({ service }: { service: Service }) {
-  const [tab, setTab] = useState<'single' | 'package'>('single')
-
   const isPilates = service.category === 'pilates' || service.id.includes('pilates')
-
-  const displayPrice =
-    tab === 'single'
-      ? service.price
-      : service.packages
-      ? service.packages[0].price
-      : service.packagePrice
-
-  const packageLabel = service.packages
-    ? service.packages[0].name
-    : isPilates
-    ? '10 Session Bundle'
-    : '5 Session Package'
 
   return (
     <div className="group relative bg-white overflow-hidden rounded-3xl transition-all duration-500 hover:shadow-xl border border-sand/30 flex flex-col h-full">
@@ -44,28 +26,10 @@ export default function ServiceCard({ service }: { service: Service }) {
         </div>
 
         <div className="mb-8">
-          <div className="flex bg-sand/10 p-1 rounded-xl mb-4">
-            <button
-              onClick={() => setTab('single')}
-              className={`flex-1 py-2.5 text-[10px] uppercase tracking-widest font-bold rounded-lg transition-all ${
-                tab === 'single' ? 'bg-white text-gold shadow-sm' : 'text-gray-400 hover:text-gray-600'
-              }`}
-            >
-              Single
-            </button>
-            <button
-              onClick={() => setTab('package')}
-              className={`flex-1 py-2.5 text-[10px] uppercase tracking-widest font-bold rounded-lg transition-all ${
-                tab === 'package' ? 'bg-white text-gold shadow-sm' : 'text-gray-400 hover:text-gray-600'
-              }`}
-            >
-              {service.packages ? 'Bundles' : 'Package'}
-            </button>
-          </div>
           <div className="flex items-baseline space-x-2">
-            <span className="text-3xl serif italic text-charcoal">₦{displayPrice}</span>
+            <span className="text-3xl serif italic text-charcoal">₦{service.price}</span>
             <span className="text-[10px] text-gray-400 uppercase tracking-widest font-medium">
-              {tab === 'single' ? '/ session' : `/ ${packageLabel.toLowerCase()}`}
+              / session
             </span>
           </div>
         </div>

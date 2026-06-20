@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -53,14 +52,8 @@ export default function Step4Details({
   onSubmit: (details: ClientDetails, pricingTier: 'single' | 'package') => void
   onBack: () => void
 }) {
-  const [tier, setTier] = useState<'single' | 'package'>(initialTier)
-  const hasPackage =
-    service.package_price_naira != null && service.package_session_count != null
-
-  const pkgPrice = service.package_price_naira ?? 0
-  const pkgSessions = service.package_session_count ?? 0
-  const amount = tier === 'package' && hasPackage ? pkgPrice : service.single_price_naira
-  const saving = service.single_price_naira * pkgSessions - pkgPrice
+  const tier = initialTier
+  const amount = service.single_price_naira
 
   const { register, handleSubmit, formState: { errors } } = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -99,47 +92,6 @@ export default function Step4Details({
       </div>
 
       <form onSubmit={handleSubmit(onValid)} noValidate className="space-y-5">
-
-        {/* Pricing tier selector */}
-        {hasPackage && (
-          <div className="bg-white rounded-2xl border border-charcoal/8 p-6">
-            <p className="text-[9px] uppercase tracking-[0.4em] text-charcoal/50 font-semibold mb-4">
-              Pricing
-            </p>
-            <div className="grid grid-cols-2 gap-3">
-              <button
-                type="button"
-                onClick={() => setTier('single')}
-                className={`p-4 rounded-xl border text-left transition-all duration-200 ${
-                  tier === 'single'
-                    ? 'border-gold bg-gold/5'
-                    : 'border-charcoal/10 hover:border-gold/40'
-                }`}
-              >
-                <p className="text-[9px] uppercase tracking-widest font-bold text-charcoal/50 mb-1">Single</p>
-                <p className="text-lg font-light serif italic text-charcoal">
-                  ₦{fmt(service.single_price_naira)}
-                </p>
-                <p className="text-[9px] text-charcoal/40 font-light mt-0.5">1 session</p>
-              </button>
-              <button
-                type="button"
-                onClick={() => setTier('package')}
-                className={`p-4 rounded-xl border text-left transition-all duration-200 ${
-                  tier === 'package'
-                    ? 'border-gold bg-gold/5'
-                    : 'border-charcoal/10 hover:border-gold/40'
-                }`}
-              >
-                <p className="text-[9px] uppercase tracking-widest font-bold text-charcoal/50 mb-1">Package</p>
-                <p className="text-lg font-light serif italic text-charcoal">₦{fmt(pkgPrice)}</p>
-                <p className="text-[9px] text-charcoal/40 font-light mt-0.5">
-                  {pkgSessions} sessions · save ₦{fmt(saving)}
-                </p>
-              </button>
-            </div>
-          </div>
-        )}
 
         {/* Contact fields */}
         <div className="bg-white rounded-2xl border border-charcoal/8 p-6 space-y-5">

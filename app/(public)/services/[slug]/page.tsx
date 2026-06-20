@@ -164,30 +164,12 @@ export default async function ServiceDetailPage({ params }: Props) {
                 Pricing
               </p>
 
-              {/* Single */}
-              <div className="pb-6 border-b border-sand mb-6">
-                <span className="text-[10px] uppercase tracking-widest text-gray-400 font-bold block mb-3">
-                  Single Session
-                </span>
+              <div className="pb-8 mb-8">
                 <span className="text-4xl serif italic text-charcoal">
                   ₦{fmt(service.single_price_naira)}
                 </span>
+                <p className="text-[11px] text-gray-400 font-light mt-2">per session</p>
               </div>
-
-              {/* Package */}
-              {service.package_price_naira != null && service.package_session_count != null && (
-                <div className="pb-8 border-b border-sand mb-8">
-                  <span className="text-[10px] uppercase tracking-widest text-gray-400 font-bold block mb-3">
-                    {service.package_session_count}-Session Package
-                  </span>
-                  <span className="text-4xl serif italic text-charcoal">
-                    ₦{fmt(service.package_price_naira)}
-                  </span>
-                  <p className="text-[11px] text-gray-400 font-light mt-2">
-                    ₦{fmt(Math.round(service.package_price_naira / service.package_session_count))} per session
-                  </p>
-                </div>
-              )}
 
               {/* CTA */}
               <Link
