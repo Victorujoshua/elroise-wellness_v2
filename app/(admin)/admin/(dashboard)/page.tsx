@@ -1,5 +1,6 @@
 import { getDashboardData } from './actions'
 import type { DashboardAppointment, UpcomingAppointment } from './actions'
+import { cn } from '@/lib/utils'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -48,23 +49,33 @@ const STATUS_CLS: Record<string, string> = {
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 
-function KpiCard({ label, value, sub }: { label: string; value: string; sub: string }) {
+function KpiCard({ label, value, sub, accent = false }: { label: string; value: string; sub: string; accent?: boolean }) {
   return (
-    <div className="rounded-lg border border-border bg-background p-5">
+    <div className={cn(
+      'relative overflow-hidden rounded-xl border bg-card p-5 shadow-sm transition-shadow duration-200 hover:shadow-md',
+      accent ? 'border-[#C5A059]/30' : 'border-border',
+    )}>
+      {accent && (
+        <div className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-transparent via-[#C5A059] to-transparent" />
+      )}
       <p className="text-[10px] uppercase tracking-widest font-semibold text-muted-foreground mb-3">
         {label}
       </p>
-      <p className="text-3xl font-semibold tabular-nums">{value}</p>
-      <p className="text-xs text-muted-foreground mt-1">{sub}</p>
+      <p className={cn('text-3xl font-semibold tabular-nums tracking-tight', accent ? 'text-[#C5A059]' : 'text-foreground')}>
+        {value}
+      </p>
+      <p className="text-xs text-muted-foreground mt-1.5">{sub}</p>
     </div>
   )
 }
 
 function StatusBadge({ status }: { status: string }) {
   return (
-    <span
-      className={`inline-block text-[10px] uppercase tracking-wide font-semibold px-2 py-0.5 rounded-full ${STATUS_CLS[status] ?? 'bg-zinc-100 text-zinc-500'}`}
-    >
+    <span className={cn(
+      'inline-flex items-center gap-1.5 text-[10px] uppercase tracking-wide font-semibold px-2.5 py-1 rounded-full',
+      STATUS_CLS[status] ?? 'bg-zinc-100 text-zinc-500',
+    )}>
+      <span className="size-1.5 rounded-full bg-current opacity-80" />
       {status.replace('_', ' ')}
     </span>
   )
@@ -95,7 +106,7 @@ function TodayTable({ appointments }: { appointments: DashboardAppointment[] }) 
         </thead>
         <tbody>
           {appointments.map(a => (
-            <tr key={a.id} className="border-b border-border last:border-0 hover:bg-muted/40 transition-colors">
+            <tr key={a.id} className="border-b border-border last:border-0 hover:bg-muted/50 transition-colors duration-150">
               <td className="py-3 pr-4 font-mono text-xs text-muted-foreground whitespace-nowrap">
                 {fmtTime(a.start_time)}
               </td>
@@ -199,6 +210,7 @@ export default async function DashboardPage() {
           label="Revenue This Week"
           value={fmtNaira(data.weekRevenueNaira)}
           sub="confirmed payments"
+          accent
         />
       </div>
 
@@ -206,13 +218,13 @@ export default async function DashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-6 items-start">
 
         {/* Today's appointments */}
-        <div className="rounded-lg border border-border bg-background p-6">
+        <div className="rounded-xl border border-border bg-card shadow-sm p-6">
           <h2 className="text-sm font-semibold mb-4">Today&apos;s Appointments</h2>
           <TodayTable appointments={data.todaysAppointments} />
         </div>
 
         {/* Upcoming */}
-        <div className="rounded-lg border border-border bg-background p-6">
+        <div className="rounded-xl border border-border bg-card shadow-sm p-6">
           <h2 className="text-sm font-semibold mb-4">Upcoming — Next 7 Days</h2>
           <UpcomingList appointments={data.upcomingAppointments} />
         </div>

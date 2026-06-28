@@ -30,7 +30,7 @@ export default async function AppointmentsPage({ searchParams }: Props) {
   const practitioners: FilterOption[] = (practitionersRes.data ?? []).map(p => ({ id: p.id, name: p.full_name }))
 
   const emptyState = (
-    <div className="p-6 flex flex-col gap-4">
+    <div className="space-y-5 max-w-[1200px]">
       <div>
         <h1 className="text-xl font-semibold">Appointments</h1>
         <p className="text-sm text-muted-foreground">0 total</p>
@@ -106,7 +106,7 @@ export default async function AppointmentsPage({ searchParams }: Props) {
   })
 
   return (
-    <div className="p-6 flex flex-col gap-4">
+    <div className="space-y-5 max-w-[1200px]">
       <div>
         <h1 className="text-xl font-semibold">Appointments</h1>
         <p className="text-sm text-muted-foreground">{total} total</p>

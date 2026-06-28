@@ -1,7 +1,7 @@
-﻿'use client'
+'use client'
 
 import { useState, useTransition } from 'react'
-import { X } from 'lucide-react'
+import { X, Clock } from 'lucide-react'
 import { toast } from 'sonner'
 import {
   Dialog,
@@ -23,20 +23,36 @@ import type { CalendarAppointment } from './CalendarView'
 
 // ── Status styling ────────────────────────────────────────────────────────────
 
-const CARD_STYLE: Record<string, string> = {
-  pending:   'bg-amber-50   border-l-amber-400   text-amber-900',
-  confirmed: 'bg-emerald-50 border-l-emerald-500 text-emerald-900',
-  completed: 'bg-sky-50     border-l-sky-500     text-sky-900',
-  no_show:   'bg-red-50     border-l-red-400     text-red-900',
-  cancelled: 'bg-muted      border-l-border      text-muted-foreground opacity-60',
+const CARD_BG: Record<string, string> = {
+  pending:   'bg-amber-50   border-l-amber-400   text-amber-950',
+  confirmed: 'bg-emerald-50 border-l-emerald-500 text-emerald-950',
+  completed: 'bg-sky-50     border-l-sky-400     text-sky-950',
+  no_show:   'bg-red-50     border-l-red-400     text-red-950',
+  cancelled: 'bg-muted/50   border-l-border      text-muted-foreground',
+}
+
+const STATUS_DOT: Record<string, string> = {
+  pending:   'bg-amber-400',
+  confirmed: 'bg-emerald-500',
+  completed: 'bg-sky-400',
+  no_show:   'bg-red-400',
+  cancelled: 'bg-muted-foreground/40',
+}
+
+const STATUS_STRIPE: Record<string, string> = {
+  pending:   'bg-amber-400',
+  confirmed: 'bg-emerald-500',
+  completed: 'bg-sky-400',
+  no_show:   'bg-red-400',
+  cancelled: 'bg-border',
 }
 
 const BADGE_STYLE: Record<string, string> = {
-  pending:   'bg-amber-100   text-amber-700',
-  confirmed: 'bg-emerald-100 text-emerald-700',
-  completed: 'bg-sky-100     text-sky-700',
-  no_show:   'bg-red-100     text-red-700',
-  cancelled: 'bg-muted       text-muted-foreground',
+  pending:   'bg-amber-100   text-amber-700   ring-amber-200/60',
+  confirmed: 'bg-emerald-100 text-emerald-700 ring-emerald-200/60',
+  completed: 'bg-sky-100     text-sky-700     ring-sky-200/60',
+  no_show:   'bg-red-100     text-red-700     ring-red-200/60',
+  cancelled: 'bg-muted       text-muted-foreground ring-border/40',
 }
 
 const STATUS_LABEL: Record<string, string> = {
@@ -60,6 +76,10 @@ function fmtTime(t: string): string {
   return `${h % 12 || 12}:${String(m).padStart(2, '0')} ${ampm}`
 }
 
+function getInitials(name: string): string {
+  return name.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase()
+}
+
 // ── AppointmentCard ───────────────────────────────────────────────────────────
 
 interface Props {
@@ -70,6 +90,7 @@ interface Props {
 
 export default function AppointmentCard({ appt, top, height }: Props) {
   const [open, setOpen] = useState(false)
+  const isCancelled = appt.status === 'cancelled'
 
   return (
     <>
@@ -83,25 +104,32 @@ export default function AppointmentCard({ appt, top, height }: Props) {
           right:    4,
         }}
         className={cn(
-          'rounded-md border-l-[3px] px-2 py-1 text-left text-xs overflow-hidden',
-          'shadow-sm hover:brightness-95 transition-[filter] cursor-pointer',
-          CARD_STYLE[appt.status] ?? CARD_STYLE.pending,
+          'rounded-lg border-l-4 overflow-hidden text-left',
+          'shadow-[0_1px_3px_rgba(0,0,0,0.07),0_1px_2px_rgba(0,0,0,0.04)]',
+          'hover:shadow-[0_4px_8px_rgba(0,0,0,0.10),0_2px_4px_rgba(0,0,0,0.06)]',
+          'hover:-translate-y-px transition-all duration-150 cursor-pointer',
+          isCancelled && 'opacity-50',
+          CARD_BG[appt.status] ?? CARD_BG.pending,
         )}
         title={`${appt.clients?.full_name ?? ''} — ${appt.services?.name ?? ''}`}
       >
-        <p className="font-semibold truncate leading-tight">
-          {appt.clients?.full_name ?? 'Unknown'}
-        </p>
-        {height >= 48 && (
-          <p className="truncate leading-tight mt-0.5 opacity-75">
+        <div className="px-2 py-1 text-xs h-full flex flex-col justify-start gap-px overflow-hidden">
+          {/* Name row with status dot */}
+          <div className="flex items-center gap-1.5 min-w-0">
+            <span className={cn('size-1.5 rounded-full shrink-0', STATUS_DOT[appt.status] ?? STATUS_DOT.pending)} />
+            <p className="font-semibold truncate leading-tight text-[11px]">
+              {appt.clients?.full_name ?? 'Unknown'}
+            </p>
+          </div>
+          {/* Service */}
+          <p className="truncate leading-tight text-[10px] opacity-70 pl-3">
             {appt.services?.name ?? ''}
           </p>
-        )}
-        {height >= 76 && (
-          <p className="leading-tight mt-0.5 opacity-60 tabular-nums">
+          {/* Time range */}
+          <p className="leading-tight text-[10px] opacity-55 pl-3 tabular-nums whitespace-nowrap">
             {fmtTime(appt.start_time)} – {fmtTime(appt.end_time)}
           </p>
-        )}
+        </div>
       </button>
 
       <AppointmentDetail appt={appt} open={open} onClose={() => setOpen(false)} />
@@ -135,14 +163,24 @@ function AppointmentDetail({
 
   return (
     <Dialog open={open} onOpenChange={v => { if (!v) onClose() }}>
-      <DialogContent className="sm:max-w-sm flex flex-col gap-0 p-0" showCloseButton={false}>
+      <DialogContent className="sm:max-w-sm flex flex-col gap-0 p-0 overflow-hidden" showCloseButton={false}>
+        {/* Status colour stripe */}
+        <div className={cn('h-1 w-full shrink-0', STATUS_STRIPE[appt.status] ?? STATUS_STRIPE.pending)} />
+
         {/* Header */}
-        <div className="flex items-start justify-between px-5 py-4 border-b shrink-0">
-          <div className="min-w-0 pr-2">
-            <DialogTitle className="text-base font-semibold truncate">
+        <div className="flex items-start gap-3 px-5 py-4 border-b bg-muted/20 shrink-0">
+          {/* Client avatar */}
+          <div className="size-9 rounded-full bg-[#C5A059]/15 border border-[#C5A059]/25 flex items-center justify-center shrink-0 mt-0.5">
+            <span className="text-[11px] font-bold text-[#C5A059]">
+              {appt.clients?.full_name ? getInitials(appt.clients.full_name) : '?'}
+            </span>
+          </div>
+          <div className="min-w-0 flex-1">
+            <DialogTitle className="text-base font-semibold truncate leading-tight">
               {appt.clients?.full_name ?? 'Unknown client'}
             </DialogTitle>
-            <p className="text-xs text-muted-foreground mt-0.5 tabular-nums">
+            <p className="text-xs text-muted-foreground mt-1 tabular-nums flex items-center gap-1">
+              <Clock className="size-3 shrink-0" />
               {fmtTime(appt.start_time)} – {fmtTime(appt.end_time)} · {durationMin} min
             </p>
           </div>
@@ -191,9 +229,10 @@ function AppointmentDetail({
           <Section label="Status">
             <div className="flex items-center gap-2 flex-wrap">
               <span className={cn(
-                'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium',
+                'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ring-1',
                 BADGE_STYLE[appt.status],
               )}>
+                <span className={cn('size-1.5 rounded-full', STATUS_DOT[appt.status])} />
                 {STATUS_LABEL[appt.status]}
               </span>
               <Select value={appt.status} onValueChange={handleStatusChange}>
@@ -222,7 +261,7 @@ function AppointmentDetail({
 function Section({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">{label}</p>
+      <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-semibold mb-1.5">{label}</p>
       {children}
     </div>
   )

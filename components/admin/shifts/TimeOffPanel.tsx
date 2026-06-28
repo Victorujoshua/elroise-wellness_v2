@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { Plus, Trash2, X } from 'lucide-react'
+import { CalendarOff, Plus, Trash2, X } from 'lucide-react'
 import { toast } from 'sonner'
 import {
   Dialog,
@@ -42,11 +42,11 @@ export default function TimeOffPanel({ practitionerId, timeOff }: Props) {
       </div>
 
       {timeOff.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-[#2D2926]/20 py-10 text-center">
+        <div className="rounded-xl border border-dashed border-[#2D2926]/15 bg-muted/20 py-10 text-center">
           <p className="text-sm text-muted-foreground">No time off recorded.</p>
         </div>
       ) : (
-        <ul className="divide-y rounded-lg border">
+        <ul className="divide-y rounded-xl border border-border bg-card shadow-sm overflow-hidden">
           {timeOff.map(row => (
             <TimeOffItem key={row.id} row={row} />
           ))}
@@ -74,13 +74,16 @@ function TimeOffItem({ row }: { row: TimeOffRow }) {
   }
 
   return (
-    <li className="flex items-center justify-between px-4 py-3 text-sm">
-      <div>
-        <span className="font-medium">
+    <li className="flex items-center gap-4 px-4 py-3.5 hover:bg-muted/30 transition-colors duration-150 group">
+      <div className="size-8 rounded-lg bg-orange-50 border border-orange-100 flex items-center justify-center shrink-0">
+        <CalendarOff className="size-4 text-orange-500" />
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-medium">
           {row.start_date === row.end_date
             ? fmtDate(row.start_date)
             : `${fmtDate(row.start_date)} – ${fmtDate(row.end_date)}`}
-        </span>
+        </p>
         {row.reason && (
           <p className="text-xs text-muted-foreground mt-0.5">{row.reason}</p>
         )}
@@ -90,7 +93,7 @@ function TimeOffItem({ row }: { row: TimeOffRow }) {
         variant="ghost"
         onClick={handleDelete}
         disabled={isPending}
-        className="shrink-0 text-destructive hover:text-destructive"
+        className="shrink-0 text-destructive hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity duration-150"
       >
         <Trash2 className="size-3.5" />
       </Button>

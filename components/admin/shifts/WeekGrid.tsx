@@ -73,16 +73,25 @@ function DayCard({
   onAdd:     () => void
   onEdit:    (s: ShiftRow) => void
 }) {
+  const activeCount = dayShifts.filter(s => s.is_active).length
+
   return (
-    <div className="rounded-lg border border-input bg-white p-4 space-y-3">
+    <div className="rounded-xl border border-border bg-card shadow-sm p-4 space-y-3 transition-shadow duration-200 hover:shadow-md">
       <div className="flex items-center justify-between">
-        <span className="text-sm font-semibold">{label}</span>
-        <Button size="icon-sm" variant="ghost" onClick={onAdd} title="Add shift">
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-semibold">{label}</span>
+          {activeCount > 0 && (
+            <span className="text-[10px] font-semibold bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-full leading-none">
+              {activeCount} active
+            </span>
+          )}
+        </div>
+        <Button size="icon-sm" variant="ghost" onClick={onAdd} title="Add shift" className="size-7 rounded-lg">
           <Plus className="size-3.5" />
         </Button>
       </div>
       {dayShifts.length === 0 ? (
-        <p className="text-xs text-muted-foreground">No shift</p>
+        <p className="text-xs text-muted-foreground/60 italic">No shifts</p>
       ) : (
         <ul className="space-y-2">
           {dayShifts.map(s => (
@@ -114,23 +123,23 @@ function ShiftItem({ shift, onEdit }: { shift: ShiftRow; onEdit: (s: ShiftRow) =
 
   return (
     <li className={cn(
-      'flex items-center justify-between gap-1.5 rounded-md border px-2.5 py-2 text-xs',
-      !shift.is_active && 'opacity-50',
+      'flex items-center gap-2 rounded-lg border px-2.5 py-2 text-xs transition-all duration-150',
+      shift.is_active
+        ? 'bg-emerald-50/60 border-emerald-100 text-emerald-950'
+        : 'bg-muted/30 border-border text-muted-foreground opacity-60',
     )}>
-      <div className="flex items-center gap-2 min-w-0">
-        <Switch
-          checked={shift.is_active}
-          onCheckedChange={handleToggle}
-          disabled={isPending}
-        />
-        <div className="min-w-0">
-          <p className="font-medium tabular-nums">
-            {fmtTime(shift.start_time)} – {fmtTime(shift.end_time)}
-          </p>
-          {shift.effective_until && (
-            <p className="text-muted-foreground truncate">until {shift.effective_until}</p>
-          )}
-        </div>
+      <Switch
+        checked={shift.is_active}
+        onCheckedChange={handleToggle}
+        disabled={isPending}
+      />
+      <div className="flex-1 min-w-0">
+        <p className="font-semibold tabular-nums">
+          {fmtTime(shift.start_time)} – {fmtTime(shift.end_time)}
+        </p>
+        {shift.effective_until && (
+          <p className="text-[10px] mt-0.5 opacity-70 truncate">until {shift.effective_until}</p>
+        )}
       </div>
       <div className="flex shrink-0 gap-0.5">
         <Button
