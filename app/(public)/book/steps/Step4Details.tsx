@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -17,7 +17,7 @@ type FormValues = z.infer<typeof schema>
 const fmt = (n: number) => new Intl.NumberFormat('en-NG').format(n)
 
 const inputClass =
-  'w-full border border-charcoal/15 rounded-lg px-4 py-3 text-sm font-light text-charcoal placeholder:text-charcoal/30 focus:outline-none focus:border-gold transition-colors bg-white'
+  'w-full border border-[#2D2926]/15 rounded-lg px-4 py-3 text-sm font-light text-[#2D2926] placeholder:text-[#2D2926]/30 focus:outline-none focus:border-[#636B2F] transition-colors bg-white'
 
 function Field({
   label,
@@ -30,7 +30,7 @@ function Field({
 }) {
   return (
     <div>
-      <label className="block text-[9px] uppercase tracking-[0.4em] text-charcoal/50 font-semibold mb-2">
+      <label className="block text-[9px] uppercase tracking-[0.4em] text-[#2D2926]/50 font-semibold mb-2">
         {label}
       </label>
       {children}
@@ -82,11 +82,11 @@ export default function Step4Details({
   return (
     <div>
       <div className="mb-8">
-        <p className="text-[9px] uppercase tracking-[0.5em] text-gold font-semibold mb-3">Step 4 of 5</p>
-        <h1 className="text-3xl md:text-4xl font-light text-charcoal mb-1">
-          Your <span className="serif italic text-gold">details</span>
+        <p className="text-[9px] uppercase tracking-[0.5em] text-[#636B2F] font-semibold mb-3">Step 4 of 5</p>
+        <h1 className="text-3xl md:text-4xl font-light text-[#2D2926] mb-1">
+          Your <span className="font-sora text-[#636B2F]">details</span>
         </h1>
-        <p className="text-sm text-charcoal/50 font-light">
+        <p className="text-sm text-[#2D2926]/50 font-light">
           We'll use this to confirm your booking.
         </p>
       </div>
@@ -94,7 +94,7 @@ export default function Step4Details({
       <form onSubmit={handleSubmit(onValid)} noValidate className="space-y-5">
 
         {/* Contact fields */}
-        <div className="bg-white rounded-2xl border border-charcoal/8 p-6 space-y-5">
+        <div className="bg-white border border-[#2D2926]/8 p-6 space-y-5">
           <Field label="Full Name" error={errors.full_name?.message}>
             <input
               {...register('full_name')}
@@ -129,14 +129,14 @@ export default function Step4Details({
         </div>
 
         {/* Total + CTA */}
-        <div className="bg-white rounded-2xl border border-charcoal/8 p-6 flex items-center justify-between">
+        <div className="bg-white border border-[#2D2926]/8 p-6 flex items-center justify-between">
           <div>
-            <p className="text-[9px] uppercase tracking-widest text-charcoal/40 font-semibold">Total</p>
-            <p className="text-2xl font-light serif italic text-charcoal mt-0.5">₦{fmt(amount)}</p>
+            <p className="text-[9px] uppercase tracking-widest text-[#2D2926]/40 font-semibold">Total</p>
+            <p className="text-2xl font-light font-sora text-[#2D2926] mt-0.5">₦{fmt(amount)}</p>
           </div>
           <button
             type="submit"
-            className="bg-charcoal text-white px-8 py-4 text-[9px] uppercase tracking-[0.4em] font-bold hover:bg-gold transition-all duration-500 rounded-lg"
+            className="bg-[#2D2926] text-white px-8 py-4 text-[9px] uppercase tracking-[0.4em] font-bold hover:bg-[#636B2F] transition-all duration-500 rounded-lg"
           >
             Continue →
           </button>
@@ -145,7 +145,7 @@ export default function Step4Details({
 
       <button
         onClick={onBack}
-        className="mt-6 text-[9px] uppercase tracking-widest text-charcoal/40 hover:text-charcoal transition-colors font-semibold"
+        className="mt-6 text-[9px] uppercase tracking-widest text-[#2D2926]/40 hover:text-[#2D2926] transition-colors font-semibold"
       >
         ← Back
       </button>

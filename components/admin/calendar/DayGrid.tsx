@@ -59,7 +59,7 @@ export default function DayGrid({ practitioners, appointments }: Props) {
 
   if (practitioners.length === 0) {
     return (
-      <div className="rounded-lg border border-dashed border-charcoal/20 py-16 text-center">
+      <div className="rounded-lg border border-dashed border-[#2D2926]/20 py-16 text-center">
         <p className="text-sm text-muted-foreground">
           No active practitioners — add team members first.
         </p>

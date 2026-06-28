@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState, useTransition, useRef, useEffect } from 'react'
 import { createAppointment } from '../actions'
@@ -16,11 +16,11 @@ function formatDate(dateStr: string): string {
 
 function Row({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-start justify-between py-3 border-b border-charcoal/6 last:border-0">
-      <p className="text-[9px] uppercase tracking-widest text-charcoal/40 font-semibold shrink-0 mr-4">
+    <div className="flex items-start justify-between py-3 border-b border-[#2D2926]/6 last:border-0">
+      <p className="text-[9px] uppercase tracking-widest text-[#2D2926]/40 font-semibold shrink-0 mr-4">
         {label}
       </p>
-      <p className="text-sm font-light text-charcoal text-right">{value}</p>
+      <p className="text-sm font-light text-[#2D2926] text-right">{value}</p>
     </div>
   )
 }
@@ -162,17 +162,17 @@ export default function Step5Payment({
   return (
     <div>
       <div className="mb-8">
-        <p className="text-[9px] uppercase tracking-[0.5em] text-gold font-semibold mb-3">Step 5 of 5</p>
-        <h1 className="text-3xl md:text-4xl font-light text-charcoal mb-1">
-          Confirm &amp; <span className="serif italic text-gold">pay</span>
+        <p className="text-[9px] uppercase tracking-[0.5em] text-[#636B2F] font-semibold mb-3">Step 5 of 5</p>
+        <h1 className="text-3xl md:text-4xl font-light text-[#2D2926] mb-1">
+          Confirm &amp; <span className="font-sora text-[#636B2F]">pay</span>
         </h1>
-        <p className="text-sm text-charcoal/50 font-light">
+        <p className="text-sm text-[#2D2926]/50 font-light">
           Review your booking before proceeding to payment.
         </p>
       </div>
 
       {/* Summary */}
-      <div className="bg-white rounded-2xl border border-charcoal/8 p-6 mb-5">
+      <div className="bg-white border border-[#2D2926]/8 p-6 mb-5">
         <Row label="Service" value={service.name} />
         <Row label="Date" value={formatDate(date)} />
         <Row label="Time" value={`${slot} — ${endTime}`} />
@@ -193,15 +193,15 @@ export default function Step5Payment({
 
       {/* Payment */}
       <form ref={formRef} onSubmit={e => { e.preventDefault(); handlePay() }}>
-        <div className="bg-white rounded-2xl border border-charcoal/8 p-6">
+        <div className="bg-white border border-[#2D2926]/8 p-6">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <p className="text-[9px] uppercase tracking-widest text-charcoal/40 font-semibold">Total</p>
-              <p className="text-3xl font-light serif italic text-charcoal mt-0.5">₦{fmt(amount)}</p>
+              <p className="text-[9px] uppercase tracking-widest text-[#2D2926]/40 font-semibold">Total</p>
+              <p className="text-3xl font-light font-sora text-[#2D2926] mt-0.5">₦{fmt(amount)}</p>
             </div>
             <div className="text-right">
-              <p className="text-[9px] text-charcoal/30 font-light">Secured by</p>
-              <p className="text-[10px] uppercase tracking-widest text-charcoal/50 font-semibold">Paystack</p>
+              <p className="text-[9px] text-[#2D2926]/30 font-light">Secured by</p>
+              <p className="text-[10px] uppercase tracking-widest text-[#2D2926]/50 font-semibold">Paystack</p>
             </div>
           </div>
 
@@ -212,11 +212,11 @@ export default function Step5Payment({
           <button
             type="submit"
             disabled={isPending || !paystackReady}
-            className="w-full py-5 bg-gold text-white text-[10px] uppercase tracking-[0.4em] font-bold rounded-lg hover:bg-charcoal transition-all duration-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full py-5 bg-[#636B2F] text-white text-[10px] uppercase tracking-[0.4em] font-bold rounded-lg hover:bg-[#2D2926] transition-all duration-500 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {!paystackReady ? 'Loading payment…' : isPending ? 'Processing…' : `Pay ₦${fmt(amount)}`}
           </button>
-          <p className="text-[9px] text-charcoal/30 text-center mt-4 font-light">
+          <p className="text-[9px] text-[#2D2926]/30 text-center mt-4 font-light">
             Your card is never stored. Secured by Paystack.
           </p>
         </div>
@@ -225,7 +225,7 @@ export default function Step5Payment({
       <button
         onClick={onBack}
         disabled={isPending}
-        className="mt-8 text-[9px] uppercase tracking-widest text-charcoal/40 hover:text-charcoal transition-colors font-semibold disabled:opacity-30"
+        className="mt-8 text-[9px] uppercase tracking-widest text-[#2D2926]/40 hover:text-[#2D2926] transition-colors font-semibold disabled:opacity-30"
       >
         ← Back
       </button>

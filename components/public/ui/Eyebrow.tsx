@@ -5,7 +5,7 @@ type EyebrowColor = 'green-primary' | 'green-secondary' | 'charcoal' | 'white'
 const COLOR: Record<EyebrowColor, string> = {
   'green-primary':   'text-[#636B2F]',
   'green-secondary': 'text-[#98A869]',
-  'charcoal':        'text-charcoal',
+  'charcoal':        'text-[#2D2926]',
   'white':           'text-white',
 }
 

@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useState, useTransition } from 'react'
 import { useForm, Controller } from 'react-hook-form'
@@ -42,7 +42,7 @@ function getDefaults(service: ServiceWithPractitioners | null): ServiceFormData 
       has_package: false,
       package_price_naira: null,
       package_session_count: null,
-      color_hex: '#C5A059',
+      color_hex: '#636B2F',
       is_active: true,
       sort_order: 0,
       practitioner_ids: [],
@@ -58,7 +58,7 @@ function getDefaults(service: ServiceWithPractitioners | null): ServiceFormData 
     has_package: service.package_price_naira != null,
     package_price_naira: service.package_price_naira,
     package_session_count: service.package_session_count,
-    color_hex: service.color_hex ?? '#C5A059',
+    color_hex: service.color_hex ?? '#636B2F',
     is_active: service.is_active,
     sort_order: service.sort_order,
     practitioner_ids: service.practitioner_ids,
@@ -274,7 +274,7 @@ export default function ServiceDialog({ open, onClose, service, practitioners }:
                 />
                 <Input
                   {...register('color_hex')}
-                  placeholder="#C5A059"
+                  placeholder="#636B2F"
                   className="font-mono text-xs"
                 />
               </div>

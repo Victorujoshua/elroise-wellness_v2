@@ -1,16 +1,17 @@
-'use client'
+﻿'use client'
 
 import { useState, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
-import { CheckCircle } from 'lucide-react'
+import { HugeiconsIcon } from '@hugeicons/react'
+import { CheckmarkCircle01Icon } from '@hugeicons/core-free-icons'
 import { contactSchema, type ContactFormValues } from './schema'
 import { submitContactForm } from './actions'
 import { trackEvent } from '@/lib/analytics'
 
 const inputClass =
-  'w-full border-b border-sand py-4 text-sm font-light focus:border-gold outline-none transition-colors bg-transparent placeholder:text-gray-300'
+  'w-full border-b border-[#E5E0D8] py-4 text-sm font-light focus:border-[#636B2F] outline-none transition-colors bg-transparent placeholder:text-gray-300'
 const labelClass =
   'text-[10px] uppercase tracking-widest text-gray-400 mb-2 block font-bold'
 const errorClass = 'text-red-400 text-xs mt-1.5 font-light'
@@ -43,14 +44,14 @@ export default function ContactForm() {
   if (submitted) {
     return (
       <div className="flex flex-col items-center justify-center h-full py-12 text-center">
-        <CheckCircle size={56} className="text-gold mb-6" strokeWidth={1.5} />
-        <h3 className="serif text-3xl mb-4 italic">Message Sent!</h3>
+        <HugeiconsIcon icon={CheckmarkCircle01Icon} size={56} color="#636B2F" strokeWidth={1.5} className="mb-6" />
+        <h3 className="font-sora text-3xl mb-4">Message Sent!</h3>
         <p className="text-gray-500 font-light leading-relaxed mb-8">
           Thank you for reaching out. Our team will get back to you shortly.
         </p>
         <button
           onClick={() => setSubmitted(false)}
-          className="text-xs uppercase tracking-widest text-gold border-b border-gold pb-1 hover:opacity-70 transition-opacity"
+          className="text-xs uppercase tracking-widest text-[#636B2F] border-b border-[#636B2F] pb-1 hover:opacity-70 transition-opacity"
         >
           Send Another Message
         </button>
@@ -60,8 +61,8 @@ export default function ContactForm() {
 
   return (
     <>
-      <h3 className="serif text-3xl mb-10">
-        Send a <span className="italic text-gold">message.</span>
+      <h3 className="font-sora text-3xl mb-10">
+        Send a <span className="text-[#636B2F]">message.</span>
       </h3>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
         <div>
@@ -112,7 +113,7 @@ export default function ContactForm() {
         <button
           type="submit"
           disabled={isPending}
-          className="w-full bg-charcoal text-white py-5 text-xs uppercase tracking-[0.2em] font-semibold hover:bg-gold transition-colors rounded-sm shadow-lg disabled:opacity-60 disabled:cursor-not-allowed"
+          className="w-full bg-[#2D2926] text-white py-5 text-xs uppercase tracking-[0.2em] font-semibold hover:bg-[#636B2F] transition-colors rounded-sm disabled:opacity-60 disabled:cursor-not-allowed"
         >
           {isPending ? 'Sending…' : 'Send Message'}
         </button>

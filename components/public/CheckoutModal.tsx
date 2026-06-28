@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useTransition, useRef, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
@@ -39,7 +39,7 @@ const schema = z.object({
 type FormValues = z.infer<typeof schema>
 
 const inputClass =
-  'w-full border border-charcoal/15 rounded-lg px-4 py-3 text-sm font-light text-charcoal placeholder:text-charcoal/30 focus:outline-none focus:border-gold transition-colors bg-white'
+  'w-full border border-[#2D2926]/15 rounded-lg px-4 py-3 text-sm font-light text-[#2D2926] placeholder:text-[#2D2926]/30 focus:outline-none focus:border-[#636B2F] transition-colors bg-white'
 
 function Field({
   label,
@@ -52,7 +52,7 @@ function Field({
 }) {
   return (
     <div>
-      <label className="block text-[9px] uppercase tracking-[0.4em] text-charcoal/50 font-semibold mb-2">
+      <label className="block text-[9px] uppercase tracking-[0.4em] text-[#2D2926]/50 font-semibold mb-2">
         {label}
       </label>
       {children}
@@ -149,15 +149,15 @@ export default function CheckoutModal({
       />
 
       {/* Panel */}
-      <div className="relative bg-bg w-full sm:max-w-lg sm:rounded-2xl shadow-2xl max-h-[90vh] flex flex-col">
+      <div className="relative bg-[#F9F6F2] w-full sm:max-w-lg sm:rounded-2xl shadow-2xl max-h-[90vh] flex flex-col">
 
         {/* Header */}
-        <div className="flex items-center justify-between px-8 py-5 border-b border-charcoal/10 shrink-0">
+        <div className="flex items-center justify-between px-8 py-5 border-b border-[#2D2926]/10 shrink-0">
           <div>
-            <h2 className="text-lg font-light text-charcoal">
-              Shipping <span className="italic serif text-gold">Details</span>
+            <h2 className="text-lg font-light text-[#2D2926]">
+              Shipping <span className="font-sora text-[#636B2F]">Details</span>
             </h2>
-            <p className="text-[10px] uppercase tracking-widest text-charcoal/40 mt-0.5">
+            <p className="text-[10px] uppercase tracking-widest text-[#2D2926]/40 mt-0.5">
               Total: ₦{total.toLocaleString('en-NG')}
             </p>
           </div>
@@ -165,7 +165,7 @@ export default function CheckoutModal({
             onClick={onClose}
             disabled={isPending}
             aria-label="Close checkout"
-            className="text-charcoal/40 hover:text-charcoal text-2xl font-light leading-none transition-colors disabled:opacity-30"
+            className="text-[#2D2926]/40 hover:text-[#2D2926] text-2xl font-light leading-none transition-colors disabled:opacity-30"
           >
             ×
           </button>
@@ -229,16 +229,16 @@ export default function CheckoutModal({
         </div>
 
         {/* Footer CTA */}
-        <div className="px-8 py-5 border-t border-charcoal/10 shrink-0">
+        <div className="px-8 py-5 border-t border-[#2D2926]/10 shrink-0">
           <button
             type="submit"
             form="checkout-form"
             disabled={isPending}
-            className="w-full py-4 bg-gold text-white text-[10px] uppercase tracking-[0.4em] font-bold rounded-lg hover:bg-charcoal transition-all duration-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full py-4 bg-[#636B2F] text-white text-[10px] uppercase tracking-[0.4em] font-bold rounded-lg hover:bg-[#2D2926] transition-all duration-500 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isPending ? 'Processing…' : `Pay ₦${total.toLocaleString('en-NG')} via Paystack`}
           </button>
-          <p className="text-[9px] text-charcoal/30 text-center mt-3 font-light">
+          <p className="text-[9px] text-[#2D2926]/30 text-center mt-3 font-light">
             Secured by Paystack · Lagos delivery (V1)
           </p>
         </div>

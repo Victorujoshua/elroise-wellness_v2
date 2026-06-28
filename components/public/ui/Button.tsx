@@ -1,13 +1,14 @@
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
 
-type Variant = 'primary' | 'secondary' | 'ghost'
+type Variant = 'primary' | 'secondary' | 'ghost' | 'outline'
 type Size    = 'sm' | 'md' | 'lg'
 
 const VARIANT: Record<Variant, string> = {
   primary:   'bg-[#636B2F] text-white hover:bg-[#98A869]',
-  secondary: 'border-2 border-charcoal text-charcoal hover:bg-charcoal hover:text-white',
-  ghost:     'text-charcoal hover:text-[#636B2F] underline-offset-4 hover:underline',
+  secondary: 'border-2 border-[#2D2926] text-[#2D2926] hover:bg-[#2D2926] hover:text-white',
+  outline:   'border border-[#2D2926] text-[#2D2926] hover:bg-[#636B2F] hover:text-white hover:border-[#636B2F]',
+  ghost:     'text-[#2D2926] hover:text-[#636B2F] underline-offset-4 hover:underline',
 }
 
 const SIZE: Record<Size, string> = {

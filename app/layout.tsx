@@ -51,7 +51,7 @@ export default function RootLayout({
       className={cn("h-full", "antialiased", playfair.variable, montserrat.variable, sora.variable, "font-sans", geist.variable)}
     >
       {/* suppressHydrationWarning: browser extensions add attributes to body that don't exist in SSR HTML */}
-      <body className="min-h-full flex flex-col font-body bg-bg text-charcoal" suppressHydrationWarning>
+      <body className="min-h-full flex flex-col font-body bg-[#F9F6F2] text-[#2D2926]" suppressHydrationWarning>
         {children}
         <Toaster position="bottom-right" richColors />
         {process.env.NODE_ENV === 'production' && process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID && (

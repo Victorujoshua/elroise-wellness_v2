@@ -11,9 +11,9 @@ const PADDING: Record<CardPadding, string> = {
 
 const BG: Record<CardBg, string> = {
   'white':           'bg-white',
-  'off-white':       'bg-bg',
+  'off-white':       'bg-[#F9F6F2]',
   'green-primary':   'bg-[#636B2F] text-white',
-  'green-secondary': 'bg-[#98A869] text-charcoal',
+  'green-secondary': 'bg-[#98A869] text-[#2D2926]',
 }
 
 export function Card({
@@ -28,7 +28,7 @@ export function Card({
   children: React.ReactNode
 }) {
   return (
-    <div className={cn('rounded-2xl shadow-sm border border-charcoal/8', PADDING[padding], BG[background], className)}>
+    <div className={cn('rounded-2xl shadow-sm border border-[#2D2926]/8', PADDING[padding], BG[background], className)}>
       {children}
     </div>
   )

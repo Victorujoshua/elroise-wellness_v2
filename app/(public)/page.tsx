@@ -1,237 +1,332 @@
-import Image from 'next/image'
+﻿import Image from 'next/image'
 import Link from 'next/link'
 import type { Metadata } from 'next'
-import ServiceCard from '@/components/public/ServiceCard'
-import { featuredServices } from '@/lib/data/services'
+import { Section } from '@/components/public/ui/Section'
+import ProductSlider from '@/components/public/ProductSlider'
+import { HugeiconsIcon } from '@hugeicons/react'
+import {
+  Yoga01Icon,
+  MagicWand01Icon,
+  ArrowRight01Icon,
+  CheckmarkBadge01Icon,
+  UserGroupIcon,
+  Diamond01Icon,
+  Shield01Icon,
+  Clock01Icon,
+} from '@hugeicons/core-free-icons'
 
 export const metadata: Metadata = {
   title: "Lagos' Premier Pilates & Laser Hair Removal Studio",
   description:
-    'Where light meets the art of motion. Premium Reformer Pilates and Laser Hair Reduction in Lekki, Lagos.',
+    'Premium Reformer Pilates and Laser Hair Reduction in Lekki, Lagos. Book your session today.',
 }
 
 export default function HomePage() {
   return (
-    <div className="bg-bg">
-      {/* Hero */}
-      <section className="relative h-screen overflow-hidden bg-bg flex flex-col">
-        <div className="flex flex-1 pt-[72px]">
-          {/* Left text */}
-          <div className="flex flex-col justify-center px-10 md:px-16 lg:px-20 w-full lg:w-[52%] relative z-10">
-            <div className="flex items-center space-x-4 mb-10">
-              <div className="w-10 h-[1px] bg-gold" />
-              <p className="text-[9px] uppercase tracking-[0.5em] text-gold font-semibold">
-                Omnia Flunnt — Everything Flows
-              </p>
-            </div>
-            <h1 className="text-5xl md:text-6xl lg:text-[4.5rem] leading-[1.08] mb-8 text-charcoal font-light fade-in">
-              Where <span className="italic serif text-gold">light</span> meets
-              <br />the art of <span className="italic serif text-charcoal">motion.</span>
-            </h1>
-            <div className="w-16 h-[1px] bg-gold/40 mb-8" />
-            <p className="text-sm md:text-[15px] text-charcoal/55 mb-12 max-w-sm font-light leading-loose tracking-wide">
-              Lagos&apos; premier sanctuary for Laser Hair Reduction and Reformer Pilates. Precision.
-              Grace. You.
-            </p>
-            <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-8">
-              <Link
-                href="/booking"
-                className="bg-charcoal text-white px-10 py-4 text-[9px] uppercase tracking-[0.4em] font-bold hover:bg-gold transition-all duration-500 rounded-sm"
-              >
-                Book a Session
-              </Link>
-              <Link
-                href="/services"
-                className="flex items-center space-x-3 text-[9px] uppercase tracking-[0.4em] font-bold text-charcoal/50 hover:text-gold transition-colors duration-300 group"
-              >
-                <span>Explore Rituals</span>
-                <span className="w-6 h-[1px] bg-charcoal/30 group-hover:bg-gold group-hover:w-10 transition-all duration-500 inline-block" />
-              </Link>
-            </div>
-          </div>
+    <div className="bg-[#F9F6F2] pt-[72px]">
 
-          {/* Right image */}
-          <div className="hidden lg:flex lg:w-[48%] relative overflow-hidden items-center justify-center p-8">
-            <div className="relative w-full h-full rounded-3xl overflow-hidden shadow-2xl">
-              <Image
-                src="/hero.jpeg"
-                fill
-                className="object-cover scale-105 hover:scale-100 transition-transform duration-[10s]"
-                alt="Elroisè Reformer Pilates Studio"
-                priority
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-              <div className="absolute inset-4 border border-gold/30 rounded-2xl pointer-events-none z-10" />
-              <div className="absolute bottom-8 left-8 z-20 bg-white/85 backdrop-blur-sm px-5 py-3 rounded-xl shadow-lg">
-                <p className="text-[8px] uppercase tracking-[0.4em] text-gold font-semibold mb-0.5">
-                  Est. Lagos
-                </p>
-                <p className="text-xs text-charcoal font-light">Premium Wellness Sanctuary</p>
-              </div>
-            </div>
-            <div className="absolute inset-0 bg-gradient-to-r from-bg/50 via-transparent to-transparent pointer-events-none" />
-          </div>
-        </div>
+      {/* ── 1. Announcement bar ─────────────────────────────────── */}
+      <div className="bg-[#636B2F] py-2.5 px-6 text-center">
+        <p className="font-sora text-[10px] uppercase tracking-[0.2em] text-white">
+          Now booking sessions in Lekki —{' '}
+          <Link href="/book" className="underline underline-offset-2 hover:no-underline">
+            Book online
+          </Link>
+        </p>
+      </div>
 
-        {/* Stats bar */}
-        <div className="border-t border-charcoal/10 bg-white/60 backdrop-blur-sm px-10 md:px-20 py-5">
-          <div className="max-w-7xl mx-auto flex items-center justify-between">
-            <div className="flex items-center space-x-10 md:space-x-16">
-              <div>
-                <p className="text-xl md:text-2xl font-light text-charcoal">5+</p>
-                <p className="text-[8px] uppercase tracking-[0.3em] text-charcoal/40 mt-0.5">
-                  Years of Excellence
-                </p>
-              </div>
-              <div className="w-[1px] h-7 bg-charcoal/15" />
-              <div>
-                <p className="text-xl md:text-2xl font-light text-charcoal">2</p>
-                <p className="text-[8px] uppercase tracking-[0.3em] text-charcoal/40 mt-0.5">
-                  Signature Studios
-                </p>
-              </div>
-              <div className="w-[1px] h-7 bg-charcoal/15" />
-              <div>
-                <p className="text-xl md:text-2xl font-light text-charcoal">∞</p>
-                <p className="text-[8px] uppercase tracking-[0.3em] text-charcoal/40 mt-0.5">
-                  Rituals Offered
-                </p>
-              </div>
-            </div>
-            <div className="hidden md:flex flex-col items-center space-y-2">
-              <div className="w-[1px] h-8 bg-gradient-to-b from-charcoal/30 to-transparent animate-pulse" />
-              <p className="text-[7px] uppercase tracking-[0.5em] text-charcoal/30">Scroll</p>
-            </div>
-          </div>
+      {/* ── 2. Hero (Merit "Clean Volume" — full-bleed + floating card) */}
+      <section className="relative w-full h-[80vh] min-h-[500px] overflow-hidden">
+
+        <Image
+          src="/hero1.png"
+          alt="Woman performing Pilates on a reformer at Elroisè Wellness Center"
+          fill
+          className="object-cover"
+          priority
+        />
+
+        {/* Light overlay — stays when real image is added */}
+        <div className="absolute inset-0 bg-black/10" />
+
+        {/* Floating content card — bottom-left */}
+        <div className="absolute left-4 bottom-4 md:left-8 md:bottom-8 bg-white p-6 md:p-8 max-w-md shadow-sm">
+
+          <p className="text-xs uppercase tracking-wider text-[#2D2926] font-medium mb-3">
+            New
+          </p>
+
+          <h1 className="font-sora text-3xl md:text-4xl font-bold text-[#2D2926] leading-tight mb-3">
+            Book a session
+          </h1>
+
+          <p className="text-sm text-[#2D2926] leading-relaxed mb-5">
+            Lagos&apos; premier sanctuary for laser hair reduction and reformer Pilates.
+          </p>
+
+          <Link
+            href="/book"
+            className="inline-flex items-center gap-2 text-sm font-medium text-[#2D2926] hover:text-[#636B2F] transition-colors duration-200 group cursor-pointer"
+          >
+            Book now
+            <HugeiconsIcon icon={ArrowRight01Icon} size={14} color="currentColor" strokeWidth={2} className="transform group-hover:translate-x-0.5 transition-transform duration-200" />
+          </Link>
+
         </div>
       </section>
 
-      {/* Feature sections */}
-      <section className="py-24 md:py-40 px-6 max-w-7xl mx-auto">
+      {/* ── 2b. Services highlight ───────────────────────────────── */}
+      <section className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-[#E5E0D8] bg-white">
+
         {/* Pilates */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center mb-32">
-          <div className="order-2 lg:order-1">
-            <p className="text-gold text-xs uppercase tracking-widest mb-6 font-bold">
-              The Pilates Studio
+        <Link href="/services" className="group px-8 md:px-12 lg:px-16 py-14 md:py-16 block cursor-pointer hover:bg-[#F9F6F2] transition-colors duration-300">
+          <div className="flex items-center gap-3 mb-5">
+            <div className="w-8 h-8 bg-[#F3F5EE] flex items-center justify-center">
+              <HugeiconsIcon icon={Yoga01Icon} size={16} color="#636B2F" strokeWidth={1.5} />
+            </div>
+            <p className="font-sora text-[10px] uppercase tracking-[0.25em] text-[#636B2F] font-medium">
+              Studio
             </p>
-            <h2 className="text-3xl md:text-5xl serif mb-8 leading-tight italic text-charcoal/90">
-              Mindful movement, <br />redefined.
-            </h2>
-            <p className="text-lg text-gray-500 font-light leading-loose mb-12">
-              Our Reformer Pilates sessions are designed to build long, lean muscle and core
-              stability. In our sanctuary, movement is a ritual of strength and grace.
-            </p>
-            <Link
-              href="/services"
-              className="text-[10px] uppercase tracking-[0.3em] font-bold border-b border-gold pb-2 hover:text-gold transition-colors"
-            >
-              Explore Pilates
-            </Link>
           </div>
-          <div className="order-1 lg:order-2 relative rounded-2xl overflow-hidden shadow-2xl h-[600px]">
-            <Image
-              src="/pilates.jpeg"
-              fill
-              className="object-cover grayscale-[10%] hover:grayscale-0 transition-all duration-1000"
-              alt="Pilates Reformer Session"
-            />
-          </div>
-        </div>
+          <h2 className="font-sora text-3xl md:text-4xl font-light text-[#2D2926] leading-tight mb-4">
+            Reformer Pilates
+          </h2>
+          <p className="text-sm text-[#2D2926]/60 leading-relaxed mb-8 max-w-sm">
+            Build long, lean muscle and core stability in our private reformer studio. Movement as ritual — precise, intentional, transformative.
+          </p>
+          <span className="inline-flex items-center gap-2 font-sora text-[11px] uppercase tracking-[0.2em] font-medium text-[#2D2926] group-hover:text-[#636B2F] transition-colors duration-200">
+            Explore Pilates
+            <HugeiconsIcon icon={ArrowRight01Icon} size={13} color="currentColor" strokeWidth={2} className="transform group-hover:translate-x-0.5 transition-transform duration-200" />
+          </span>
+        </Link>
 
         {/* Laser */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
-          <div className="relative rounded-2xl overflow-hidden shadow-2xl h-[600px]">
-            <Image
-              src="/laser.jpeg"
-              fill
-              className="object-cover grayscale-[10%] hover:grayscale-0 transition-all duration-1000"
-              alt="Laser Hair Reduction Treatment"
-            />
-          </div>
-          <div>
-            <p className="text-gold text-xs uppercase tracking-widest mb-6 font-bold">
-              Laser Precision
-            </p>
-            <h2 className="text-3xl md:text-5xl serif mb-8 leading-tight italic text-charcoal/90">
-              Silky smooth, <br />permanently.
-            </h2>
-            <p className="text-lg text-gray-500 font-light leading-loose mb-12">
-              Experience the gold standard in hair reduction. Our advanced laser technology ensures
-              comfort and precision for all skin types, revealing your most radiant self.
-            </p>
-            <Link
-              href="/services"
-              className="text-[10px] uppercase tracking-[0.3em] font-bold border-b border-gold pb-2 hover:text-gold transition-colors"
-            >
-              Explore Laser
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Image strip */}
-      <section className="flex overflow-hidden h-64 md:h-80 w-full opacity-80">
-        {['/strip-1.jpeg', '/strip-2.jpeg', '/strip-3.jpeg', '/strip-4.jpeg'].map((src, i) => (
-          <div key={i} className="relative w-1/4 h-full overflow-hidden">
-            <Image
-              src={src}
-              fill
-              className="object-cover hover:scale-110 transition-transform duration-[3s]"
-              alt="Ritual Texture"
-            />
-          </div>
-        ))}
-      </section>
-
-      {/* Rituals section */}
-      <section className="py-32 px-6 bg-white/30">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row justify-between items-end mb-20">
-            <div className="max-w-xl">
-              <p className="text-gold text-xs uppercase tracking-widest mb-4 font-bold">Rituals</p>
-              <h2 className="text-4xl md:text-6xl serif mb-6">
-                Nurturing your <br />
-                <span className="italic">inner landscape.</span>
-              </h2>
+        <Link href="/services" className="group px-8 md:px-12 lg:px-16 py-14 md:py-16 block cursor-pointer hover:bg-[#F9F6F2] transition-colors duration-300">
+          <div className="flex items-center gap-3 mb-5">
+            <div className="w-8 h-8 bg-[#FDF8F0] flex items-center justify-center">
+              <HugeiconsIcon icon={MagicWand01Icon} size={16} color="#636B2F" strokeWidth={1.5} />
             </div>
-            <Link
-              href="/services"
-              className="text-[10px] uppercase tracking-widest font-bold mb-4 border-b border-sand pb-1 hover:border-gold transition-all"
-            >
-              View All Offerings
-            </Link>
+            <p className="font-sora text-[10px] uppercase tracking-[0.25em] text-[#636B2F] font-medium">
+              Clinic
+            </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-            {featuredServices.map(service => (
-              <ServiceCard key={service.id} service={service} />
-            ))}
-          </div>
+          <h2 className="font-sora text-3xl md:text-4xl font-light text-[#2D2926] leading-tight mb-4">
+            Laser Hair Removal
+          </h2>
+          <p className="text-sm text-[#2D2926]/60 leading-relaxed mb-8 max-w-sm">
+            Gold-standard laser technology for permanent hair reduction. Safe for all skin types, delivered with clinical precision in a private setting.
+          </p>
+          <span className="inline-flex items-center gap-2 font-sora text-[11px] uppercase tracking-[0.2em] font-medium text-[#2D2926] group-hover:text-[#636B2F] transition-colors duration-200">
+            Explore Laser
+            <HugeiconsIcon icon={ArrowRight01Icon} size={13} color="currentColor" strokeWidth={2} className="transform group-hover:translate-x-0.5 transition-transform duration-200" />
+          </span>
+        </Link>
+
+      </section>
+
+      {/* ── 2c. Trust signals bar ─────────────────────────────────── */}
+      <section className="bg-[#2D2926] py-10 px-6">
+        <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8">
+          {[
+            { icon: UserGroupIcon, label: '500+', sub: 'Clients Served', color: '#636B2F' },
+            { icon: CheckmarkBadge01Icon, label: 'Expert', sub: 'Certified Practitioners', color: '#636B2F' },
+            { icon: Diamond01Icon, label: 'Gold', sub: 'Standard Technology', color: '#636B2F' },
+            { icon: Shield01Icon, label: 'Private', sub: 'Treatment Rooms', color: '#636B2F' },
+          ].map(({ icon, label, sub, color }) => (
+            <div key={label + sub} className="flex items-center gap-4">
+              <HugeiconsIcon icon={icon} size={22} color={color} strokeWidth={1.5} className="shrink-0" />
+              <div>
+                <p className="font-sora text-sm font-semibold text-white">{label}</p>
+                <p className="font-sora text-[10px] text-white/50 uppercase tracking-widest">{sub}</p>
+              </div>
+            </div>
+          ))}
         </div>
       </section>
 
-      {/* Final CTA */}
-      <section className="relative py-40 overflow-hidden text-center text-white">
-        <div className="absolute inset-0 z-0">
-          <Image
-            src="https://images.unsplash.com/photo-1596178065887-1198b6148b2b?q=80&w=2070&auto=format&fit=crop"
-            fill
-            className="object-cover brightness-50"
-            alt="Final CTA Background"
-          />
-        </div>
-        <div className="relative z-10 px-6 max-w-4xl mx-auto">
-          <h2 className="text-4xl md:text-6xl serif mb-6">Return to yourself.</h2>
-          <p className="text-xl md:text-2xl font-light italic mb-12 opacity-80">
-            Begin your wellness flow today.
+      {/* ── 3. Intro ──────────────────────────────────────────────── */}
+      <section className="relative px-6 md:px-16 lg:px-24 py-14 md:py-20 overflow-hidden">
+        <Image
+          src="/back.webp"
+          alt="Wellness sanctuary"
+          fill
+          className="object-cover object-center"
+        />
+        <div className="absolute inset-0 bg-black/55" />
+        <div className="relative z-10 max-w-2xl">
+          <h2 className="font-sora text-[48px] font-light text-white leading-[1.08] mb-6">
+            Wellness With Intention
+          </h2>
+          <p className="text-sm md:text-base text-white/70 leading-relaxed mb-10 max-w-md">
+            A considered collection of treatments and rituals designed to bring grace, precision,
+            and care to your everyday.
           </p>
           <Link
-            href="/booking"
-            className="bg-white text-charcoal px-12 py-5 text-[10px] uppercase tracking-[0.3em] font-bold hover:bg-gold hover:text-white transition-all duration-500 rounded-sm inline-block shadow-2xl"
+            href="/about"
+            className="inline-block bg-white text-[#2D2926] text-[11px] font-medium uppercase tracking-[0.2em] px-8 py-4 hover:bg-[#F9F6F2] transition-colors duration-200"
           >
-            Book Your Session
+            About Us
           </Link>
         </div>
       </section>
+
+      {/* ── 5. Best Sellers (hidden) ─────────────────────────────── */}
+      {false && <Section background="white" className="py-20 md:py-24">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+
+          {/* Left — atmospheric image */}
+          <div className="aspect-[4/5] lg:aspect-auto lg:h-full bg-[#F9F6F2] border border-[#E5E0D8] flex items-center justify-center">
+            <span className="font-sora text-[9px] uppercase tracking-wider text-[#A8A29E]">
+              Atmospheric Product Photo
+            </span>
+          </div>
+
+          {/* Right — text + cards */}
+          <div className="flex flex-col">
+
+            <p className="font-sora text-4xl md:text-5xl text-[#2D2926] mb-3 leading-tight">
+              Best Sellers
+            </p>
+            <p className="text-sm md:text-base text-[#2D2926]/70 mb-4">
+              Thoughtfully crafted essentials to extend your sanctuary ritual at home.
+            </p>
+            <Link
+              href="/shop"
+              className="self-start text-sm font-medium text-[#2D2926] hover:text-[#636B2F] transition-colors duration-200 mb-10"
+            >
+              Shop All ▸
+            </Link>
+
+            <div className="grid grid-cols-3 gap-4">
+
+              <Link href="/shop" className="group block">
+                <div className="relative aspect-square bg-[#F9F6F2] border border-[#E5E0D8] flex items-center justify-center overflow-hidden">
+                  <span className="font-sora text-[9px] uppercase tracking-wider text-[#A8A29E]">
+                    Product Photo
+                  </span>
+                  <div className="absolute inset-x-0 bottom-0 bg-[#2D2926] py-3 translate-y-full group-hover:translate-y-0 transition-transform duration-300 flex items-center justify-center">
+                    <span className="font-sora text-[9px] uppercase tracking-[0.15em] text-white">Add to Cart</span>
+                  </div>
+                </div>
+                <p className="font-sora text-sm text-[#2D2926] mt-3 group-hover:text-[#636B2F] transition-colors duration-300">
+                  Recovery Cream
+                </p>
+                <p className="font-sora text-xs text-[#2D2926]/60 mt-1">₦12,500</p>
+              </Link>
+
+              <Link href="/shop" className="group block">
+                <div className="relative aspect-square bg-[#F9F6F2] border border-[#E5E0D8] flex items-center justify-center overflow-hidden">
+                  <span className="font-sora text-[9px] uppercase tracking-wider text-[#A8A29E]">
+                    Product Photo
+                  </span>
+                  <div className="absolute inset-x-0 bottom-0 bg-[#2D2926] py-3 translate-y-full group-hover:translate-y-0 transition-transform duration-300 flex items-center justify-center">
+                    <span className="font-sora text-[9px] uppercase tracking-[0.15em] text-white">Add to Cart</span>
+                  </div>
+                </div>
+                <p className="font-sora text-sm text-[#2D2926] mt-3 group-hover:text-[#636B2F] transition-colors duration-300">
+                  Pilates Grip Socks
+                </p>
+                <p className="font-sora text-xs text-[#2D2926]/60 mt-1">₦7,500</p>
+              </Link>
+
+              <Link href="/shop" className="group block">
+                <div className="relative aspect-square bg-[#F9F6F2] border border-[#E5E0D8] flex items-center justify-center overflow-hidden">
+                  <span className="font-sora text-[9px] uppercase tracking-wider text-[#A8A29E]">
+                    Product Photo
+                  </span>
+                  <div className="absolute inset-x-0 bottom-0 bg-[#2D2926] py-3 translate-y-full group-hover:translate-y-0 transition-transform duration-300 flex items-center justify-center">
+                    <span className="font-sora text-[9px] uppercase tracking-[0.15em] text-white">Add to Cart</span>
+                  </div>
+                </div>
+                <p className="font-sora text-sm text-[#2D2926] mt-3 group-hover:text-[#636B2F] transition-colors duration-300">
+                  Sanctuary Candle
+                </p>
+                <p className="font-sora text-xs text-[#2D2926]/60 mt-1">₦8,500</p>
+              </Link>
+
+            </div>
+          </div>
+
+        </div>
+      </Section>}
+
+      {/* ── 9. Services Overview ─────────────────────────────────── */}
+      <Section background="white" className="py-20 md:py-24">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+
+          {/* Left — atmospheric image */}
+          <div className="aspect-[4/5] bg-[#F9F6F2] border border-[#E5E0D8] flex items-center justify-center">
+            <span className="font-sora text-xs uppercase tracking-wider text-[#A8A29E]">
+              Services Atmospheric Photo
+            </span>
+          </div>
+
+          {/* Right — header + service list */}
+          <div className="flex flex-col justify-center">
+
+            <p className="font-sora text-4xl md:text-5xl text-[#2D2926] mb-3">
+              Our Services
+            </p>
+            <p className="text-sm md:text-base text-[#2D2926]/70 leading-relaxed mb-4">
+              A complete catalog of laser hair reduction and reformer Pilates treatments, available for online booking.
+            </p>
+            <Link
+              href="/services"
+              className="self-start inline-flex items-center gap-2 text-sm font-medium text-[#2D2926] hover:text-[#636B2F] transition-colors duration-200 mb-10 group cursor-pointer"
+            >
+              View All
+              <HugeiconsIcon icon={ArrowRight01Icon} size={14} color="currentColor" strokeWidth={2} className="transform group-hover:translate-x-0.5 transition-transform duration-200" />
+            </Link>
+
+            <div className="divide-y divide-[#E5E0D8]">
+              {([
+                { name: 'Reformer Pilates',       duration: '55 MIN', price: '₦20,000', href: '/services', cat: 'pilates' },
+                { name: 'Pilates Private Session', duration: '60 MIN', price: '₦35,000', href: '/services', cat: 'pilates' },
+                { name: 'Pilates Group Class',     duration: '50 MIN', price: '₦15,000', href: '/services', cat: 'pilates' },
+                { name: 'Lower Face Laser',        duration: '30 MIN', price: '₦70,000', href: '/services', cat: 'laser' },
+                { name: 'Brazilian Laser',         duration: '45 MIN', price: '₦95,000', href: '/services', cat: 'laser' },
+                { name: 'Underarm Laser',          duration: '20 MIN', price: '₦30,000', href: '/services', cat: 'laser' },
+              ] as const).map(service => (
+                <Link
+                  key={service.name}
+                  href={service.href}
+                  className="flex justify-between items-center py-3 md:py-4 -mx-2 px-2 hover:bg-[#F9F6F2] transition-colors duration-200 rounded group cursor-pointer"
+                >
+                  <div className="flex items-center gap-3">
+                    <HugeiconsIcon
+                      icon={service.cat === 'pilates' ? Yoga01Icon : MagicWand01Icon}
+                      size={14}
+                      color={service.cat === 'pilates' ? '#636B2F' : '#636B2F'}
+                      strokeWidth={1.5}
+                      className="shrink-0"
+                    />
+                    <div>
+                      <p className="text-base text-[#2D2926] group-hover:text-[#636B2F] transition-colors duration-200">
+                        {service.name}
+                      </p>
+                      <div className="flex items-center gap-1 mt-0.5">
+                        <HugeiconsIcon icon={Clock01Icon} size={10} color="#9CA3AF" strokeWidth={1.5} />
+                        <p className="text-xs text-[#2D2926]/60">{service.duration}</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 shrink-0">
+                    <span className="text-sm text-[#2D2926]">{service.price}</span>
+                    <HugeiconsIcon icon={ArrowRight01Icon} size={13} color="currentColor" strokeWidth={1.5} className="text-[#2D2926]/40 group-hover:text-[#636B2F] transition-colors duration-200" />
+                  </div>
+                </Link>
+              ))}
+            </div>
+
+          </div>
+        </div>
+      </Section>
+
+      {/* ── 10. Shop the Sanctuary (hidden) ─────────────────────── */}
+      {false && <Section background="white" className="py-20 md:py-24">
+        <ProductSlider />
+      </Section>}
+
     </div>
   )
 }

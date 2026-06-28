@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState, useTransition } from 'react'
 import { X } from 'lucide-react'
@@ -166,10 +166,10 @@ function AppointmentDetail({
           {appt.clients && (
             <Section label="Client">
               <p className="font-medium">{appt.clients.full_name}</p>
-              <a href={`tel:${appt.clients.phone}`} className="text-xs text-gold hover:underline block mt-0.5">
+              <a href={`tel:${appt.clients.phone}`} className="text-xs text-[#636B2F] hover:underline block mt-0.5">
                 {appt.clients.phone}
               </a>
-              <a href={`mailto:${appt.clients.email}`} className="text-xs text-gold hover:underline block">
+              <a href={`mailto:${appt.clients.email}`} className="text-xs text-[#636B2F] hover:underline block">
                 {appt.clients.email}
               </a>
             </Section>

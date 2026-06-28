@@ -42,7 +42,7 @@ export default function TimeOffPanel({ practitionerId, timeOff }: Props) {
       </div>
 
       {timeOff.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-charcoal/20 py-10 text-center">
+        <div className="rounded-lg border border-dashed border-[#2D2926]/20 py-10 text-center">
           <p className="text-sm text-muted-foreground">No time off recorded.</p>
         </div>
       ) : (

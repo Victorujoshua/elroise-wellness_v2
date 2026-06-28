@@ -311,7 +311,7 @@ function SlotStep({
       </div>
 
       {state.availability.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-charcoal/20 py-10 text-center">
+        <div className="rounded-lg border border-dashed border-[#2D2926]/20 py-10 text-center">
           <p className="text-sm text-muted-foreground">No availability for this date.</p>
           <p className="text-xs text-muted-foreground mt-1">
             Check that practitioners have shifts set up for this day.
@@ -332,8 +332,8 @@ function SlotStep({
                     className={cn(
                       'px-3 py-1.5 rounded-md border text-xs font-medium transition-colors',
                       state.slot === slot && state.pid === p.practitioner_id
-                        ? 'bg-charcoal text-white border-charcoal'
-                        : 'border-input hover:border-charcoal/40 hover:bg-muted',
+                        ? 'bg-[#2D2926] text-white border-[#2D2926]'
+                        : 'border-input hover:border-[#2D2926]/40 hover:bg-muted',
                     )}
                   >
                     {fmtTime(slot)}
@@ -459,8 +459,8 @@ function PaymentStep({
                 className={cn(
                   'rounded-lg border p-3 text-left text-sm transition-colors',
                   state.tier === t
-                    ? 'border-charcoal bg-charcoal/5 font-medium'
-                    : 'border-input hover:border-charcoal/30',
+                    ? 'border-[#2D2926] bg-[#2D2926]/5 font-medium'
+                    : 'border-input hover:border-[#2D2926]/30',
                 )}
               >
                 <p className="capitalize font-medium">{t}</p>
@@ -487,8 +487,8 @@ function PaymentStep({
               className={cn(
                 'rounded-lg border px-3 py-2 text-sm text-left transition-colors',
                 state.payMethod === value
-                  ? 'border-charcoal bg-charcoal/5 font-medium'
-                  : 'border-input hover:border-charcoal/30',
+                  ? 'border-[#2D2926] bg-[#2D2926]/5 font-medium'
+                  : 'border-input hover:border-[#2D2926]/30',
               )}
             >
               {label}

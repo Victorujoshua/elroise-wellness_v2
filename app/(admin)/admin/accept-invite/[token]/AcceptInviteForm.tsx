@@ -1,11 +1,11 @@
-'use client'
+﻿'use client'
 
 import { useState, useTransition } from 'react'
 import Link from 'next/link'
 import { acceptInvite } from './actions'
 
 const inputClass =
-  'w-full px-3 py-2 text-sm border border-charcoal/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-gold/40 focus:border-gold transition-colors'
+  'w-full px-3 py-2 text-sm border border-[#2D2926]/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#636B2F]/40 focus:border-[#636B2F] transition-colors'
 
 interface Props {
   token: string
@@ -42,9 +42,9 @@ export default function AcceptInviteForm({ token, defaultName, email, role }: Pr
 
   if (done) {
     return (
-      <div className="bg-white rounded-xl shadow-sm border border-charcoal/10 p-8 text-center">
-        <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-gold/10 mb-4">
-          <svg viewBox="0 0 24 24" fill="none" className="w-6 h-6 text-gold">
+      <div className="bg-white rounded-xl shadow-sm border border-[#2D2926]/10 p-8 text-center">
+        <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[#636B2F]/10 mb-4">
+          <svg viewBox="0 0 24 24" fill="none" className="w-6 h-6 text-[#636B2F]">
             <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5" />
             <path
               d="M7.5 12.5l3 3 6-6"
@@ -55,13 +55,13 @@ export default function AcceptInviteForm({ token, defaultName, email, role }: Pr
             />
           </svg>
         </div>
-        <p className="text-sm font-medium text-charcoal mb-1">Account created</p>
-        <p className="text-xs text-charcoal/50 mb-6">
+        <p className="text-sm font-medium text-[#2D2926] mb-1">Account created</p>
+        <p className="text-xs text-[#2D2926]/50 mb-6">
           You can now sign in to the admin portal.
         </p>
         <Link
           href="/admin/login"
-          className="inline-block px-6 py-2.5 bg-charcoal text-white text-xs font-medium rounded-lg hover:bg-charcoal/90 transition-colors"
+          className="inline-block px-6 py-2.5 bg-[#2D2926] text-white text-xs font-medium rounded-lg hover:bg-[#2D2926]/90 transition-colors"
         >
           Sign in →
         </Link>
@@ -72,26 +72,26 @@ export default function AcceptInviteForm({ token, defaultName, email, role }: Pr
   return (
     <form
       onSubmit={handleSubmit}
-      className="bg-white rounded-xl shadow-sm border border-charcoal/10 p-8 space-y-5"
+      className="bg-white rounded-xl shadow-sm border border-[#2D2926]/10 p-8 space-y-5"
     >
-      <p className="text-xs text-charcoal/50">
+      <p className="text-xs text-[#2D2926]/50">
         You&apos;ve been invited as{' '}
-        <span className="font-medium text-charcoal capitalize">{role}</span>.
+        <span className="font-medium text-[#2D2926] capitalize">{role}</span>.
         Set your name and a password to complete sign-up.
       </p>
 
       <div>
-        <label className="block text-xs font-medium text-charcoal/70 mb-1.5">Email</label>
+        <label className="block text-xs font-medium text-[#2D2926]/70 mb-1.5">Email</label>
         <input
           type="email"
           value={email}
           disabled
-          className="w-full px-3 py-2 text-sm border border-charcoal/10 rounded-lg bg-charcoal/5 text-charcoal/50 cursor-not-allowed"
+          className="w-full px-3 py-2 text-sm border border-[#2D2926]/10 rounded-lg bg-[#2D2926]/5 text-[#2D2926]/50 cursor-not-allowed"
         />
       </div>
 
       <div>
-        <label className="block text-xs font-medium text-charcoal/70 mb-1.5">Full name</label>
+        <label className="block text-xs font-medium text-[#2D2926]/70 mb-1.5">Full name</label>
         <input
           name="full_name"
           required
@@ -101,7 +101,7 @@ export default function AcceptInviteForm({ token, defaultName, email, role }: Pr
       </div>
 
       <div>
-        <label className="block text-xs font-medium text-charcoal/70 mb-1.5">Password</label>
+        <label className="block text-xs font-medium text-[#2D2926]/70 mb-1.5">Password</label>
         <input
           name="password"
           type="password"
@@ -113,7 +113,7 @@ export default function AcceptInviteForm({ token, defaultName, email, role }: Pr
       </div>
 
       <div>
-        <label className="block text-xs font-medium text-charcoal/70 mb-1.5">
+        <label className="block text-xs font-medium text-[#2D2926]/70 mb-1.5">
           Confirm password
         </label>
         <input
@@ -130,7 +130,7 @@ export default function AcceptInviteForm({ token, defaultName, email, role }: Pr
       <button
         type="submit"
         disabled={isPending}
-        className="w-full py-2.5 bg-charcoal text-white text-sm font-medium rounded-lg hover:bg-charcoal/90 transition-colors disabled:opacity-50"
+        className="w-full py-2.5 bg-[#2D2926] text-white text-sm font-medium rounded-lg hover:bg-[#2D2926]/90 transition-colors disabled:opacity-50"
       >
         {isPending ? 'Creating account…' : 'Create account'}
       </button>

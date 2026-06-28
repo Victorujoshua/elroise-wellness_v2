@@ -26,7 +26,7 @@ export default function TopBar({ user }: Props) {
       <h1 className="text-sm font-semibold text-foreground">{title}</h1>
       <div className="flex items-center gap-2.5">
         <span className="text-xs text-muted-foreground hidden sm:block">{user.name}</span>
-        <div className="size-7 rounded-full bg-gold/20 flex items-center justify-center text-xs font-semibold text-gold">
+        <div className="size-7 rounded-full bg-[#636B2F]/15 flex items-center justify-center text-xs font-semibold text-[#636B2F]">
           {user.name.charAt(0).toUpperCase()}
         </div>
       </div>

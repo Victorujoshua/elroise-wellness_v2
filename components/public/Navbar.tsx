@@ -3,15 +3,13 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { ShoppingBag, Menu, X } from 'lucide-react'
-import { useCartStore } from '@/lib/cart'
+import { Menu, X } from 'lucide-react'
 import { Button } from '@/components/public/ui/Button'
 
 const NAV_LINKS = [
   { name: 'Home',        path: '/' },
   { name: 'About',       path: '/about' },
   { name: 'Services',    path: '/services' },
-  { name: 'Shop',        path: '/shop' },
   { name: 'Contact',     path: '/contact' },
   { name: 'My Bookings', path: '/my-bookings' },
 ]
@@ -19,13 +17,7 @@ const NAV_LINKS = [
 export default function Navbar() {
   const [scrolled,  setScrolled]  = useState(false)
   const [menuOpen,  setMenuOpen]  = useState(false)
-  const [mounted,   setMounted]   = useState(false)
   const pathname = usePathname()
-
-  const openCart  = useCartStore((s) => s.openCart)
-  const itemCount = useCartStore((s) => s.items.reduce((sum, i) => sum + i.qty, 0))
-
-  useEffect(() => setMounted(true), [])
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 50)
@@ -45,7 +37,7 @@ export default function Navbar() {
       <nav
         className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
           scrolled
-            ? 'bg-white border-b border-charcoal/10 shadow-sm py-4'
+            ? 'bg-white border-b border-[#2D2926]/10 shadow-sm py-4'
             : 'bg-transparent py-6'
         }`}
       >
@@ -82,20 +74,6 @@ export default function Navbar() {
           {/* Right actions */}
           <div className="flex items-center gap-3">
 
-            {/* Cart */}
-            <button
-              onClick={openCart}
-              aria-label="Open cart"
-              className="relative p-1 text-[#2D2926] hover:text-[#636B2F] transition-colors duration-200"
-            >
-              <ShoppingBag size={19} strokeWidth={1.5} />
-              {mounted && itemCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#636B2F] rounded-full text-white text-[8px] flex items-center justify-center font-bold leading-none">
-                  {itemCount > 9 ? '9+' : itemCount}
-                </span>
-              )}
-            </button>
-
             {/* Book Session — desktop */}
             <div className="hidden md:block">
               <Button href="/book" variant="primary" size="sm">
@@ -121,7 +99,7 @@ export default function Navbar() {
         <div className="md:hidden fixed inset-0 z-[60] bg-white flex flex-col">
 
           {/* Menu header */}
-          <div className="flex items-center justify-between px-8 py-6 border-b border-charcoal/8">
+          <div className="flex items-center justify-between px-8 py-6 border-b border-[#2D2926]/8">
             <Link
               href="/"
               onClick={() => setMenuOpen(false)}
@@ -158,7 +136,7 @@ export default function Navbar() {
           </div>
 
           {/* Book Session */}
-          <div className="px-8 pb-12 pt-6 border-t border-charcoal/8">
+          <div className="px-8 pb-12 pt-6 border-t border-[#2D2926]/8">
             <Button href="/book" variant="primary" size="lg" className="w-full block text-center">
               Book Session
             </Button>

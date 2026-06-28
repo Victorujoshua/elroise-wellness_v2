@@ -20,7 +20,7 @@ export function Heading({
   children: React.ReactNode
 }) {
   return (
-    <Tag className={cn('font-sora font-light text-charcoal', SIZE[size], className)}>
+    <Tag className={cn('font-sora font-light text-[#2D2926]', SIZE[size], className)}>
       {children}
     </Tag>
   )

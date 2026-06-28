@@ -103,7 +103,7 @@ export default function ClientTable({ clients, total, pageCount, q, page }: Prop
 
         {/* Table */}
         {clients.length === 0 ? (
-          <div className="rounded-lg border border-dashed border-charcoal/20 py-16 text-center">
+          <div className="rounded-lg border border-dashed border-[#2D2926]/20 py-16 text-center">
             <Users className="size-8 mx-auto mb-3 text-muted-foreground/40" />
             <p className="text-sm text-muted-foreground">
               {q ? 'No clients match that search.' : 'No clients yet.'}

@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
@@ -14,7 +14,7 @@ import type { MemberWithServices, ServiceOption } from '@/app/(admin)/admin/(das
 import type { InvitationRow } from '@/lib/database.types'
 
 const ROLE_STYLES: Record<string, string> = {
-  owner:        'bg-gold/15 text-gold',
+  owner:        'bg-[#636B2F]/15 text-[#636B2F]',
   practitioner: 'bg-teal-100 text-teal-700',
   staff:        'bg-blue-100 text-blue-700',
 }

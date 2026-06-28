@@ -68,7 +68,7 @@ export default function PractitionerShifts({
       </div>
 
       {!selectedPid ? (
-        <div className="rounded-lg border border-dashed border-charcoal/20 py-16 text-center">
+        <div className="rounded-lg border border-dashed border-[#2D2926]/20 py-16 text-center">
           <p className="text-sm text-muted-foreground">
             Select a practitioner above to manage their schedule.
           </p>
@@ -83,8 +83,8 @@ export default function PractitionerShifts({
                 className={cn(
                   'px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-px',
                   tab === t.id
-                    ? 'border-charcoal text-charcoal'
-                    : 'border-transparent text-muted-foreground hover:text-charcoal',
+                    ? 'border-[#2D2926] text-[#2D2926]'
+                    : 'border-transparent text-muted-foreground hover:text-[#2D2926]',
                 )}
               >
                 {t.label}

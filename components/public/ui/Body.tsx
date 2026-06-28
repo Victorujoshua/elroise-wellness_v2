@@ -20,7 +20,7 @@ export function Body({
   children: React.ReactNode
 }) {
   return (
-    <p className={cn('font-sora font-light', SIZE[size], muted ? 'text-charcoal/50' : 'text-charcoal/70', className)}>
+    <p className={cn('font-sora font-light', SIZE[size], muted ? 'text-[#2D2926]/50' : 'text-[#2D2926]/70', className)}>
       {children}
     </p>
   )

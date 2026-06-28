@@ -50,7 +50,7 @@ export default function OverridePanel({ practitionerId, overrides }: Props) {
       </div>
 
       {overrides.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-charcoal/20 py-10 text-center">
+        <div className="rounded-lg border border-dashed border-[#2D2926]/20 py-10 text-center">
           <p className="text-sm text-muted-foreground">No overrides recorded.</p>
         </div>
       ) : (
