@@ -3,6 +3,7 @@ import Link from 'next/link'
 import type { Metadata } from 'next'
 import { Section } from '@/components/public/ui/Section'
 import ProductSlider from '@/components/public/ProductSlider'
+import HeroSlider from '@/components/public/HeroSlider'
 import { HugeiconsIcon } from '@hugeicons/react'
 import {
   Yoga01Icon,
@@ -35,45 +36,8 @@ export default function HomePage() {
         </p>
       </div>
 
-      {/* ── 2. Hero (Merit "Clean Volume" — full-bleed + floating card) */}
-      <section className="relative w-full h-[80vh] min-h-[500px] overflow-hidden">
-
-        <Image
-          src="/hero1.png"
-          alt="Woman performing Pilates on a reformer at Elroisè Wellness Center"
-          fill
-          className="object-cover"
-          priority
-        />
-
-        {/* Light overlay — stays when real image is added */}
-        <div className="absolute inset-0 bg-black/10" />
-
-        {/* Floating content card — bottom-left */}
-        <div className="absolute left-4 bottom-4 md:left-8 md:bottom-8 bg-white p-6 md:p-8 max-w-md shadow-sm">
-
-          <p className="text-xs uppercase tracking-wider text-[#2D2926] font-medium mb-3">
-            New
-          </p>
-
-          <h1 className="font-sora text-3xl md:text-4xl font-bold text-[#2D2926] leading-tight mb-3">
-            Book a session
-          </h1>
-
-          <p className="text-sm text-[#2D2926] leading-relaxed mb-5">
-            Lagos&apos; premier sanctuary for laser hair reduction and reformer Pilates.
-          </p>
-
-          <Link
-            href="/book"
-            className="inline-flex items-center gap-2 text-sm font-medium text-[#2D2926] hover:text-[#636B2F] transition-colors duration-200 group cursor-pointer"
-          >
-            Book now
-            <HugeiconsIcon icon={ArrowRight01Icon} size={14} color="currentColor" strokeWidth={2} className="transform group-hover:translate-x-0.5 transition-transform duration-200" />
-          </Link>
-
-        </div>
-      </section>
+      {/* ── 2. Hero — auto-sliding image carousel */}
+      <HeroSlider />
 
       {/* ── 2b. Services highlight ───────────────────────────────── */}
       <section className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-[#E5E0D8] bg-white">
