@@ -68,15 +68,15 @@ export default function CalendarView({ date, practitioners, appointments, servic
   return (
     <div className="flex flex-col gap-4 h-full">
       {/* Premium toolbar */}
-      <div className="flex items-center gap-3 shrink-0 flex-wrap bg-card border border-border rounded-xl px-4 py-3 shadow-sm">
+      <div className="flex items-center gap-3 shrink-0 flex-wrap bg-card border border-border px-4 py-3">
         {/* Grouped nav arrows */}
-        <div className="inline-flex items-center rounded-lg border border-border overflow-hidden shadow-sm divide-x divide-border">
+        <div className="inline-flex items-center border border-border overflow-hidden divide-x divide-border">
           <Button
             variant="ghost"
             size="icon-sm"
             onClick={() => go(-1)}
             aria-label="Previous day"
-            className="rounded-none h-8 w-8 hover:bg-muted/70"
+            className="h-8 w-8 hover:bg-muted/70"
           >
             <ChevronLeft className="size-4" />
           </Button>
@@ -85,7 +85,7 @@ export default function CalendarView({ date, practitioners, appointments, servic
             size="icon-sm"
             onClick={() => go(1)}
             aria-label="Next day"
-            className="rounded-none h-8 w-8 hover:bg-muted/70"
+            className="h-8 w-8 hover:bg-muted/70"
           >
             <ChevronRight className="size-4" />
           </Button>

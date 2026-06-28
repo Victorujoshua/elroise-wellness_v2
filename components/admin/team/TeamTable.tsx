@@ -91,7 +91,7 @@ export default function TeamTable({ members, pendingInvites, services }: Props) 
       </div>
 
       {/* Active members */}
-      <div className="rounded-lg border border-border overflow-hidden mb-8">
+      <div className="border border-border overflow-hidden mb-8">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -169,7 +169,7 @@ export default function TeamTable({ members, pendingInvites, services }: Props) 
           <p className="text-xs uppercase tracking-widest font-semibold text-muted-foreground mb-3">
             Pending invitations
           </p>
-          <div className="rounded-lg border border-border overflow-hidden">
+          <div className="border border-border overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>

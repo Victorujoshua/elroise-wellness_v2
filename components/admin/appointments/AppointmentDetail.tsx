@@ -93,7 +93,7 @@ function fmtAuditAction(action: string) {
 
 function Card({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="rounded-lg border bg-background flex flex-col">
+    <div className="border bg-background flex flex-col">
       <div className="px-4 py-3 border-b">
         <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{title}</h3>
       </div>
@@ -228,7 +228,7 @@ export default function AppointmentDetail({ appt: initial }: { appt: DetailAppoi
                   onChange={e => setNotesValue(e.target.value)}
                   rows={3}
                   placeholder="Internal notes…"
-                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring resize-none"
+                  className="w-full border border-input bg-background px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring resize-none"
                 />
                 <div className="flex gap-1.5">
                   <Button size="sm" className="h-7 text-xs" onClick={handleNoteSave}>
@@ -295,7 +295,7 @@ export default function AppointmentDetail({ appt: initial }: { appt: DetailAppoi
 
       {/* ── Actions bar ── */}
       {appt.status !== 'cancelled' && appt.status !== 'completed' && (
-        <div className="flex items-center gap-2 flex-wrap rounded-lg border bg-muted/30 px-4 py-3">
+        <div className="flex items-center gap-2 flex-wrap border bg-muted/30 px-4 py-3">
           <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mr-2">Actions</span>
           <Button size="sm" variant="outline" onClick={() => setReschedOpen(true)}>
             Reschedule
@@ -317,7 +317,7 @@ export default function AppointmentDetail({ appt: initial }: { appt: DetailAppoi
           <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-3">
             Activity log
           </h3>
-          <div className="rounded-lg border bg-background divide-y">
+          <div className="border bg-background divide-y">
             {appt.audit.map(entry => (
               <div key={entry.id} className="px-4 py-3 flex items-start gap-4 text-sm">
                 <span className="text-xs text-muted-foreground whitespace-nowrap mt-0.5 w-36 shrink-0">

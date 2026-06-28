@@ -83,7 +83,7 @@ export default function DayGrid({ practitioners, appointments }: Props) {
 
   if (practitioners.length === 0) {
     return (
-      <div className="rounded-xl border border-dashed border-[#2D2926]/20 py-16 text-center bg-muted/20">
+      <div className="border border-dashed border-[#2D2926]/20 py-16 text-center bg-muted/20">
         <p className="text-sm text-muted-foreground">
           No active practitioners — add team members first.
         </p>
@@ -93,8 +93,8 @@ export default function DayGrid({ practitioners, appointments }: Props) {
 
   return (
     <div
-      className="overflow-auto rounded-xl border border-border bg-card shadow-sm"
-      style={{ maxHeight: 'calc(100vh - 16rem)' }}
+      className="overflow-auto border border-border bg-card"
+      style={{ maxHeight: 'calc(100vh - 10.5rem)' }}
     >
       <div style={{ minWidth: `${64 + practitioners.length * COL_W}px` }}>
         {/* Sticky practitioner header */}
@@ -106,7 +106,7 @@ export default function DayGrid({ practitioners, appointments }: Props) {
               style={{ width: COL_W }}
               className="shrink-0 border-l px-3 py-3 flex items-center gap-3"
             >
-              <div className="size-8 rounded-full bg-[#C5A059]/12 border border-[#C5A059]/30 flex items-center justify-center shrink-0 shadow-sm">
+              <div className="size-8 rounded-full bg-[#C5A059]/12 border border-[#C5A059]/30 flex items-center justify-center shrink-0">
                 <span className="text-[10px] font-bold text-[#C5A059]">{getInitials(p.full_name)}</span>
               </div>
               <div className="min-w-0">
@@ -198,7 +198,7 @@ export default function DayGrid({ practitioners, appointments }: Props) {
                   className="absolute inset-x-0 z-10 pointer-events-none flex items-center"
                   style={{ top: nowTop }}
                 >
-                  <div className="size-2.5 rounded-full bg-rose-500 -ml-1.5 shrink-0 shadow-sm ring-2 ring-rose-200" />
+                  <div className="size-2.5 rounded-full bg-rose-500 -ml-1.5 shrink-0 ring-2 ring-rose-200" />
                   <div className="flex-1 h-[2px] bg-rose-500/70" />
                 </div>
               )}

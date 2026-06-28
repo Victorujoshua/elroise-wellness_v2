@@ -104,9 +104,7 @@ export default function AppointmentCard({ appt, top, height }: Props) {
           right:    4,
         }}
         className={cn(
-          'rounded-lg border-l-4 overflow-hidden text-left',
-          'shadow-[0_1px_3px_rgba(0,0,0,0.07),0_1px_2px_rgba(0,0,0,0.04)]',
-          'hover:shadow-[0_4px_8px_rgba(0,0,0,0.10),0_2px_4px_rgba(0,0,0,0.06)]',
+          'border-l-4 overflow-hidden text-left',
           'hover:-translate-y-px transition-all duration-150 cursor-pointer',
           isCancelled && 'opacity-50',
           CARD_BG[appt.status] ?? CARD_BG.pending,

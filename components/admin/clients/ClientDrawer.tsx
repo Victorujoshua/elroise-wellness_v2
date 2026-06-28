@@ -164,14 +164,14 @@ export default function ClientDrawer({ client, open, onClose, onUpdated }: Props
                 <Field label="Name" error={errors.full_name?.message}>
                   <input
                     {...register('full_name')}
-                    className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                    className="w-full border border-input bg-background px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
                     placeholder="Full name"
                   />
                 </Field>
                 <Field label="Phone" error={errors.phone?.message}>
                   <input
                     {...register('phone')}
-                    className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                    className="w-full border border-input bg-background px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
                     placeholder="+234…"
                   />
                 </Field>
@@ -182,7 +182,7 @@ export default function ClientDrawer({ client, open, onClose, onUpdated }: Props
                   <textarea
                     {...register('notes')}
                     rows={3}
-                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring resize-none"
+                    className="w-full border border-input bg-background px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring resize-none"
                     placeholder="Internal notes…"
                   />
                 </Field>

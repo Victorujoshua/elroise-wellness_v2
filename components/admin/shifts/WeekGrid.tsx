@@ -76,7 +76,7 @@ function DayCard({
   const activeCount = dayShifts.filter(s => s.is_active).length
 
   return (
-    <div className="rounded-xl border border-border bg-card shadow-sm p-4 space-y-3 transition-shadow duration-200 hover:shadow-md">
+    <div className="border border-border bg-card p-4 space-y-3">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="text-sm font-semibold">{label}</span>
@@ -86,7 +86,7 @@ function DayCard({
             </span>
           )}
         </div>
-        <Button size="icon-sm" variant="ghost" onClick={onAdd} title="Add shift" className="size-7 rounded-lg">
+        <Button size="icon-sm" variant="ghost" onClick={onAdd} title="Add shift" className="size-7">
           <Plus className="size-3.5" />
         </Button>
       </div>
@@ -123,7 +123,7 @@ function ShiftItem({ shift, onEdit }: { shift: ShiftRow; onEdit: (s: ShiftRow) =
 
   return (
     <li className={cn(
-      'flex items-center gap-2 rounded-lg border px-2.5 py-2 text-xs transition-all duration-150',
+      'flex items-center gap-2 border px-2.5 py-2 text-xs transition-all duration-150',
       shift.is_active
         ? 'bg-emerald-50/60 border-emerald-100 text-emerald-950'
         : 'bg-muted/30 border-border text-muted-foreground opacity-60',

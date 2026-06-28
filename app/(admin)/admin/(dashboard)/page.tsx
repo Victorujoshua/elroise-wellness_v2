@@ -52,7 +52,7 @@ const STATUS_CLS: Record<string, string> = {
 function KpiCard({ label, value, sub, accent = false }: { label: string; value: string; sub: string; accent?: boolean }) {
   return (
     <div className={cn(
-      'relative overflow-hidden rounded-xl border bg-card p-5 shadow-sm transition-shadow duration-200 hover:shadow-md',
+      'relative overflow-hidden border bg-card p-5',
       accent ? 'border-[#C5A059]/30' : 'border-border',
     )}>
       {accent && (
@@ -218,13 +218,13 @@ export default async function DashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-6 items-start">
 
         {/* Today's appointments */}
-        <div className="rounded-xl border border-border bg-card shadow-sm p-6">
+        <div className="border border-border bg-card p-6">
           <h2 className="text-sm font-semibold mb-4">Today&apos;s Appointments</h2>
           <TodayTable appointments={data.todaysAppointments} />
         </div>
 
         {/* Upcoming */}
-        <div className="rounded-xl border border-border bg-card shadow-sm p-6">
+        <div className="border border-border bg-card p-6">
           <h2 className="text-sm font-semibold mb-4">Upcoming — Next 7 Days</h2>
           <UpcomingList appointments={data.upcomingAppointments} />
         </div>

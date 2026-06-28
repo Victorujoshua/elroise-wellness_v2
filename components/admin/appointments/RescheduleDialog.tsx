@@ -107,7 +107,7 @@ export default function RescheduleDialog({
               </p>
             ) : (
               availability.map(p => p.slots.length === 0 ? null : (
-                <div key={p.practitioner_id} className="rounded-lg border bg-background p-3">
+                <div key={p.practitioner_id} className="border bg-background p-3">
                   <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
                     {p.practitioner_name}
                   </p>

@@ -97,7 +97,7 @@ function getInitials(name: string) {
   return name.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase()
 }
 
-const FILTER_CLS = 'h-9 rounded-lg border border-input bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring transition-colors'
+const FILTER_CLS = 'border border-input bg-background px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring transition-colors'
 const FILTER_KEYS = ['q', 'status', 'service_id', 'practitioner_id', 'payment_status', 'date_from', 'date_to']
 
 // ── component ─────────────────────────────────────────────────────────────────
@@ -174,7 +174,7 @@ export default function AppointmentTable({
     <div className="flex flex-col gap-4">
 
       {/* ── Filter bar ── */}
-      <div className="rounded-xl border border-border bg-card shadow-sm p-3 flex flex-wrap gap-3 items-end">
+      <div className="border border-border bg-card p-3 flex flex-wrap gap-3 items-end">
 
         {/* Search */}
         <div className="relative min-w-[200px] flex-1">
@@ -267,7 +267,7 @@ export default function AppointmentTable({
       </div>
 
       {/* ── Table ── */}
-      <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
+      <div className="border border-border bg-card overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -363,7 +363,7 @@ export default function AppointmentTable({
                     <Link
                       href={`/admin/appointments/${a.id}`}
                       className={cn(
-                        'inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1.5 rounded-lg',
+                        'inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1.5',
                         'bg-transparent hover:bg-muted text-muted-foreground hover:text-foreground',
                         'transition-all duration-150 whitespace-nowrap',
                         'opacity-0 group-hover:opacity-100 focus:opacity-100',
@@ -385,10 +385,10 @@ export default function AppointmentTable({
           <span className="text-xs text-muted-foreground">
             Showing {(page - 1) * pageSize + 1}–{Math.min(page * pageSize, total)} of {total} appointment{total !== 1 ? 's' : ''}
           </span>
-          <div className="inline-flex items-center rounded-lg border border-border divide-x divide-border overflow-hidden shadow-sm">
+          <div className="inline-flex items-center border border-border divide-x divide-border overflow-hidden">
             <Button
               size="sm" variant="ghost"
-              className="rounded-none h-8 px-3 text-xs"
+              className="h-8 px-3 text-xs"
               disabled={page <= 1}
               onClick={() => pushParams({ page: String(page - 1) })}
             >
@@ -399,7 +399,7 @@ export default function AppointmentTable({
             </span>
             <Button
               size="sm" variant="ghost"
-              className="rounded-none h-8 px-3 text-xs"
+              className="h-8 px-3 text-xs"
               disabled={page >= totalPages}
               onClick={() => pushParams({ page: String(page + 1) })}
             >

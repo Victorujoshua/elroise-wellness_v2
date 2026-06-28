@@ -311,7 +311,7 @@ function SlotStep({
       </div>
 
       {state.availability.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-[#2D2926]/20 py-10 text-center">
+        <div className="border border-dashed border-[#2D2926]/20 py-10 text-center">
           <p className="text-sm text-muted-foreground">No availability for this date.</p>
           <p className="text-xs text-muted-foreground mt-1">
             Check that practitioners have shifts set up for this day.
@@ -438,7 +438,7 @@ function PaymentStep({
   return (
     <div className="space-y-5">
       {/* Booking summary */}
-      <div className="rounded-lg border p-4 space-y-2 text-sm bg-muted/30">
+      <div className="border p-4 space-y-2 text-sm bg-muted/30">
         <SummaryRow label="Service"      value={service?.name ?? '—'} />
         <SummaryRow label="Date"         value={fmtDate(state.date)} />
         <SummaryRow label="Time"         value={`${fmtTime(state.slot)} – ${fmtTime(state.endTime)}`} />

@@ -52,7 +52,7 @@ export default function PractitionerShifts({
   return (
     <div className="space-y-5">
       {/* Practitioner selector — card toolbar */}
-      <div className="flex items-center gap-3 bg-card border border-border rounded-xl px-4 py-3 shadow-sm">
+      <div className="flex items-center gap-3 bg-card border border-border px-4 py-3">
         <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground shrink-0">
           Practitioner
         </span>
@@ -71,7 +71,7 @@ export default function PractitionerShifts({
       </div>
 
       {!selectedPid ? (
-        <div className="rounded-xl border border-dashed border-[#2D2926]/15 bg-muted/20 py-16 text-center">
+        <div className="border border-dashed border-[#2D2926]/15 bg-muted/20 py-16 text-center">
           <p className="text-sm text-muted-foreground">
             Select a practitioner above to manage their schedule.
           </p>
@@ -79,15 +79,15 @@ export default function PractitionerShifts({
       ) : (
         <>
           {/* Pill-style tab switcher */}
-          <div className="flex gap-1 bg-muted/50 p-1 rounded-lg w-fit">
+          <div className="flex gap-1 bg-muted/50 p-1 w-fit">
             {TABS.map(t => (
               <button
                 key={t.id}
                 onClick={() => setTab(t.id)}
                 className={cn(
-                  'px-3.5 py-1.5 text-xs font-medium rounded-md transition-all duration-150 cursor-pointer',
+                  'px-3.5 py-1.5 text-xs font-medium transition-all duration-150 cursor-pointer',
                   tab === t.id
-                    ? 'bg-card shadow-sm text-foreground'
+                    ? 'bg-card text-foreground'
                     : 'text-muted-foreground hover:text-foreground',
                 )}
               >

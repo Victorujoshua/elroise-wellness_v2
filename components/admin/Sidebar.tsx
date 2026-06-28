@@ -71,7 +71,7 @@ function NavContent({ user, onNavigate }: Props & { onNavigate?: () => void }) {
                 href={href}
                 onClick={onNavigate}
                 className={cn(
-                  'flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors duration-200',
+                  'flex items-center gap-3 px-3 py-3 text-sm transition-colors duration-200',
                   isActive
                     ? 'bg-[#636B2F] text-white'
                     : 'text-[#2D2926] hover:bg-[#F9F6F2] hover:text-[#2D2926]',
@@ -137,7 +137,7 @@ export default function Sidebar({ user }: Props) {
 
       {/* Mobile trigger */}
       <button
-        className="lg:hidden fixed top-3 left-3 z-50 p-2 rounded-lg border border-border bg-background shadow-sm"
+        className="lg:hidden fixed top-3 left-3 z-50 p-2 border border-border bg-background"
         onClick={() => setOpen(true)}
         aria-label="Open menu"
       >

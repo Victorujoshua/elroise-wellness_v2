@@ -314,7 +314,7 @@ export default function ServiceDialog({ open, onClose, service, practitioners }:
           </div>
 
           {/* Package toggle */}
-          <div className="rounded-lg border border-border p-4 space-y-4">
+          <div className="border border-border p-4 space-y-4">
             <div className="flex items-center gap-3">
               <Controller
                 name="has_package"

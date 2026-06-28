@@ -42,11 +42,11 @@ export default function TimeOffPanel({ practitionerId, timeOff }: Props) {
       </div>
 
       {timeOff.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-[#2D2926]/15 bg-muted/20 py-10 text-center">
+        <div className="border border-dashed border-[#2D2926]/15 bg-muted/20 py-10 text-center">
           <p className="text-sm text-muted-foreground">No time off recorded.</p>
         </div>
       ) : (
-        <ul className="divide-y rounded-xl border border-border bg-card shadow-sm overflow-hidden">
+        <ul className="divide-y border border-border bg-card overflow-hidden">
           {timeOff.map(row => (
             <TimeOffItem key={row.id} row={row} />
           ))}

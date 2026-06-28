@@ -66,7 +66,7 @@ export default function RefundDialog({
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 py-2">
-          <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2.5 flex gap-2 text-sm text-amber-800">
+          <div className="border border-amber-200 bg-amber-50 px-3 py-2.5 flex gap-2 text-sm text-amber-800">
             <AlertTriangle className="size-4 shrink-0 mt-0.5" />
             <span>Refunds are processed via Paystack and cannot be reversed once submitted.</span>
           </div>
@@ -79,7 +79,7 @@ export default function RefundDialog({
                 type="number"
                 min={1}
                 max={fullNaira}
-                className="h-9 flex-1 rounded-md border border-input bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                className="flex-1 border border-input bg-background px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
               />
               <Button
                 type="button"

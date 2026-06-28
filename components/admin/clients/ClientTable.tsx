@@ -84,7 +84,7 @@ export default function ClientTable({ clients, total, pageCount, q, page }: Prop
                 type="search"
                 defaultValue={q}
                 placeholder="Name, email or phone…"
-                className="h-8 pl-8 pr-3 rounded-md border border-input bg-background text-sm w-64 focus:outline-none focus:ring-2 focus:ring-ring"
+                className="pl-9 pr-4 py-2.5 border border-input bg-background text-sm w-64 focus:outline-none focus:ring-2 focus:ring-ring"
               />
             </div>
             <Button type="submit" size="sm" variant="outline">Search</Button>
@@ -103,14 +103,14 @@ export default function ClientTable({ clients, total, pageCount, q, page }: Prop
 
         {/* Table */}
         {clients.length === 0 ? (
-          <div className="rounded-lg border border-dashed border-[#2D2926]/20 py-16 text-center">
+          <div className="border border-dashed border-[#2D2926]/20 py-16 text-center">
             <Users className="size-8 mx-auto mb-3 text-muted-foreground/40" />
             <p className="text-sm text-muted-foreground">
               {q ? 'No clients match that search.' : 'No clients yet.'}
             </p>
           </div>
         ) : (
-          <div className="rounded-lg border bg-background overflow-hidden">
+          <div className="border bg-background overflow-hidden">
             <table className="w-full text-sm">
               <thead className="bg-muted/40 border-b">
                 <tr>
