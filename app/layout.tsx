@@ -7,6 +7,12 @@ import { cn } from "@/lib/utils";
 
 const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
+const sora = Sora({
+  variable: '--font-sora',
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700'],
+});
+
 const playfair = Playfair_Display({
   variable: '--font-playfair',
   subsets: ['latin'],
@@ -18,12 +24,6 @@ const montserrat = Montserrat({
   variable: '--font-montserrat',
   subsets: ['latin'],
   weight: ['300', '400', '500', '600'],
-})
-
-const sora = Sora({
-  variable: '--font-sora',
-  subsets: ['latin'],
-  weight: ['300', '400', '500', '600', '700'],
 })
 
 export const metadata: Metadata = {

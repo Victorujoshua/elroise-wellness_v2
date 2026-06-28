@@ -39,11 +39,19 @@ function NavContent({ user, onNavigate }: Props & { onNavigate?: () => void }) {
   const pathname = usePathname()
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full" style={{ fontFamily: "var(--font-sora, 'Sora', sans-serif)" }}>
       {/* Brand — fixed top */}
       <div className="px-5 py-4 border-b border-border shrink-0">
-        <span className="font-display text-xl text-charcoal tracking-wide">Elroisè</span>
-        <p className="text-[10px] text-muted-foreground mt-0.5 uppercase tracking-widest">
+        <span
+          className="text-xl tracking-[0.15em] font-light text-[#2D2926]"
+          style={{ fontFamily: "var(--font-sora, 'Sora', sans-serif)" }}
+        >
+          Elroisè
+        </span>
+        <p
+          className="text-xs font-medium uppercase tracking-[0.2em] text-[#636B2F] mt-0.5"
+          style={{ fontFamily: "var(--font-sora, 'Sora', sans-serif)" }}
+        >
           Admin
         </p>
       </div>
@@ -55,40 +63,58 @@ function NavContent({ user, onNavigate }: Props & { onNavigate?: () => void }) {
         </div>
 
         <nav className="px-3 py-3 space-y-0.5">
-          {NAV_ITEMS.map(({ href, label, icon: Icon, exact }) => (
-            <Link
-              key={href}
-              href={href}
-              onClick={onNavigate}
-              className={cn(
-                'flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors',
-                (exact ? pathname === href : pathname.startsWith(href))
-                  ? 'bg-charcoal text-white'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-muted',
-              )}
-            >
-              <Icon className="size-4 shrink-0" />
-              {label}
-            </Link>
-          ))}
+          {NAV_ITEMS.map(({ href, label, icon: Icon, exact }) => {
+            const isActive = exact ? pathname === href : pathname.startsWith(href)
+            return (
+              <Link
+                key={href}
+                href={href}
+                onClick={onNavigate}
+                className={cn(
+                  'flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors duration-200',
+                  isActive
+                    ? 'bg-[#636B2F] text-white'
+                    : 'text-[#2D2926] hover:bg-[#F9F6F2] hover:text-[#2D2926]',
+                )}
+              >
+                <Icon
+                  className={cn(
+                    'size-4 shrink-0',
+                    isActive ? 'text-white' : 'text-[#2D2926]/70',
+                  )}
+                />
+                {label}
+              </Link>
+            )
+          })}
         </nav>
       </div>
 
       {/* User + Sign out — fixed bottom */}
       <div className="px-4 py-3 border-t border-border shrink-0">
         <div className="flex items-center gap-2 mb-2.5">
-          <div className="size-7 rounded-full bg-gold/20 flex items-center justify-center text-xs font-semibold text-gold shrink-0">
+          <div className="size-7 rounded-full bg-[#636B2F] flex items-center justify-center text-xs font-semibold text-white shrink-0">
             {user.name.charAt(0).toUpperCase()}
           </div>
           <div className="min-w-0">
-            <p className="text-xs font-medium text-foreground truncate">{user.name}</p>
-            <p className="text-[10px] text-muted-foreground capitalize">{user.role}</p>
+            <p
+              className="text-xs font-medium text-[#2D2926] truncate"
+              style={{ fontFamily: "var(--font-sora, 'Sora', sans-serif)" }}
+            >
+              {user.name}
+            </p>
+            <p
+              className="text-[10px] text-[#2D2926]/60 uppercase tracking-widest"
+              style={{ fontFamily: "var(--font-sora, 'Sora', sans-serif)" }}
+            >
+              {user.role}
+            </p>
           </div>
         </div>
         <form action={signOut}>
           <button
             type="submit"
-            className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors w-full px-1"
+            className="flex items-center gap-2 text-xs text-[#2D2926] hover:text-[#636B2F] transition-colors duration-200 w-full px-1"
           >
             <LogOut className="size-3.5" />
             Sign out
