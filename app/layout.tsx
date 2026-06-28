@@ -1,11 +1,17 @@
 import type { Metadata } from 'next'
-import { Playfair_Display, Montserrat, Geist } from 'next/font/google'
+import { Playfair_Display, Montserrat, Geist, Sora } from 'next/font/google'
 import Script from 'next/script'
 import { Toaster } from 'sonner'
 import './globals.css'
 import { cn } from "@/lib/utils";
 
 const geist = Geist({subsets:['latin'],variable:'--font-sans'});
+
+const sora = Sora({
+  variable: '--font-sora',
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600'],
+});
 
 const playfair = Playfair_Display({
   variable: '--font-playfair',
@@ -42,7 +48,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={cn("h-full", "antialiased", playfair.variable, montserrat.variable, "font-sans", geist.variable)}
+      className={cn("h-full", "antialiased", playfair.variable, montserrat.variable, "font-sans", geist.variable, sora.variable)}
     >
       {/* suppressHydrationWarning: browser extensions add attributes to body that don't exist in SSR HTML */}
       <body className="min-h-full flex flex-col font-body bg-bg text-charcoal" suppressHydrationWarning>

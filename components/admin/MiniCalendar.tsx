@@ -53,23 +53,23 @@ export default function MiniCalendar() {
   const label = month.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })
 
   return (
-    <div className="w-full select-none">
+    <div className="w-full select-none" style={{ fontFamily: "var(--font-sora, 'Sora', sans-serif)" }}>
       {/* Month navigation */}
       <div className="flex items-center justify-between mb-2 px-0.5">
         <button
           onClick={() => setMonth(m => new Date(m.getFullYear(), m.getMonth() - 1, 1))}
-          className="p-1 rounded hover:bg-muted transition-colors"
+          className="p-1 rounded text-[#2D2926] hover:text-[#636B2F] transition-colors duration-200"
           aria-label="Previous month"
         >
-          <ChevronLeft className="size-3 text-muted-foreground" />
+          <ChevronLeft className="size-3" />
         </button>
-        <span className="text-[11px] font-medium text-foreground">{label}</span>
+        <span className="text-[11px] font-medium text-[#2D2926]">{label}</span>
         <button
           onClick={() => setMonth(m => new Date(m.getFullYear(), m.getMonth() + 1, 1))}
-          className="p-1 rounded hover:bg-muted transition-colors"
+          className="p-1 rounded text-[#2D2926] hover:text-[#636B2F] transition-colors duration-200"
           aria-label="Next month"
         >
-          <ChevronRight className="size-3 text-muted-foreground" />
+          <ChevronRight className="size-3" />
         </button>
       </div>
 
@@ -78,7 +78,7 @@ export default function MiniCalendar() {
         {WEEKDAYS.map(d => (
           <div
             key={d}
-            className="flex items-center justify-center h-6 text-[9px] font-medium text-muted-foreground tracking-wider"
+            className="flex items-center justify-center h-6 text-[9px] font-medium uppercase tracking-wider text-[#2D2926]/60"
           >
             {d}
           </div>
@@ -100,18 +100,20 @@ export default function MiniCalendar() {
               }}
               className={cn(
                 'w-full aspect-square flex items-center justify-center',
-                'rounded-full text-[10px] font-light transition-colors',
-                // Outside days — faded, no fill
-                outside && 'text-foreground/30',
-                // Density fills (in-month, not selected)
-                !outside && !isSelected && count >= 1 && count <= 3 && 'bg-charcoal/15',
-                !outside && !isSelected && count >= 4              && 'bg-charcoal/40',
-                // Today ring when not selected
-                isToday && !isSelected && 'ring-1 ring-charcoal/30',
-                // Selected — highest priority
-                isSelected && 'bg-charcoal text-white',
+                'rounded-full text-[10px] font-light transition-colors duration-200',
+                // Outside-month days — deeply faded, no fill
+                outside && 'text-[#2D2926]/30',
+                // Density highlights (in-month, not selected)
+                !outside && !isSelected && count >= 1 && count <= 3 && 'bg-[#98A869]/20 text-[#2D2926]',
+                !outside && !isSelected && count >= 4              && 'bg-[#98A869]/40 text-[#2D2926]',
+                // Today — olive fill when not selected
+                isToday && !isSelected && 'bg-[#636B2F] text-white',
+                // Selected — olive fill, highest priority
+                isSelected && 'bg-[#636B2F] text-white',
                 // Hover for non-selected in-month days
-                !isSelected && !outside && 'hover:bg-muted',
+                !isSelected && !outside && !isToday && 'hover:bg-[#F9F6F2]',
+                // Default text for plain in-month days
+                !outside && !isSelected && !isToday && count === 0 && 'text-[#2D2926]',
               )}
             >
               {date.getDate()}
