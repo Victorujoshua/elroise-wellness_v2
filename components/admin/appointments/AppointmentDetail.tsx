@@ -298,7 +298,7 @@ export default function AppointmentDetail({ appt: initial }: { appt: DetailAppoi
         <div className="flex items-center gap-2 flex-wrap rounded-lg border bg-muted/30 px-4 py-3">
           <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mr-2">Actions</span>
           <Button size="sm" variant="outline" onClick={() => setReschedOpen(true)}>
-            Reschedule
+            Edit appointment
           </Button>
           <Button
             size="sm"
@@ -358,6 +358,7 @@ export default function AppointmentDetail({ appt: initial }: { appt: DetailAppoi
       <RescheduleDialog
         appointmentId={appt.id}
         serviceId={appt.service.id}
+        durationMinutes={appt.service.duration_minutes}
         clientName={appt.client.full_name}
         open={reschedOpen}
         onClose={() => setReschedOpen(false)}

@@ -12,10 +12,21 @@ type ActionResult = { success: true } | { success: false; error: string }
 
 // ── helpers ───────────────────────────────────────────────────────────────────
 
-function addMinutes(time: string, mins: number): string {
-  const [h, m] = time.split(':').map(Number)
-  const total = h * 60 + m + mins
-  return `${String(Math.floor(total / 60)).padStart(2, '0')}:${String(total % 60).padStart(2, '0')}`
+function timeToMinutes(t: string): number {
+  const [h, m] = t.split(':').map(Number)
+  return h * 60 + m
+}
+
+function fmtDateLabel(iso: string): string {
+  const [y, m, d] = iso.split('-').map(Number)
+  return new Date(y, m - 1, d).toLocaleDateString('en-GB', {
+    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
+  })
+}
+
+function fmtTimeLabel(t: string): string {
+  const [h, m] = t.split(':').map(Number)
+  return `${h % 12 || 12}:${String(m).padStart(2, '0')} ${h >= 12 ? 'PM' : 'AM'}`
 }
 
 // ── updateAppointmentStatus (canonical — re-exported by calendar/actions.ts) ──
@@ -71,6 +82,7 @@ export async function updateAppointmentNotes(
 const rescheduleSchema = z.object({
   date:            z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   start_time:      z.string().regex(/^\d{2}:\d{2}$/),
+  end_time:        z.string().regex(/^\d{2}:\d{2}$/),
   practitioner_id: z.string().uuid(),
 })
 
@@ -81,29 +93,102 @@ export async function rescheduleAppointment(
   const parsed = rescheduleSchema.safeParse(data)
   if (!parsed.success) return { success: false, error: 'Invalid reschedule data.' }
 
+  // ── 1. Auth ───────────────────────────────────────────────────────────────
   const auth = await createAuthClient()
   const { data: { user } } = await auth.auth.getUser()
   if (!user) return { success: false, error: 'Not authenticated.' }
 
   const db = getSupabaseServiceClient()
 
-  // Fetch existing appointment + service duration
+  // ── 2. Fetch existing appointment ─────────────────────────────────────────
   const { data: appt } = await db
     .from('appointments')
-    .select('id, appointment_date, start_time, end_time, practitioner_id, service_id, services(duration_minutes)')
+    .select(`
+      id, appointment_date, start_time, end_time, practitioner_id, status,
+      services(name),
+      clients(full_name, email),
+      users!appointments_practitioner_id_fkey(full_name)
+    `)
     .eq('id', appointmentId)
     .single()
+
   if (!appt) return { success: false, error: 'Appointment not found.' }
+  if (['cancelled', 'completed'].includes(appt.status)) {
+    return { success: false, error: 'Cannot reschedule a cancelled or completed appointment.' }
+  }
 
-  const duration = (appt.services as unknown as { duration_minutes: number } | null)?.duration_minutes ?? 60
-  const end_time = addMinutes(parsed.data.start_time, duration)
+  const service         = appt.services  as unknown as { name: string } | null
+  const client          = appt.clients   as unknown as { full_name: string; email: string } | null
+  const oldPractitioner = appt.users     as unknown as { full_name: string } | null
 
-  // Slot conflict check — exclude the appointment being rescheduled
+  const newDate  = parsed.data.date
+  const end_time = parsed.data.end_time
+
+  // ── 3. Business hours check ───────────────────────────────────────────────
+  // No business_hours table exists — shift-defined. Covered by step 4 below.
+
+  // ── 4. Shift availability check ───────────────────────────────────────────
+  const { data: timeOff } = await db
+    .from('time_off')
+    .select('id')
+    .eq('practitioner_id', parsed.data.practitioner_id)
+    .lte('start_date', newDate)
+    .gte('end_date', newDate)
+    .limit(1)
+    .maybeSingle()
+
+  if (timeOff) return { success: false, error: 'Practitioner is on time off for this date.' }
+
+  const { data: override } = await db
+    .from('shift_overrides')
+    .select('start_time, end_time, is_unavailable')
+    .eq('practitioner_id', parsed.data.practitioner_id)
+    .eq('override_date', newDate)
+    .maybeSingle()
+
+  let shiftStartMins: number
+  let shiftEndMins:   number
+  let shiftLabel:     string
+
+  if (override) {
+    if (override.is_unavailable) {
+      return { success: false, error: 'Practitioner is unavailable on this date.' }
+    }
+    shiftStartMins = timeToMinutes(override.start_time!)
+    shiftEndMins   = timeToMinutes(override.end_time!)
+    shiftLabel     = `${override.start_time!.slice(0, 5)}–${override.end_time!.slice(0, 5)}`
+  } else {
+    const [y, mo, d] = newDate.split('-').map(Number)
+    const dayOfWeek  = new Date(y, mo - 1, d).getDay()
+
+    const { data: shift } = await db
+      .from('shifts')
+      .select('start_time, end_time')
+      .eq('practitioner_id', parsed.data.practitioner_id)
+      .eq('day_of_week', dayOfWeek)
+      .eq('is_active', true)
+      .lte('effective_from', newDate)
+      .or(`effective_until.is.null,effective_until.gte.${newDate}`)
+      .maybeSingle()
+
+    if (!shift) return { success: false, error: 'Practitioner has no shift scheduled for this date.' }
+    shiftStartMins = timeToMinutes(shift.start_time)
+    shiftEndMins   = timeToMinutes(shift.end_time)
+    shiftLabel     = `${shift.start_time.slice(0, 5)}–${shift.end_time.slice(0, 5)}`
+  }
+
+  const newStartMins = timeToMinutes(parsed.data.start_time)
+  const newEndMins   = timeToMinutes(end_time)
+  if (newStartMins < shiftStartMins || newEndMins > shiftEndMins) {
+    return { success: false, error: `Appointment falls outside the practitioner's shift window (${shiftLabel}).` }
+  }
+
+  // ── 5. Conflict check (exclude self) ─────────────────────────────────────
   const { data: conflict } = await db
     .from('appointments')
     .select('id')
     .eq('practitioner_id', parsed.data.practitioner_id)
-    .eq('appointment_date', parsed.data.date)
+    .eq('appointment_date', newDate)
     .neq('id', appointmentId)
     .in('status', ['pending', 'confirmed'])
     .lt('start_time', end_time)
@@ -113,33 +198,79 @@ export async function rescheduleAppointment(
 
   if (conflict) return { success: false, error: 'That slot is already booked. Please choose another.' }
 
-  const prev = {
-    appointment_date: appt.appointment_date,
-    start_time: appt.start_time,
-    end_time: appt.end_time,
-    practitioner_id: appt.practitioner_id,
-  }
-
+  // ── 6. DB update ──────────────────────────────────────────────────────────
   const { error: updateErr } = await db
     .from('appointments')
     .update({
-      appointment_date: parsed.data.date,
-      start_time: parsed.data.start_time,
+      appointment_date: newDate,
+      start_time:       parsed.data.start_time,
       end_time,
-      practitioner_id: parsed.data.practitioner_id,
+      practitioner_id:  parsed.data.practitioner_id,
     })
     .eq('id', appointmentId)
 
   if (updateErr) return { success: false, error: updateErr.message }
 
+  // ── 7. Audit log (only changed fields) ───────────────────────────────────
+  const before: Record<string, unknown> = {}
+  const after:  Record<string, unknown> = {}
+
+  if (newDate !== appt.appointment_date) {
+    before.appointment_date = appt.appointment_date
+    after.appointment_date  = newDate
+  }
+  if (timeToMinutes(parsed.data.start_time) !== timeToMinutes(appt.start_time)) {
+    before.start_time = appt.start_time
+    after.start_time  = parsed.data.start_time
+  }
+  if (newEndMins !== timeToMinutes(appt.end_time)) {
+    before.end_time = appt.end_time
+    after.end_time  = end_time
+  }
+  if (parsed.data.practitioner_id !== appt.practitioner_id) {
+    before.practitioner_id = appt.practitioner_id
+    after.practitioner_id  = parsed.data.practitioner_id
+  }
+
   await db.from('audit_log').insert({
-    actor_id: user.id, action: 'reschedule', entity_type: 'appointment',
-    entity_id: appointmentId,
-    changes: {
-      from: prev,
-      to: { appointment_date: parsed.data.date, start_time: parsed.data.start_time, end_time, practitioner_id: parsed.data.practitioner_id },
-    } as unknown as Json,
+    actor_id:    user.id,
+    action:      'reschedule',
+    entity_type: 'appointment',
+    entity_id:   appointmentId,
+    changes:     { before, after } as unknown as Json,
   })
+
+  // ── 8. Loops reschedule email (non-fatal) ─────────────────────────────────
+  const templateId = process.env.LOOPS_BOOKING_RESCHEDULED_TEMPLATE_ID
+  if (templateId && client) {
+    try {
+      let practitionerName = oldPractitioner?.full_name ?? ''
+      if (parsed.data.practitioner_id !== appt.practitioner_id) {
+        const { data: newPrac } = await db
+          .from('users').select('full_name')
+          .eq('id', parsed.data.practitioner_id).single()
+        if (newPrac) practitionerName = newPrac.full_name
+      }
+
+      await sendTransactional({
+        templateId,
+        email: client.email,
+        dataVariables: {
+          clientName:         client.full_name,
+          serviceName:        service?.name ?? '',
+          oldDate:            fmtDateLabel(appt.appointment_date),
+          oldTime:            fmtTimeLabel(appt.start_time),
+          newDate:            fmtDateLabel(newDate),
+          newTime:            fmtTimeLabel(parsed.data.start_time),
+          practitionerName,
+          locationAddress:    process.env.NEXT_PUBLIC_LOCATION_ADDRESS ?? '',
+          cancellationNotice: process.env.NEXT_PUBLIC_CANCELLATION_NOTICE ?? '',
+        },
+      })
+    } catch (err) {
+      console.warn('[reschedule] Loops email failed (non-fatal):', err)
+    }
+  }
 
   revalidatePath('/admin/calendar')
   revalidatePath('/admin/appointments')

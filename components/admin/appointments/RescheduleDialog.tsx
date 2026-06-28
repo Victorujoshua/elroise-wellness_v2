@@ -7,18 +7,20 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
+import { Label } from '@/components/ui/label'
 import { Calendar } from '@/app/(public)/book/steps/Step2Date'
 import { getAvailability } from '@/app/(public)/book/actions'
 import { rescheduleAppointment } from '@/app/(admin)/admin/(dashboard)/appointments/actions'
 import type { PractitionerSlots } from '@/lib/availability'
 
 interface Props {
-  appointmentId: string
-  serviceId:     string
-  clientName:    string
-  open:          boolean
-  onClose:       () => void
-  onRescheduled: () => void
+  appointmentId:   string
+  serviceId:       string
+  durationMinutes: number
+  clientName:      string
+  open:            boolean
+  onClose:         () => void
+  onRescheduled:   () => void
 }
 
 function fmtDate(iso: string) {
@@ -26,8 +28,14 @@ function fmtDate(iso: string) {
   return new Date(y, m - 1, d).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
 }
 
+function addMinutes(time: string, mins: number): string {
+  const [h, m] = time.split(':').map(Number)
+  const total = h * 60 + m + mins
+  return `${String(Math.floor(total / 60)).padStart(2, '0')}:${String(total % 60).padStart(2, '0')}`
+}
+
 export default function RescheduleDialog({
-  appointmentId, serviceId, clientName, open, onClose, onRescheduled,
+  appointmentId, serviceId, durationMinutes, clientName, open, onClose, onRescheduled,
 }: Props) {
   const [step, setStep]                       = useState<'date' | 'slot'>('date')
   const [date, setDate]                       = useState<string | null>(null)
@@ -57,10 +65,13 @@ export default function RescheduleDialog({
     if (!date || !selPractitioner || !selSlot) return
     startTransition(async () => {
       const res = await rescheduleAppointment(appointmentId, {
-        date, start_time: selSlot, practitioner_id: selPractitioner.id,
+        date,
+        start_time:      selSlot,
+        end_time:        addMinutes(selSlot, durationMinutes),
+        practitioner_id: selPractitioner.id,
       })
       if (!res.success) { toast.error(res.error); return }
-      toast.success('Appointment rescheduled')
+      toast.success('Appointment rescheduled — client notified')
       reset(); onRescheduled(); onClose()
     })
   }
@@ -72,7 +83,7 @@ export default function RescheduleDialog({
           <DialogTitle>Reschedule appointment</DialogTitle>
           <DialogDescription>
             {step === 'date'
-              ? `Pick a new date for ${clientName}'s appointment`
+              ? `Pick a new date and time for ${clientName}'s appointment`
               : `Choose a slot on ${fmtDate(date!)}`}
           </DialogDescription>
         </DialogHeader>
@@ -80,10 +91,13 @@ export default function RescheduleDialog({
         {/* ── Step 1: date picker ── */}
         {step === 'date' && (
           <div className="py-2">
+            <Label className="text-xs uppercase tracking-wide text-muted-foreground mb-2 block">
+              Date
+            </Label>
             <Calendar
               selectedDate={date}
               onSelect={handleDateSelect}
-              disabled={loadingSlots}
+              disabled={loadingSlots || pending}
               maxDays={180}
             />
             {loadingSlots && (
@@ -95,13 +109,16 @@ export default function RescheduleDialog({
           </div>
         )}
 
-        {/* ── Step 2: admin slot grid ── */}
+        {/* ── Step 2: slot grid ── */}
         {step === 'slot' && (
           <div className="py-2 space-y-3 max-h-72 overflow-y-auto pr-1">
             {availability.every(p => p.slots.length === 0) ? (
               <p className="text-sm text-muted-foreground py-6 text-center">
                 No availability on this date.{' '}
-                <button className="text-primary underline underline-offset-2" onClick={() => setStep('date')}>
+                <button
+                  className="text-primary underline underline-offset-2"
+                  onClick={() => setStep('date')}
+                >
                   Choose another date
                 </button>
               </p>
