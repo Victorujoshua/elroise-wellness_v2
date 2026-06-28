@@ -218,11 +218,16 @@ export default function HomePage() {
       <Section background="white" className="py-20 md:py-24">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
 
-          {/* Left — atmospheric image */}
-          <div className="aspect-[4/5] bg-[#F9F6F2] border border-[#E5E0D8] flex items-center justify-center">
-            <span className="font-sora text-xs uppercase tracking-wider text-[#A8A29E]">
-              Services Atmospheric Photo
-            </span>
+          {/* Left — services video */}
+          <div className="aspect-[4/5] bg-[#F9F6F2] overflow-hidden">
+            <video
+              src="/servicevideo.mp4"
+              autoPlay
+              muted
+              loop
+              playsInline
+              className="w-full h-full object-cover"
+            />
           </div>
 
           {/* Right — header + service list */}
