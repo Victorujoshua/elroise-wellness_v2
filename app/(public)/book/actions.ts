@@ -170,8 +170,15 @@ export async function createAppointment(
       weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
     })
 
+    const { data: clientPref } = await db
+      .from('clients')
+      .select('notify_email')
+      .eq('email', client.email)
+      .maybeSingle()
+    const shouldNotifyClient = clientPref?.notify_email ?? true
+
     const templateId = process.env.LOOPS_BOOKING_CONFIRMED_TEMPLATE_ID
-    if (templateId) {
+    if (templateId && shouldNotifyClient) {
       try {
         await sendTransactional({
           templateId,

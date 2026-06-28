@@ -15,6 +15,7 @@ export type Database = {
           phone: string | null
           role: 'owner' | 'staff' | 'practitioner'
           is_active: boolean
+          notify_email: boolean
           created_at: string
           updated_at: string
         }
@@ -24,6 +25,7 @@ export type Database = {
           phone?: string | null
           role: 'owner' | 'staff' | 'practitioner'
           is_active?: boolean
+          notify_email?: boolean
           created_at?: string
           updated_at?: string
         }
@@ -38,6 +40,7 @@ export type Database = {
           email: string
           phone: string
           notes: string | null
+          notify_email: boolean
           created_at: string
           updated_at: string
         }
@@ -47,6 +50,7 @@ export type Database = {
           email: string
           phone: string
           notes?: string | null
+          notify_email?: boolean
           created_at?: string
           updated_at?: string
         }

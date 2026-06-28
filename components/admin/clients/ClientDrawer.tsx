@@ -4,10 +4,11 @@ import { useEffect, useState, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Pencil, X, Check, Loader2 } from 'lucide-react'
+import { Pencil, X, Check, Loader2, Bell, BellOff } from 'lucide-react'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
+import { Switch } from '@/components/ui/switch'
 import {
   Sheet,
   SheetContent,
@@ -15,7 +16,7 @@ import {
   SheetTitle,
   SheetClose,
 } from '@/components/ui/sheet'
-import { updateClient, getClientHistory } from '@/app/(admin)/admin/(dashboard)/clients/actions'
+import { updateClient, getClientHistory, toggleClientNotifyEmail } from '@/app/(admin)/admin/(dashboard)/clients/actions'
 import type { ClientRow } from '@/lib/database.types'
 import type { ClientHistoryItem } from '@/app/(admin)/admin/(dashboard)/clients/actions'
 
@@ -75,6 +76,8 @@ export default function ClientDrawer({ client, open, onClose, onUpdated }: Props
   const [history, setHistory] = useState<ClientHistoryItem[]>([])
   const [historyLoading, setHistoryLoading] = useState(false)
   const [historyError, setHistoryError]     = useState<string | null>(null)
+  const [notifyEmail, setNotifyEmail]       = useState(client?.notify_email ?? true)
+  const [togglingNotify, setTogglingNotify] = useState(false)
   const [, startTransition] = useTransition()
 
   const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<EditData>({
@@ -88,6 +91,7 @@ export default function ClientDrawer({ client, open, onClose, onUpdated }: Props
     setHistoryError(null)
     if (client) {
       reset({ full_name: client.full_name, phone: client.phone, notes: client.notes ?? '' })
+      setNotifyEmail(client.notify_email)
     }
   }, [client?.id]) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -103,6 +107,18 @@ export default function ClientDrawer({ client, open, onClose, onUpdated }: Props
       else setHistoryError(res.error)
     })
   }, [open, client?.id]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  async function handleNotifyToggle(checked: boolean) {
+    if (!client) return
+    setNotifyEmail(checked)
+    setTogglingNotify(true)
+    const res = await toggleClientNotifyEmail(client.id, checked)
+    setTogglingNotify(false)
+    if (!res.success) {
+      setNotifyEmail(!checked)
+      toast.error(res.error)
+    }
+  }
 
   async function onSubmit(data: EditData) {
     if (!client) return
@@ -216,6 +232,23 @@ export default function ClientDrawer({ client, open, onClose, onUpdated }: Props
                 )}
               </dl>
             )}
+
+            {/* Email notification toggle — always visible */}
+            <div className="flex items-center justify-between mt-4 pt-4 border-t">
+              <div className="flex items-center gap-2">
+                {notifyEmail
+                  ? <Bell className="size-3.5 text-muted-foreground" />
+                  : <BellOff className="size-3.5 text-muted-foreground" />
+                }
+                <span className="text-sm text-muted-foreground">Email notifications</span>
+              </div>
+              <Switch
+                checked={notifyEmail}
+                onCheckedChange={handleNotifyToggle}
+                disabled={togglingNotify}
+                size="sm"
+              />
+            </div>
           </section>
 
           {/* ── Appointment history ── */}

@@ -174,6 +174,24 @@ export async function toggleMemberActive(
   return { success: true }
 }
 
+// ── toggleMemberNotifyEmail ───────────────────────────────────────────────────
+
+export async function toggleMemberNotifyEmail(
+  id: string,
+  notify: boolean,
+): Promise<ActionResult> {
+  const auth = await createAuthClient()
+  const { data: { user } } = await auth.auth.getUser()
+  if (!user) return { success: false, error: 'Not authenticated.' }
+
+  const db = getSupabaseServiceClient()
+  const { error } = await db.from('users').update({ notify_email: notify }).eq('id', id)
+  if (error) return { success: false, error: error.message }
+
+  revalidatePath('/admin/team')
+  return { success: true }
+}
+
 // ── revokeInvite ─────────────────────────────────────────────────────────────
 
 export async function revokeInvite(id: string): Promise<ActionResult> {
