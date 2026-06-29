@@ -80,7 +80,7 @@ export default async function ServicesPage() {
       </section>
 
       {/* Pilates */}
-      <section className="px-6 pb-16 max-w-7xl mx-auto">
+      <section id="pilates" className="px-6 pb-16 max-w-7xl mx-auto">
         <div className="flex items-center gap-3 mb-7 pb-4 border-b border-[#E5E0D8]">
           <div className="w-8 h-8 bg-[#F3F5EE] border border-[#E5E0D8] flex items-center justify-center shrink-0">
             <HugeiconsIcon icon={Yoga01Icon} size={16} color="#636B2F" strokeWidth={1.5} />

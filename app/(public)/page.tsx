@@ -43,7 +43,7 @@ export default function HomePage() {
       <section className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-[#E5E0D8] bg-white">
 
         {/* Pilates */}
-        <Link href="/services" className="group px-8 md:px-12 lg:px-16 py-14 md:py-16 block cursor-pointer hover:bg-[#F9F6F2] transition-colors duration-300">
+        <Link href="/services#pilates" className="group px-8 md:px-12 lg:px-16 py-14 md:py-16 block cursor-pointer hover:bg-[#F9F6F2] transition-colors duration-300">
           <div className="flex items-center gap-3 mb-5">
             <div className="w-8 h-8 bg-[#F3F5EE] flex items-center justify-center">
               <HugeiconsIcon icon={Yoga01Icon} size={16} color="#636B2F" strokeWidth={1.5} />
@@ -249,9 +249,9 @@ export default function HomePage() {
 
             <div className="divide-y divide-[#E5E0D8]">
               {([
-                { name: 'Reformer Pilates',       duration: '55 MIN', price: '₦20,000', href: '/services', cat: 'pilates' },
-                { name: 'Pilates Private Session', duration: '60 MIN', price: '₦35,000', href: '/services', cat: 'pilates' },
-                { name: 'Pilates Group Class',     duration: '50 MIN', price: '₦15,000', href: '/services', cat: 'pilates' },
+                { name: 'Reformer Pilates',       duration: '55 MIN', price: '₦20,000', href: '/services#pilates', cat: 'pilates' },
+                { name: 'Pilates Private Session', duration: '60 MIN', price: '₦35,000', href: '/services#pilates', cat: 'pilates' },
+                { name: 'Pilates Group Class',     duration: '50 MIN', price: '₦15,000', href: '/services#pilates', cat: 'pilates' },
                 { name: 'Lower Face Laser',        duration: '30 MIN', price: '₦70,000', href: '/services', cat: 'laser' },
                 { name: 'Brazilian Laser',         duration: '45 MIN', price: '₦95,000', href: '/services', cat: 'laser' },
                 { name: 'Underarm Laser',          duration: '20 MIN', price: '₦30,000', href: '/services', cat: 'laser' },
