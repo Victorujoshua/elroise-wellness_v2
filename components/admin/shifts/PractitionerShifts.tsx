@@ -58,7 +58,9 @@ export default function PractitionerShifts({
         </span>
         <Select value={selectedPid ?? ''} onValueChange={handleSelect}>
           <SelectTrigger className="w-64">
-            <SelectValue placeholder="Select a practitioner…" />
+            <SelectValue placeholder="Select a practitioner…">
+              {practitioners.find(p => p.id === selectedPid)?.full_name}
+            </SelectValue>
           </SelectTrigger>
           <SelectContent>
             {practitioners.map(p => (
