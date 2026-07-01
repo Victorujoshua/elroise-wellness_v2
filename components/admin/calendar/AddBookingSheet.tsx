@@ -118,13 +118,11 @@ export default function AddBookingSheet({ open, onClose, defaultDate, services }
   const selectedService = services.find(s => s.id === state.serviceId)
 
   return (
-    <Sheet open={open} onOpenChange={v => { if (!v) onClose() }}>
+    <Sheet open={open} onOpenChange={v => { if (!v) onClose() }} disablePointerDismissal>
       <SheetContent
         side="right"
         className="flex flex-col gap-0 p-0 sm:max-w-lg"
         showCloseButton={false}
-        onPointerDownOutside={(e) => e.preventDefault()}
-        onInteractOutside={(e) => e.preventDefault()}
       >
         {/* Header */}
         <SheetHeader className="flex-row items-center justify-between border-b px-5 py-3.5 shrink-0">
