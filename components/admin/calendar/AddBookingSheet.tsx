@@ -123,6 +123,8 @@ export default function AddBookingSheet({ open, onClose, defaultDate, services }
         side="right"
         className="flex flex-col gap-0 p-0 sm:max-w-lg"
         showCloseButton={false}
+        onPointerDownOutside={(e) => e.preventDefault()}
+        onInteractOutside={(e) => e.preventDefault()}
       >
         {/* Header */}
         <SheetHeader className="flex-row items-center justify-between border-b px-5 py-3.5 shrink-0">
@@ -201,7 +203,9 @@ function DetailsStep({
         <Label>Service *</Label>
         <Select value={state.serviceId} onValueChange={val => { if (val) set({ serviceId: val }) }}>
           <SelectTrigger className="w-full">
-            <SelectValue placeholder="Select a service…" />
+            <SelectValue placeholder="Select a service…">
+              {services.find(s => s.id === state.serviceId)?.name}
+            </SelectValue>
           </SelectTrigger>
           <SelectContent>
             {services.map(s => (
