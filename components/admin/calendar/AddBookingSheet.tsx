@@ -201,7 +201,9 @@ function DetailsStep({
         <Label>Service *</Label>
         <Select value={state.serviceId} onValueChange={val => { if (val) set({ serviceId: val }) }}>
           <SelectTrigger className="w-full">
-            <SelectValue placeholder="Select a service…" />
+            <SelectValue placeholder="Select a service…">
+              {services.find(s => s.id === state.serviceId)?.name}
+            </SelectValue>
           </SelectTrigger>
           <SelectContent>
             {services.map(s => (
