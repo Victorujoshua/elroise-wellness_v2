@@ -89,7 +89,9 @@ export async function createAdminBooking(input: AdminBookingInput): Promise<Resu
       pricing_tier === 'package' ? (svc.package_session_count ?? null) : null
 
     // Atomic RPC: client upsert + appointment + optional credits in one transaction
-    const { data: appointmentId, error: rpcErr } = await db.rpc(
+    // NB: as of 0011_package_redemption, this RPC returns a row set
+    // (appointment_id, client_id, credit_id, new_credit_id), not a bare uuid.
+    const { data: rpcRows, error: rpcErr } = await db.rpc(
       'create_appointment_atomic',
       {
         p_full_name:             client.full_name,
@@ -103,6 +105,8 @@ export async function createAdminBooking(input: AdminBookingInput): Promise<Resu
         p_end_time:              end_time,
         p_pricing_tier:          pricing_tier,
         p_package_session_count: packageSessionCount,
+        p_source:                'admin',
+        p_credit_id:             null, // no redemption UI yet — always a fresh purchase/single booking
       },
     )
 
@@ -115,7 +119,11 @@ export async function createAdminBooking(input: AdminBookingInput): Promise<Resu
       return { success: false, error: 'Failed to create appointment.' }
     }
 
-    const apptId = appointmentId as string
+    const apptId = (rpcRows as { appointment_id: string }[] | null)?.[0]?.appointment_id
+    if (!apptId) {
+      console.error('[admin-booking] RPC returned no appointment row:', rpcRows)
+      return { success: false, error: 'Failed to create appointment.' }
+    }
 
     // Payment row — cash/pos get a synthetic reference; none skips entirely
     if (payment_method !== 'none') {

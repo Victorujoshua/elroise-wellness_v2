@@ -363,9 +363,16 @@ export type Database = {
           p_start_time:            string
           p_end_time:              string
           p_pricing_tier:          string
-          p_package_session_count: number | null
+          p_package_session_count?: number | null
+          p_source?:               string
+          p_credit_id?:            string | null
         }
-        Returns: string // uuid
+        Returns: {
+          appointment_id: string // uuid
+          client_id:      string // uuid
+          credit_id:      string | null // uuid
+          new_credit_id:  string | null // uuid
+        }[]
       }
     }
     Enums: Record<never, never>
