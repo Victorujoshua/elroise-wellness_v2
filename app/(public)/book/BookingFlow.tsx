@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useReducer, useTransition } from 'react'
 import Link from 'next/link'
@@ -140,8 +140,8 @@ function ConfirmationPanel({
   return (
     <div className="max-w-xl mx-auto text-center">
       {/* Icon */}
-      <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gold/10 mb-8">
-        <svg viewBox="0 0 24 24" fill="none" className="w-10 h-10 text-gold">
+      <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-[#636B2F]/10 mb-8">
+        <svg viewBox="0 0 24 24" fill="none" className="w-10 h-10 text-[#636B2F]">
           <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5" />
           <path
             d="M7.5 12.5l3 3 6-6"
@@ -154,19 +154,19 @@ function ConfirmationPanel({
       </div>
 
       {/* Heading */}
-      <p className="text-[9px] uppercase tracking-[0.5em] text-gold font-semibold mb-3">
+      <p className="text-[9px] uppercase tracking-[0.5em] text-[#636B2F] font-semibold mb-3">
         Booking confirmed
       </p>
-      <h1 className="text-3xl md:text-4xl font-light text-charcoal mb-2">
-        See you <span className="serif italic text-gold">soon</span>
+      <h1 className="text-3xl md:text-4xl font-light text-[#2D2926] mb-2">
+        See you <span className="font-sora text-[#636B2F]">soon</span>
       </h1>
-      <p className="text-sm font-light text-charcoal/50 mb-10">
+      <p className="text-sm font-light text-[#2D2926]/50 mb-10">
         A confirmation will be sent to{' '}
-        <span className="text-charcoal">{clientDetails.email}</span>
+        <span className="text-[#2D2926]">{clientDetails.email}</span>
       </p>
 
       {/* Summary card */}
-      <div className="bg-white rounded-2xl border border-charcoal/8 p-6 text-left mb-8">
+      <div className="bg-white rounded-2xl border border-[#2D2926]/8 p-6 text-left mb-8">
         {[
           { label: 'Reference', value: ref, mono: true },
           { label: 'Service',   value: service.name },
@@ -183,12 +183,12 @@ function ConfirmationPanel({
         ].map(({ label, value, mono }, i, arr) => (
           <div
             key={label}
-            className={`flex items-start justify-between py-3 ${i < arr.length - 1 ? 'border-b border-charcoal/6' : ''}`}
+            className={`flex items-start justify-between py-3 ${i < arr.length - 1 ? 'border-b border-[#2D2926]/6' : ''}`}
           >
-            <p className="text-[9px] uppercase tracking-widest text-charcoal/40 font-semibold shrink-0 mr-4">
+            <p className="text-[9px] uppercase tracking-widest text-[#2D2926]/40 font-semibold shrink-0 mr-4">
               {label}
             </p>
-            <p className={`text-sm text-charcoal text-right ${mono ? 'font-mono' : 'font-light'}`}>
+            <p className={`text-sm text-[#2D2926] text-right ${mono ? 'font-mono' : 'font-light'}`}>
               {value}
             </p>
           </div>
@@ -199,13 +199,13 @@ function ConfirmationPanel({
       <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
         <Link
           href={`/my-bookings?email=${encodeURIComponent(clientDetails.email)}`}
-          className="text-[9px] uppercase tracking-[0.4em] font-bold text-white bg-gold px-8 py-4 rounded-lg hover:bg-charcoal transition-all duration-500"
+          className="text-[9px] uppercase tracking-[0.4em] font-bold text-white bg-[#636B2F] px-8 py-4 rounded-lg hover:bg-[#2D2926] transition-all duration-500"
         >
           View my bookings
         </Link>
         <Link
           href="/book"
-          className="text-[9px] uppercase tracking-widest font-semibold text-charcoal/40 hover:text-charcoal transition-colors"
+          className="text-[9px] uppercase tracking-widest font-semibold text-[#2D2926]/40 hover:text-[#2D2926] transition-colors"
         >
           Book another appointment
         </Link>
@@ -280,7 +280,7 @@ export default function BookingFlow({
     <div className="min-h-screen">
 
       {/* Progress bar */}
-      <div className="border-b border-charcoal/10 bg-bg/95 backdrop-blur-sm sticky top-[72px] z-40">
+      <div className="border-b border-[#2D2926]/10 bg-[#F9F6F2]/95 backdrop-blur-sm sticky top-[72px] z-40">
         <div className="max-w-3xl mx-auto px-6 py-4 flex items-center">
           {STEP_LABELS.map((label, i) => {
             const n = (i + 1) as 1 | 2 | 3 | 4 | 5
@@ -290,20 +290,20 @@ export default function BookingFlow({
               <div key={label} className="flex items-center flex-1 last:flex-none">
                 <div className="flex items-center gap-2 shrink-0">
                   <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[9px] font-bold transition-all duration-300 ${
-                    done    ? 'bg-gold text-white'
-                    : active ? 'bg-charcoal text-white'
-                            : 'bg-charcoal/10 text-charcoal/30'
+                    done    ? 'bg-[#636B2F] text-white'
+                    : active ? 'bg-[#2D2926] text-white'
+                            : 'bg-[#2D2926]/10 text-[#2D2926]/30'
                   }`}>
                     {done ? '✓' : n}
                   </div>
                   <span className={`text-[9px] uppercase tracking-widest font-semibold hidden sm:block transition-colors ${
-                    active ? 'text-charcoal' : done ? 'text-gold' : 'text-charcoal/30'
+                    active ? 'text-[#2D2926]' : done ? 'text-[#636B2F]' : 'text-[#2D2926]/30'
                   }`}>
                     {label}
                   </span>
                 </div>
                 {i < STEP_LABELS.length - 1 && (
-                  <div className={`flex-1 h-px mx-3 transition-all duration-300 ${done ? 'bg-gold' : 'bg-charcoal/10'}`} />
+                  <div className={`flex-1 h-px mx-3 transition-all duration-300 ${done ? 'bg-[#636B2F]' : 'bg-[#2D2926]/10'}`} />
                 )}
               </div>
             )

@@ -50,12 +50,17 @@ export default function PractitionerShifts({
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-3">
-        <span className="text-sm font-medium shrink-0">Practitioner</span>
+    <div className="space-y-5">
+      {/* Practitioner selector — card toolbar */}
+      <div className="flex items-center gap-3 bg-card border border-border px-4 py-3">
+        <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground shrink-0">
+          Practitioner
+        </span>
         <Select value={selectedPid ?? ''} onValueChange={handleSelect}>
           <SelectTrigger className="w-64">
-            <SelectValue placeholder="Select a practitioner…" />
+            <SelectValue placeholder="Select a practitioner…">
+              {practitioners.find(p => p.id === selectedPid)?.full_name}
+            </SelectValue>
           </SelectTrigger>
           <SelectContent>
             {practitioners.map(p => (
@@ -68,23 +73,24 @@ export default function PractitionerShifts({
       </div>
 
       {!selectedPid ? (
-        <div className="rounded-lg border border-dashed border-charcoal/20 py-16 text-center">
+        <div className="border border-dashed border-[#2D2926]/15 bg-muted/20 py-16 text-center">
           <p className="text-sm text-muted-foreground">
             Select a practitioner above to manage their schedule.
           </p>
         </div>
       ) : (
         <>
-          <div className="flex gap-1 border-b">
+          {/* Pill-style tab switcher */}
+          <div className="flex gap-1 bg-muted/50 p-1 w-fit">
             {TABS.map(t => (
               <button
                 key={t.id}
                 onClick={() => setTab(t.id)}
                 className={cn(
-                  'px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-px',
+                  'px-3.5 py-1.5 text-xs font-medium transition-all duration-150 cursor-pointer',
                   tab === t.id
-                    ? 'border-charcoal text-charcoal'
-                    : 'border-transparent text-muted-foreground hover:text-charcoal',
+                    ? 'bg-card text-foreground'
+                    : 'text-muted-foreground hover:text-foreground',
                 )}
               >
                 {t.label}

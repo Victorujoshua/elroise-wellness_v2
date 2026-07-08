@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState } from 'react'
 import type { BookingService } from '../BookingFlow'
@@ -59,23 +59,23 @@ export function Calendar({
   ]
 
   return (
-    <div className="bg-white rounded-2xl border border-charcoal/8 p-6 w-full max-w-sm">
+    <div className="bg-white border border-[#2D2926]/8 p-6 w-full max-w-sm">
       {/* Month navigation */}
       <div className="flex items-center justify-between mb-6">
         <button
           onClick={prevMonth}
           disabled={!canGoPrev}
-          className="w-8 h-8 flex items-center justify-center rounded-full text-lg text-charcoal hover:bg-sand/60 disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
+          className="w-8 h-8 flex items-center justify-center rounded-full text-lg text-[#2D2926] hover:bg-[#F3EFEA]/60 disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
         >
           ‹
         </button>
-        <p className="text-sm font-light text-charcoal tracking-wide">
+        <p className="text-sm font-light text-[#2D2926] tracking-wide">
           {MONTHS[viewMonth]} {viewYear}
         </p>
         <button
           onClick={nextMonth}
           disabled={!canGoNext}
-          className="w-8 h-8 flex items-center justify-center rounded-full text-lg text-charcoal hover:bg-sand/60 disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
+          className="w-8 h-8 flex items-center justify-center rounded-full text-lg text-[#2D2926] hover:bg-[#F3EFEA]/60 disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
         >
           ›
         </button>
@@ -86,7 +86,7 @@ export function Calendar({
         {DOW.map(d => (
           <div
             key={d}
-            className="text-center text-[9px] uppercase tracking-widest text-charcoal/30 font-semibold py-1"
+            className="text-center text-[9px] uppercase tracking-widest text-[#2D2926]/30 font-semibold py-1"
           >
             {d}
           </div>
@@ -112,19 +112,19 @@ export function Calendar({
               key={day}
               onClick={() => !isOff && onSelect(dateStr)}
               disabled={isOff}
-              className={`relative h-9 w-full rounded-lg text-sm font-light transition-all duration-200 ${
+              className={`relative h-9 w-full text-sm font-light transition-all duration-200 ${
                 isSelected
-                  ? 'bg-gold text-white font-medium'
+                  ? 'bg-[#636B2F] text-white font-medium'
                   : isToday
-                  ? 'border border-gold text-charcoal hover:bg-gold/10'
+                  ? 'border border-[#636B2F] text-[#2D2926] hover:bg-[#636B2F]/10'
                   : isOff
-                  ? 'text-charcoal/20 cursor-not-allowed'
-                  : 'text-charcoal hover:bg-sand/60'
+                  ? 'text-[#2D2926]/20 cursor-not-allowed'
+                  : 'text-[#2D2926] hover:bg-[#F3EFEA]/60'
               }`}
             >
               {day}
               {isToday && !isSelected && (
-                <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-gold" />
+                <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#636B2F]" />
               )}
             </button>
           )
@@ -152,13 +152,13 @@ export default function Step2Date({
   return (
     <div>
       <div className="mb-8">
-        <p className="text-[9px] uppercase tracking-[0.5em] text-gold font-semibold mb-3">Step 2 of 5</p>
-        <h1 className="text-3xl md:text-4xl font-light text-charcoal mb-1">
-          Pick a <span className="serif italic text-gold">date</span>
+        <p className="text-[9px] uppercase tracking-[0.5em] text-[#636B2F] font-semibold mb-3">Step 2 of 5</p>
+        <h1 className="text-3xl md:text-4xl font-light text-[#2D2926] mb-1">
+          Pick a <span className="font-sora text-[#636B2F]">date</span>
         </h1>
-        <p className="text-sm text-charcoal/50 font-light">
+        <p className="text-sm text-[#2D2926]/50 font-light">
           Booking{' '}
-          <span className="text-charcoal font-normal">{service.name}</span>
+          <span className="text-[#2D2926] font-normal">{service.name}</span>
           {' '}· {service.duration_minutes} min
         </p>
       </div>
@@ -166,7 +166,7 @@ export default function Step2Date({
       <Calendar selectedDate={selectedDate} onSelect={onDateSelect} disabled={loading} />
 
       {loading && (
-        <p className="mt-5 text-sm text-charcoal/40 font-light animate-pulse">
+        <p className="mt-5 text-sm text-[#2D2926]/40 font-light animate-pulse">
           Checking availability…
         </p>
       )}
@@ -176,7 +176,7 @@ export default function Step2Date({
 
       <button
         onClick={onBack}
-        className="mt-10 text-[9px] uppercase tracking-widest text-charcoal/40 hover:text-charcoal transition-colors font-semibold"
+        className="mt-10 text-[9px] uppercase tracking-widest text-[#2D2926]/40 hover:text-[#2D2926] transition-colors font-semibold"
       >
         ← Back
       </button>

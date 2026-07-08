@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+﻿import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { Clock, Sparkles, ArrowRight, ChevronLeft } from 'lucide-react'
@@ -82,7 +82,7 @@ export default async function ServiceDetailPage({ params }: Props) {
   const categoryLabel = isPilates ? 'Pilates Ritual' : 'Laser Ritual'
 
   return (
-    <div className="bg-bg min-h-screen">
+    <div className="bg-[#F9F6F2] min-h-screen">
       <ServiceViewTracker
         serviceName={service.name}
         serviceCategory={service.category}
@@ -93,7 +93,7 @@ export default async function ServiceDetailPage({ params }: Props) {
         {/* Back */}
         <Link
           href="/services"
-          className="inline-flex items-center gap-2 text-[10px] uppercase tracking-widest font-bold text-charcoal/40 hover:text-gold transition-colors mb-16"
+          className="inline-flex items-center gap-2 text-[10px] uppercase tracking-widest font-bold text-[#2D2926]/40 hover:text-[#636B2F] transition-colors mb-16"
         >
           <ChevronLeft size={14} />
           All Services
@@ -105,14 +105,14 @@ export default async function ServiceDetailPage({ params }: Props) {
           <div>
             {/* Eyebrow row */}
             <div className="flex items-center gap-6 mb-8">
-              <div className="flex items-center gap-2 text-gold">
+              <div className="flex items-center gap-2 text-[#636B2F]">
                 <Sparkles size={14} />
                 <span className="text-[10px] uppercase tracking-widest font-bold">
                   {categoryLabel}
                 </span>
               </div>
-              <div className="w-[1px] h-4 bg-charcoal/15" />
-              <div className="flex items-center gap-2 text-charcoal/40">
+              <div className="w-[1px] h-4 bg-[#2D2926]/15" />
+              <div className="flex items-center gap-2 text-[#2D2926]/40">
                 <Clock size={14} />
                 <span className="text-[10px] uppercase tracking-widest font-bold">
                   {service.duration_minutes} min
@@ -121,11 +121,11 @@ export default async function ServiceDetailPage({ params }: Props) {
             </div>
 
             {/* Name */}
-            <h1 className="text-5xl md:text-6xl serif italic mb-10 text-charcoal/90 leading-tight">
+            <h1 className="text-5xl md:text-6xl font-sora mb-10 text-[#2D2926]/90 leading-tight">
               {service.name}
             </h1>
 
-            <div className="w-16 h-[1px] bg-gold/40 mb-10" />
+            <div className="w-16 h-[1px] bg-[#636B2F]/40 mb-10" />
 
             {/* Description */}
             <p className="text-lg text-gray-500 font-light leading-loose max-w-xl">
@@ -134,22 +134,22 @@ export default async function ServiceDetailPage({ params }: Props) {
 
             {/* Practitioners — hidden when empty */}
             {practitioners.length > 0 && (
-              <div className="mt-16 pt-16 border-t border-sand">
-                <p className="text-[10px] uppercase tracking-widest font-bold text-charcoal/40 mb-8">
+              <div className="mt-16 pt-16 border-t border-[#E5E0D8]">
+                <p className="text-[10px] uppercase tracking-widest font-bold text-[#2D2926]/40 mb-8">
                   Your Practitioners
                 </p>
                 <div className="flex flex-wrap gap-4">
                   {practitioners.map(p => (
                     <div
                       key={p.id}
-                      className="flex items-center gap-3 bg-white rounded-xl px-5 py-3 border border-sand"
+                      className="flex items-center gap-3 bg-white px-5 py-3 border border-[#E5E0D8]"
                     >
-                      <div className="w-8 h-8 rounded-full bg-gold/10 flex items-center justify-center shrink-0">
-                        <span className="text-gold text-[11px] font-bold">
+                      <div className="w-8 h-8 rounded-full bg-[#636B2F]/10 flex items-center justify-center shrink-0">
+                        <span className="text-[#636B2F] text-[11px] font-bold">
                           {p.full_name.charAt(0)}
                         </span>
                       </div>
-                      <span className="text-sm font-medium text-charcoal">{p.full_name}</span>
+                      <span className="text-sm font-medium text-[#2D2926]">{p.full_name}</span>
                     </div>
                   ))}
                 </div>
@@ -159,13 +159,13 @@ export default async function ServiceDetailPage({ params }: Props) {
 
           {/* Right — sticky pricing card */}
           <div className="lg:sticky lg:top-32">
-            <div className="bg-white rounded-3xl border border-sand p-8 shadow-sm">
-              <p className="text-[10px] uppercase tracking-widest font-bold text-charcoal/40 mb-8">
+            <div className="bg-white border border-[#E5E0D8] p-8">
+              <p className="text-[10px] uppercase tracking-widest font-bold text-[#2D2926]/40 mb-8">
                 Pricing
               </p>
 
               <div className="pb-8 mb-8">
-                <span className="text-4xl serif italic text-charcoal">
+                <span className="text-4xl font-sora text-[#2D2926]">
                   ₦{fmt(service.single_price_naira)}
                 </span>
                 <p className="text-[11px] text-gray-400 font-light mt-2">per session</p>
@@ -174,7 +174,7 @@ export default async function ServiceDetailPage({ params }: Props) {
               {/* CTA */}
               <Link
                 href={`/book?service=${service.slug}`}
-                className="flex items-center justify-center w-full p-5 bg-charcoal rounded-2xl text-[11px] uppercase tracking-[0.25em] font-bold text-white hover:bg-gold transition-all duration-500 group shadow-lg"
+                className="flex items-center justify-center w-full p-5 bg-[#2D2926] text-[11px] uppercase tracking-[0.25em] font-bold text-white hover:bg-[#636B2F] transition-all duration-500 group"
               >
                 <span>Book Now</span>
                 <ArrowRight

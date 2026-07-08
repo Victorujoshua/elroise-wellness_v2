@@ -100,6 +100,47 @@ export async function toggleServiceActive(
   return { success: true }
 }
 
+export async function deleteService(
+  id: string,
+): Promise<{ success: true } | { success: false; error: string }> {
+  const auth = await createAuthClient()
+  const { data: { user } } = await auth.auth.getUser()
+  if (!user) return { success: false, error: 'Not authenticated' }
+
+  const db = getSupabaseServiceClient()
+
+  // Block deletion if appointments reference this service
+  const { count } = await db
+    .from('appointments')
+    .select('id', { count: 'exact', head: true })
+    .eq('service_id', id)
+  if ((count ?? 0) > 0) {
+    return {
+      success: false,
+      error: `This service has ${count} appointment${count === 1 ? '' : 's'} and cannot be deleted. Deactivate it instead.`,
+    }
+  }
+
+  // Remove practitioner links first to avoid FK violation
+  await db.from('practitioner_services').delete().eq('service_id', id)
+
+  const { error } = await db.from('services').delete().eq('id', id)
+  if (error) return { success: false, error: error.message }
+
+  await db.from('audit_log').insert({
+    actor_id: user.id,
+    action: 'delete',
+    entity_type: 'service',
+    entity_id: id,
+    changes: {} as unknown as Json,
+  })
+
+  revalidatePath('/admin/services')
+  revalidatePath('/services')
+
+  return { success: true }
+}
+
 export async function reorderServices(
   updates: { id: string; sort_order: number }[],
 ): Promise<{ success: true } | { success: false; error: string }> {

@@ -193,7 +193,7 @@ export async function processRefund(
 
   const { data: appt } = await db
     .from('appointments')
-    .select('id, status, clients(full_name, email), services(name)')
+    .select('id, status, clients(full_name, email, notify_email), services(name)')
     .eq('id', appointmentId)
     .single()
 
@@ -239,9 +239,9 @@ export async function processRefund(
   })
 
   const templateId = process.env.LOOPS_REFUND_PROCESSED_TEMPLATE_ID
-  const client = appt.clients as unknown as { full_name: string; email: string } | null
+  const client = appt.clients as unknown as { full_name: string; email: string; notify_email: boolean } | null
   const service = appt.services as unknown as { name: string } | null
-  if (templateId && client) {
+  if (templateId && client && client.notify_email !== false) {
     try {
       await sendTransactional({
         templateId,

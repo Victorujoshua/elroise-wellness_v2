@@ -2,7 +2,8 @@ import { createClient } from '@supabase/supabase-js'
 import type { Database } from './database.types'
 
 const SLOT_INTERVAL_MINUTES = 30
-const BUFFER_HOURS = 2
+const BUFFER_HOURS          = 2
+const BUSINESS_TZ           = 'Africa/Lagos'
 
 export type Slot = string // 'HH:MM'
 
@@ -52,14 +53,37 @@ function generateCandidates(
   return slots
 }
 
+// Shift times and appointment times are stored as Lagos local time.
+// Server runs in UTC, so we must derive "now" in the business timezone
+// before comparing against slot minutes or checking whether today is the target date.
+function getLagosNow() {
+  const now   = new Date()
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone:  BUSINESS_TZ,
+    year:      'numeric',
+    month:     '2-digit',
+    day:       '2-digit',
+    hour:      '2-digit',
+    minute:    '2-digit',
+    hour12:    false,
+  }).formatToParts(now)
+
+  const get = (type: string) => parts.find(p => p.type === type)?.value ?? '0'
+  const hour   = parseInt(get('hour'),   10)
+  const minute = parseInt(get('minute'), 10)
+
+  return {
+    dateString:   `${get('year')}-${get('month')}-${get('day')}`,
+    minutesOfDay: hour * 60 + minute,
+  }
+}
+
 function currentMinutes(): number {
-  const now = new Date()
-  return now.getHours() * 60 + now.getMinutes()
+  return getLagosNow().minutesOfDay
 }
 
 function todayString(): string {
-  const d = new Date()
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+  return getLagosNow().dateString
 }
 
 export async function getAvailableSlots({

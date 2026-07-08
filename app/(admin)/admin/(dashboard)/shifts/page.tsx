@@ -43,9 +43,9 @@ export default async function ShiftsPage({ searchParams }: Props) {
   }
 
   return (
-    <div>
-      <div className="mb-6">
-        <h2 className="text-lg font-semibold">Shifts</h2>
+    <div className="space-y-6 max-w-[1200px]">
+      <div>
+        <h1 className="text-xl font-semibold">Shifts</h1>
         <p className="text-sm text-muted-foreground">
           Manage recurring schedules, time off, and date-specific overrides.
         </p>

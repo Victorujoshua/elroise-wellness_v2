@@ -66,6 +66,24 @@ export async function updateClient(
   return { success: true }
 }
 
+// ── toggleClientNotifyEmail ───────────────────────────────────────────────────
+
+export async function toggleClientNotifyEmail(
+  id: string,
+  notify: boolean,
+): Promise<{ success: true } | { success: false; error: string }> {
+  const auth = await createAuthClient()
+  const { data: { user } } = await auth.auth.getUser()
+  if (!user) return { success: false, error: 'Not authenticated.' }
+
+  const db = getSupabaseServiceClient()
+  const { error } = await db.from('clients').update({ notify_email: notify }).eq('id', id)
+  if (error) return { success: false, error: error.message }
+
+  revalidatePath('/admin/clients')
+  return { success: true }
+}
+
 // ── getClientHistory ──────────────────────────────────────────────────────────
 
 export async function getClientHistory(

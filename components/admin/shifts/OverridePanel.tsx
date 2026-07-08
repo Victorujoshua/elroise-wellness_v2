@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { Plus, Trash2, X } from 'lucide-react'
+import { Ban, Clock, Plus, Trash2, X } from 'lucide-react'
 import { toast } from 'sonner'
 import {
   Dialog,
@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
+import { cn } from '@/lib/utils'
 import { upsertOverride, deleteOverride } from '@/app/(admin)/admin/(dashboard)/shifts/actions'
 import type { ShiftOverrideRow } from '@/lib/database.types'
 
@@ -50,11 +51,11 @@ export default function OverridePanel({ practitionerId, overrides }: Props) {
       </div>
 
       {overrides.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-charcoal/20 py-10 text-center">
+        <div className="border border-dashed border-[#2D2926]/15 bg-muted/20 py-10 text-center">
           <p className="text-sm text-muted-foreground">No overrides recorded.</p>
         </div>
       ) : (
-        <ul className="divide-y rounded-lg border">
+        <ul className="divide-y border border-border bg-card overflow-hidden">
           {overrides.map(row => (
             <OverrideItem key={row.id} row={row} />
           ))}
@@ -82,12 +83,22 @@ function OverrideItem({ row }: { row: ShiftOverrideRow }) {
   }
 
   return (
-    <li className="flex items-center justify-between px-4 py-3 text-sm">
-      <div>
-        <span className="font-medium">{fmtDate(row.override_date)}</span>
+    <li className="flex items-center gap-4 px-4 py-3.5 hover:bg-muted/30 transition-colors duration-150 group">
+      <div className={cn(
+        'size-8 rounded-lg border flex items-center justify-center shrink-0',
+        row.is_unavailable
+          ? 'bg-red-50 border-red-100'
+          : 'bg-sky-50 border-sky-100',
+      )}>
+        {row.is_unavailable
+          ? <Ban className="size-4 text-red-500" />
+          : <Clock className="size-4 text-sky-500" />}
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-medium">{fmtDate(row.override_date)}</p>
         <p className="text-xs text-muted-foreground mt-0.5">
           {row.is_unavailable
-            ? 'Unavailable'
+            ? 'Unavailable all day'
             : `${fmtTime(row.start_time!)} – ${fmtTime(row.end_time!)}`}
           {row.reason ? ` — ${row.reason}` : ''}
         </p>
@@ -97,7 +108,7 @@ function OverrideItem({ row }: { row: ShiftOverrideRow }) {
         variant="ghost"
         onClick={handleDelete}
         disabled={isPending}
-        className="shrink-0 text-destructive hover:text-destructive"
+        className="shrink-0 text-destructive hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity duration-150"
       >
         <Trash2 className="size-3.5" />
       </Button>

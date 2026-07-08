@@ -7,6 +7,21 @@ import { verifyPaystackPayment } from '@/lib/paystack'
 import { sendTransactional } from '@/lib/loops'
 import type { Json } from '@/lib/database.types'
 
+// Date/time formatters — duplicated from public booking flow.
+// TODO: extract to lib/formatters.ts once branches are unified.
+function fmtDate(iso: string): string {
+  const [y, m, d] = iso.split('-').map(Number)
+  return new Date(y, m - 1, d).toLocaleDateString('en-GB', {
+    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
+  })
+}
+
+function fmtTime(t: string): string {
+  const [h, m] = t.split(':').map(Number)
+  const ampm = h >= 12 ? 'PM' : 'AM'
+  return `${h % 12 || 12}:${String(m).padStart(2, '0')} ${ampm}`
+}
+
 const schema = z.object({
   service_id:         z.string().uuid(),
   service_name:       z.string().min(1),
@@ -74,7 +89,9 @@ export async function createAdminBooking(input: AdminBookingInput): Promise<Resu
       pricing_tier === 'package' ? (svc.package_session_count ?? null) : null
 
     // Atomic RPC: client upsert + appointment + optional credits in one transaction
-    const { data: appointmentId, error: rpcErr } = await db.rpc(
+    // NB: as of 0011_package_redemption, this RPC returns a row set
+    // (appointment_id, client_id, credit_id, new_credit_id), not a bare uuid.
+    const { data: rpcRows, error: rpcErr } = await db.rpc(
       'create_appointment_atomic',
       {
         p_full_name:             client.full_name,
@@ -88,6 +105,8 @@ export async function createAdminBooking(input: AdminBookingInput): Promise<Resu
         p_end_time:              end_time,
         p_pricing_tier:          pricing_tier,
         p_package_session_count: packageSessionCount,
+        p_source:                'admin',
+        p_credit_id:             null, // no redemption UI yet — always a fresh purchase/single booking
       },
     )
 
@@ -100,7 +119,11 @@ export async function createAdminBooking(input: AdminBookingInput): Promise<Resu
       return { success: false, error: 'Failed to create appointment.' }
     }
 
-    const apptId = appointmentId as string
+    const apptId = (rpcRows as { appointment_id: string }[] | null)?.[0]?.appointment_id
+    if (!apptId) {
+      console.error('[admin-booking] RPC returned no appointment row:', rpcRows)
+      return { success: false, error: 'Failed to create appointment.' }
+    }
 
     // Payment row — cash/pos get a synthetic reference; none skips entirely
     if (payment_method !== 'none') {
@@ -124,27 +147,77 @@ export async function createAdminBooking(input: AdminBookingInput): Promise<Resu
       changes:     { source: 'admin', payment_method } as unknown as Json,
     })
 
-    // Confirmation email — non-blocking
-    const templateId = process.env.LOOPS_BOOKING_CONFIRMED_TEMPLATE_ID
-    if (templateId) {
+    // ── Fetch supplemental data for emails (parallel) ─────────────────────────
+    const [{ data: svcFull }, { data: practitioner }, { data: clientRow }] = await Promise.all([
+      db.from('services').select('duration_minutes').eq('id', service_id).single(),
+      db.from('users').select('full_name').eq('id', practitioner_id).single(),
+      db.from('clients').select('notify_email').eq('email', client.email).maybeSingle(),
+    ])
+
+    const practitionerName = practitioner?.full_name ?? 'Your practitioner'
+    const durationMins     = svcFull?.duration_minutes ?? 0
+    const shouldNotify     = clientRow?.notify_email ?? true
+    const dateLabel        = fmtDate(appointment_date)
+    const pricePaid        = amount_naira > 0
+      ? `₦${new Intl.NumberFormat('en-NG').format(amount_naira)}`
+      : 'Comp / No charge'
+    const reference        = apptId.slice(0, 8).toUpperCase()
+
+    // ── Client confirmation email ─────────────────────────────────────────────
+    const confirmTemplateId = process.env.LOOPS_BOOKING_CONFIRMED_TEMPLATE_ID
+    if (confirmTemplateId && shouldNotify) {
       try {
-        const [y, m, d] = appointment_date.split('-').map(Number)
-        const dateLabel = new Date(y, m - 1, d).toLocaleDateString('en-GB', {
-          weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
-        })
         await sendTransactional({
-          templateId,
+          templateId: confirmTemplateId,
           email: client.email,
           dataVariables: {
-            first_name:   client.full_name.split(' ')[0],
-            service_name,
-            date:         dateLabel,
-            start_time,
-            reference:    apptId.slice(0, 8).toUpperCase(),
+            clientName:         client.full_name,
+            serviceName:        service_name,
+            practitionerName,
+            bookingDate:        dateLabel,
+            startTime:          fmtTime(start_time),
+            endTime:            fmtTime(end_time),
+            duration:           `${durationMins} min`,
+            pricePaid,
+            pricingTier:        pricing_tier === 'package' ? 'Package' : 'Single session',
+            reference,
+            locationAddress:    process.env.NEXT_PUBLIC_LOCATION_ADDRESS ?? '',
+            cancellationNotice: process.env.NEXT_PUBLIC_CANCELLATION_NOTICE ?? '',
           },
         })
       } catch (err) {
-        console.warn('[admin-booking] Loops email failed (non-fatal):', err)
+        console.warn('[admin-booking] Loops client email failed (non-fatal):', err)
+      }
+    }
+
+    // ── Staff notification email ──────────────────────────────────────────────
+    // Always fires regardless of client notify_email — staff inbox is the
+    // source of truth for what got booked.
+    const notifTemplateId = process.env.LOOPS_BOOKING_NOTIFICATION_TEMPLATE_ID
+    const adminEmail      = process.env.STAFF_NOTIFICATION_EMAIL
+    if (notifTemplateId && adminEmail) {
+      try {
+        await sendTransactional({
+          templateId: notifTemplateId,
+          email: adminEmail,
+          dataVariables: {
+            clientName:       client.full_name,
+            clientEmail:      client.email,
+            clientPhone:      client.phone,
+            serviceName:      service_name,
+            practitionerName,
+            bookingDate:      dateLabel,
+            startTime:        fmtTime(start_time),
+            endTime:          fmtTime(end_time),
+            pricePaid,
+            pricingTier:      pricing_tier === 'package' ? 'Package' : 'Single session',
+            reference,
+            notes:            client.notes ?? '',
+            adminUrl:         `${process.env.NEXT_PUBLIC_APP_URL ?? ''}/admin/appointments/${apptId}`,
+          },
+        })
+      } catch (err) {
+        console.warn('[admin-booking] Loops staff notification failed (non-fatal):', err)
       }
     }
 

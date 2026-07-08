@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
@@ -9,12 +9,12 @@ import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import InviteDialog from './InviteDialog'
 import EditMemberDialog from './EditMemberDialog'
-import { toggleMemberActive, revokeInvite } from '@/app/(admin)/admin/(dashboard)/team/actions'
+import { toggleMemberActive, toggleMemberNotifyEmail, revokeInvite } from '@/app/(admin)/admin/(dashboard)/team/actions'
 import type { MemberWithServices, ServiceOption } from '@/app/(admin)/admin/(dashboard)/team/actions'
 import type { InvitationRow } from '@/lib/database.types'
 
 const ROLE_STYLES: Record<string, string> = {
-  owner:        'bg-gold/15 text-gold',
+  owner:        'bg-[#636B2F]/15 text-[#636B2F]',
   practitioner: 'bg-teal-100 text-teal-700',
   staff:        'bg-blue-100 text-blue-700',
 }
@@ -42,8 +42,9 @@ export default function TeamTable({ members, pendingInvites, services }: Props) 
 
   const [inviteOpen, setInviteOpen]     = useState(false)
   const [editMember, setEditMember]     = useState<MemberWithServices | null>(null)
-  const [togglingId, setTogglingId]     = useState<string | null>(null)
-  const [revokingId, setRevokingId]     = useState<string | null>(null)
+  const [togglingId, setTogglingId]         = useState<string | null>(null)
+  const [togglingNotifyId, setTogglingNotifyId] = useState<string | null>(null)
+  const [revokingId, setRevokingId]         = useState<string | null>(null)
 
   function handleToggle(member: MemberWithServices) {
     setTogglingId(member.id)
@@ -52,6 +53,20 @@ export default function TeamTable({ members, pendingInvites, services }: Props) 
       setTogglingId(null)
       if (result.success) {
         toast.success(member.is_active ? 'Access disabled' : 'Access enabled')
+        router.refresh()
+      } else {
+        toast.error(result.error)
+      }
+    })
+  }
+
+  function handleNotifyToggle(member: MemberWithServices) {
+    setTogglingNotifyId(member.id)
+    startTransition(async () => {
+      const result = await toggleMemberNotifyEmail(member.id, !member.notify_email)
+      setTogglingNotifyId(null)
+      if (result.success) {
+        toast.success(member.notify_email ? 'Email notifications off' : 'Email notifications on')
         router.refresh()
       } else {
         toast.error(result.error)
@@ -91,7 +106,7 @@ export default function TeamTable({ members, pendingInvites, services }: Props) 
       </div>
 
       {/* Active members */}
-      <div className="rounded-lg border border-border overflow-hidden mb-8">
+      <div className="border border-border overflow-hidden mb-8">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -100,13 +115,14 @@ export default function TeamTable({ members, pendingInvites, services }: Props) 
                 <th className="text-left px-4 py-2.5 font-medium text-muted-foreground">Role</th>
                 <th className="text-center px-4 py-2.5 font-medium text-muted-foreground whitespace-nowrap">Services</th>
                 <th className="text-center px-4 py-2.5 font-medium text-muted-foreground">Active</th>
+                <th className="text-center px-4 py-2.5 font-medium text-muted-foreground">Notify</th>
                 <th className="px-4 py-2.5" />
               </tr>
             </thead>
             <tbody>
               {members.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-4 py-10 text-center text-sm text-muted-foreground">
+                  <td colSpan={6} className="px-4 py-10 text-center text-sm text-muted-foreground">
                     No team members yet. Invite someone to get started.
                   </td>
                 </tr>
@@ -145,6 +161,14 @@ export default function TeamTable({ members, pendingInvites, services }: Props) 
                         size="sm"
                       />
                     </td>
+                    <td className="px-4 py-3 text-center">
+                      <Switch
+                        checked={member.notify_email}
+                        onCheckedChange={() => handleNotifyToggle(member)}
+                        disabled={togglingNotifyId === member.id}
+                        size="sm"
+                      />
+                    </td>
                     <td className="px-4 py-3 text-right">
                       <Button
                         variant="ghost"
@@ -169,7 +193,7 @@ export default function TeamTable({ members, pendingInvites, services }: Props) 
           <p className="text-xs uppercase tracking-widest font-semibold text-muted-foreground mb-3">
             Pending invitations
           </p>
-          <div className="rounded-lg border border-border overflow-hidden">
+          <div className="border border-border overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>

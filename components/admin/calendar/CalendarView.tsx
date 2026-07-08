@@ -67,35 +67,58 @@ export default function CalendarView({ date, practitioners, appointments, servic
 
   return (
     <div className="flex flex-col gap-4 h-full">
-      {/* Date navigation */}
-      <div className="flex items-center gap-3 shrink-0 flex-wrap">
-        <div className="flex items-center gap-1">
-          <Button variant="outline" size="icon-sm" onClick={() => go(-1)} aria-label="Previous day">
+      {/* Premium toolbar */}
+      <div className="flex items-center gap-3 shrink-0 flex-wrap bg-card border border-border px-4 py-3">
+        {/* Grouped nav arrows */}
+        <div className="inline-flex items-center border border-border overflow-hidden divide-x divide-border">
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            onClick={() => go(-1)}
+            aria-label="Previous day"
+            className="h-8 w-8 hover:bg-muted/70"
+          >
             <ChevronLeft className="size-4" />
           </Button>
-          <Button variant="outline" size="icon-sm" onClick={() => go(1)} aria-label="Next day">
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            onClick={() => go(1)}
+            aria-label="Next day"
+            className="h-8 w-8 hover:bg-muted/70"
+          >
             <ChevronRight className="size-4" />
           </Button>
         </div>
 
-        <h2 className="text-base font-semibold">{formatDate(date)}</h2>
+        {/* Date + today badge */}
+        <div className="flex items-center gap-2 min-w-0">
+          <h2 className="text-sm font-semibold tracking-tight truncate">{formatDate(date)}</h2>
+          {isToday && (
+            <span className="text-[10px] font-bold uppercase tracking-widest text-[#C5A059] bg-[#C5A059]/10 border border-[#C5A059]/25 px-2 py-0.5 rounded-full shrink-0">
+              Today
+            </span>
+          )}
+        </div>
 
         {!isToday && (
           <Button
             variant="outline"
             size="sm"
             onClick={() => router.push(`/admin/calendar?date=${todayISO()}`)}
+            className="shrink-0"
           >
             Today
           </Button>
         )}
 
-        <span className="text-xs text-muted-foreground">
+        <span className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground bg-muted px-2.5 py-1 rounded-full shrink-0">
+          <span className="size-1.5 rounded-full bg-[#C5A059]" />
           {activeCount} appointment{activeCount !== 1 ? 's' : ''}
         </span>
 
-        <Button size="sm" className="ml-auto" onClick={() => setSheetOpen(true)}>
-          <Plus className="size-4 mr-1" />
+        <Button size="sm" className="ml-auto shrink-0" onClick={() => setSheetOpen(true)}>
+          <Plus className="size-4 mr-1.5" />
           Add booking
         </Button>
       </div>

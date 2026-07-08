@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+﻿import type { Metadata } from 'next'
 import { lookupBookingsByEmail, type BookingRecord } from './actions'
 
 export const dynamic = 'force-dynamic'
@@ -18,7 +18,7 @@ function formatDate(dateStr: string): string {
 const STATUS_STYLES: Record<string, string> = {
   pending:   'bg-amber-50  text-amber-700  border border-amber-200',
   confirmed: 'bg-emerald-50 text-emerald-700 border border-emerald-200',
-  completed: 'bg-charcoal/5 text-charcoal/50 border border-charcoal/10',
+  completed: 'bg-[#2D2926]/5 text-[#2D2926]/50 border border-[#2D2926]/10',
   cancelled: 'bg-red-50    text-red-500    border border-red-100',
   no_show:   'bg-red-50    text-red-500    border border-red-100',
 }
@@ -34,7 +34,7 @@ function StatusBadge({ status }: { status: string }) {
   return (
     <span
       className={`text-[8px] uppercase tracking-widest font-bold px-2.5 py-1 rounded-full ${
-        STATUS_STYLES[status] ?? 'bg-charcoal/5 text-charcoal/40'
+        STATUS_STYLES[status] ?? 'bg-[#2D2926]/5 text-[#2D2926]/40'
       }`}
     >
       {STATUS_LABELS[status] ?? status}
@@ -46,35 +46,35 @@ function BookingCard({ booking, past }: { booking: BookingRecord; past: boolean 
   const isLaser = booking.service_category === 'laser'
   return (
     <div
-      className={`bg-white rounded-2xl border p-6 transition-opacity ${
-        past ? 'border-charcoal/6 opacity-60' : 'border-charcoal/8'
+      className={`bg-white border p-6 transition-opacity ${
+        past ? 'border-[#2D2926]/6 opacity-60' : 'border-[#2D2926]/8'
       }`}
     >
       <div className="flex items-start justify-between gap-4 mb-4">
         <div>
           <p
             className={`text-[8px] uppercase tracking-[0.4em] font-bold mb-1 ${
-              isLaser ? 'text-gold' : 'text-emerald-600'
+              isLaser ? 'text-[#636B2F]' : 'text-emerald-600'
             }`}
           >
             {isLaser ? 'Laser Hair Reduction' : 'Pilates Studio'}
           </p>
-          <h3 className="text-base font-light text-charcoal">{booking.service_name}</h3>
+          <h3 className="text-base font-light text-[#2D2926]">{booking.service_name}</h3>
         </div>
         <StatusBadge status={booking.status} />
       </div>
 
-      <div className="space-y-1.5 text-sm font-light text-charcoal/55">
+      <div className="space-y-1.5 text-sm font-light text-[#2D2926]/55">
         <p>{formatDate(booking.appointment_date)}</p>
         <p>
           {booking.start_time.slice(0, 5)} — {booking.end_time.slice(0, 5)}
-          <span className="text-charcoal/30 ml-2 text-xs">· {booking.duration_minutes} min</span>
+          <span className="text-[#2D2926]/30 ml-2 text-xs">· {booking.duration_minutes} min</span>
         </p>
         <p>With {booking.practitioner_name}</p>
       </div>
 
       {booking.pricing_tier === 'package' && (
-        <p className="text-[9px] uppercase tracking-widest text-gold font-semibold mt-3">
+        <p className="text-[9px] uppercase tracking-widest text-[#636B2F] font-semibold mt-3">
           Package booking
         </p>
       )}
@@ -91,11 +91,11 @@ function LookupForm({ defaultEmail }: { defaultEmail: string }) {
         required
         defaultValue={defaultEmail}
         placeholder="your@email.com"
-        className="flex-1 border border-charcoal/15 rounded-lg px-4 py-3 text-sm font-light text-charcoal placeholder:text-charcoal/30 focus:outline-none focus:border-gold transition-colors bg-white"
+        className="flex-1 border border-[#2D2926]/15 px-4 py-3 text-sm font-light text-[#2D2926] placeholder:text-[#2D2926]/30 focus:outline-none focus:border-[#636B2F] transition-colors bg-white"
       />
       <button
         type="submit"
-        className="px-8 py-3 bg-charcoal text-white text-[9px] uppercase tracking-[0.4em] font-bold rounded-lg hover:bg-gold transition-all duration-500 shrink-0"
+        className="px-8 py-3 bg-[#2D2926] text-white text-[9px] uppercase tracking-[0.4em] font-bold hover:bg-[#636B2F] transition-all duration-500 shrink-0"
       >
         Look up
       </button>
@@ -131,18 +131,18 @@ export default async function MyBookingsPage({
   const resolvedEmail = result?.success ? result.email : email
 
   return (
-    <div className="bg-bg min-h-screen pt-[72px]">
+    <div className="bg-[#F9F6F2] min-h-screen pt-[72px]">
       <div className="max-w-2xl mx-auto px-6 py-12">
 
         {/* Header */}
         <div className="mb-10">
-          <p className="text-[9px] uppercase tracking-[0.5em] text-gold font-semibold mb-3">
+          <p className="text-[9px] uppercase tracking-[0.5em] text-[#636B2F] font-semibold mb-3">
             Booking Lookup
           </p>
-          <h1 className="text-3xl md:text-4xl font-light text-charcoal mb-2">
-            My <span className="serif italic text-gold">Bookings</span>
+          <h1 className="text-3xl md:text-4xl font-light text-[#2D2926] mb-2">
+            My <span className="font-sora text-[#636B2F]">Bookings</span>
           </h1>
-          <p className="text-sm text-charcoal/50 font-light">
+          <p className="text-sm text-[#2D2926]/50 font-light">
             Enter the email address used when you booked.
           </p>
         </div>
@@ -156,14 +156,14 @@ export default async function MyBookingsPage({
 
         {/* No bookings found */}
         {result?.success && result.bookings.length === 0 && (
-          <div className="mt-10 bg-white rounded-2xl border border-charcoal/8 p-10 text-center">
-            <p className="text-sm text-charcoal/50 font-light mb-2">
+          <div className="mt-10 bg-white border border-[#2D2926]/8 p-10 text-center">
+            <p className="text-sm text-[#2D2926]/50 font-light mb-2">
               No bookings found for{' '}
-              <span className="text-charcoal font-normal">{result.email}</span>
+              <span className="text-[#2D2926] font-normal">{result.email}</span>
             </p>
-            <p className="text-[10px] text-charcoal/30 font-light">
+            <p className="text-[10px] text-[#2D2926]/30 font-light">
               Double-check the address, or{' '}
-              <a href="/book" className="text-gold hover:underline">
+              <a href="/book" className="text-[#636B2F] hover:underline">
                 book a session
               </a>
               .
@@ -174,7 +174,7 @@ export default async function MyBookingsPage({
         {/* Upcoming */}
         {upcoming.length > 0 && (
           <div className="mt-10">
-            <p className="text-[9px] uppercase tracking-[0.4em] text-charcoal/40 font-semibold mb-4">
+            <p className="text-[9px] uppercase tracking-[0.4em] text-[#2D2926]/40 font-semibold mb-4">
               Upcoming · {upcoming.length}
             </p>
             <div className="space-y-4">
@@ -188,7 +188,7 @@ export default async function MyBookingsPage({
         {/* Past & cancelled */}
         {past.length > 0 && (
           <div className="mt-10">
-            <p className="text-[9px] uppercase tracking-[0.4em] text-charcoal/40 font-semibold mb-4">
+            <p className="text-[9px] uppercase tracking-[0.4em] text-[#2D2926]/40 font-semibold mb-4">
               Past & Cancelled · {past.length}
             </p>
             <div className="space-y-4">
@@ -201,9 +201,9 @@ export default async function MyBookingsPage({
 
         {/* Phase 2 note */}
         {result?.success && result.bookings.length > 0 && (
-          <p className="mt-12 text-[9px] text-charcoal/30 text-center font-light">
+          <p className="mt-12 text-[9px] text-[#2D2926]/30 text-center font-light">
             To cancel or reschedule, please{' '}
-            <a href="/contact" className="text-gold hover:underline">
+            <a href="/contact" className="text-[#636B2F] hover:underline">
               contact us
             </a>
             .

@@ -109,7 +109,9 @@ export async function createAppointment(
 
     // PH-5: Atomic RPC — slot overlap check (PH-2) + client upsert + appointment
     // + client_credits all run in a single Postgres transaction.
-    const { data: appointmentId, error: rpcErr } = await db.rpc(
+    // NB: as of 0011_package_redemption, this RPC returns a row set
+    // (appointment_id, client_id, credit_id, new_credit_id), not a bare uuid.
+    const { data: rpcRows, error: rpcErr } = await db.rpc(
       'create_appointment_atomic',
       {
         p_full_name:             client.full_name,
@@ -123,6 +125,8 @@ export async function createAppointment(
         p_end_time:              end_time,
         p_pricing_tier:          pricing_tier,
         p_package_session_count: packageSessionCount,
+        p_source:                'web',
+        p_credit_id:             null, // no redemption UI yet — always a fresh purchase/single booking
       },
     )
     if (rpcErr) {
@@ -149,7 +153,14 @@ export async function createAppointment(
       }
     }
 
-    const apptId = appointmentId as string
+    const apptId = (rpcRows as { appointment_id: string }[] | null)?.[0]?.appointment_id
+    if (!apptId) {
+      console.error('[booking] RPC returned no appointment row:', rpcRows)
+      return {
+        success: false,
+        error: 'Failed to create appointment. Please contact us if you were charged.',
+      }
+    }
 
     // Payment row — non-fatal (appointment is confirmed; refund no longer possible here)
     const { error: paymentErr } = await db.from('payments').insert({
@@ -170,8 +181,15 @@ export async function createAppointment(
       weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
     })
 
+    const { data: clientPref } = await db
+      .from('clients')
+      .select('notify_email')
+      .eq('email', client.email)
+      .maybeSingle()
+    const shouldNotifyClient = clientPref?.notify_email ?? true
+
     const templateId = process.env.LOOPS_BOOKING_CONFIRMED_TEMPLATE_ID
-    if (templateId) {
+    if (templateId && shouldNotifyClient) {
       try {
         await sendTransactional({
           templateId,

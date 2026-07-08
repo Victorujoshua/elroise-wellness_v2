@@ -64,7 +64,7 @@ export default function CancelDialog({
               {...register('reason')}
               rows={3}
               placeholder="Why is this appointment being cancelled?"
-              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring resize-none"
+              className="w-full border border-input bg-background px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring resize-none"
             />
             {errors.reason && (
               <p className="text-xs text-destructive mt-1">{errors.reason.message}</p>

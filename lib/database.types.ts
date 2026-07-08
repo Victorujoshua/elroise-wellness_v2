@@ -15,6 +15,7 @@ export type Database = {
           phone: string | null
           role: 'owner' | 'staff' | 'practitioner'
           is_active: boolean
+          notify_email: boolean
           created_at: string
           updated_at: string
         }
@@ -24,6 +25,7 @@ export type Database = {
           phone?: string | null
           role: 'owner' | 'staff' | 'practitioner'
           is_active?: boolean
+          notify_email?: boolean
           created_at?: string
           updated_at?: string
         }
@@ -38,6 +40,7 @@ export type Database = {
           email: string
           phone: string
           notes: string | null
+          notify_email: boolean
           created_at: string
           updated_at: string
         }
@@ -47,6 +50,7 @@ export type Database = {
           email: string
           phone: string
           notes?: string | null
+          notify_email?: boolean
           created_at?: string
           updated_at?: string
         }
@@ -359,9 +363,16 @@ export type Database = {
           p_start_time:            string
           p_end_time:              string
           p_pricing_tier:          string
-          p_package_session_count: number | null
+          p_package_session_count?: number | null
+          p_source?:               string
+          p_credit_id?:            string | null
         }
-        Returns: string // uuid
+        Returns: {
+          appointment_id: string // uuid
+          client_id:      string // uuid
+          credit_id:      string | null // uuid
+          new_credit_id:  string | null // uuid
+        }[]
       }
     }
     Enums: Record<never, never>

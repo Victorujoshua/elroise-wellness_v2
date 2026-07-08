@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState } from 'react'
 import Image from 'next/image'
@@ -91,23 +91,23 @@ export default function ShopProduct() {
   }
 
   return (
-    <div className="bg-bg pt-[72px] min-h-screen">
+    <div className="bg-[#F9F6F2] pt-[72px] min-h-screen">
 
       {/* Page header */}
-      <section className="py-16 px-8 md:px-20 border-b border-charcoal/8 max-w-7xl mx-auto">
+      <section className="py-16 px-8 md:px-20 border-b border-[#2D2926]/8 max-w-7xl mx-auto">
         <div className="flex items-end justify-between">
           <div>
-            <p className="text-[9px] uppercase tracking-[0.5em] text-gold font-semibold mb-3">
+            <p className="text-[9px] uppercase tracking-[0.5em] text-[#636B2F] font-semibold mb-3">
               The Boutique
             </p>
-            <h1 className="text-4xl md:text-6xl font-light text-charcoal leading-tight">
+            <h1 className="text-4xl md:text-6xl font-light text-[#2D2926] leading-tight">
               Elroisè{' '}
-              <span className="italic serif text-gold">Grip Socks</span>
+              <span className="font-sora text-[#636B2F]">Grip Socks</span>
             </h1>
           </div>
           <button
             onClick={openCart}
-            className="hidden md:flex items-center space-x-3 bg-charcoal text-white px-6 py-3 rounded-sm hover:bg-gold transition-colors duration-500 text-[10px] uppercase tracking-widest font-semibold"
+            className="hidden md:flex items-center space-x-3 bg-[#2D2926] text-white px-6 py-3 rounded-sm hover:bg-[#636B2F] transition-colors duration-500 text-[10px] uppercase tracking-widest font-semibold"
           >
             <ShoppingBag size={16} />
             <span>View Cart</span>
@@ -121,7 +121,7 @@ export default function ShopProduct() {
 
           {/* Image */}
           <div>
-            <div className="relative rounded-2xl overflow-hidden aspect-[4/5] shadow-xl">
+            <div className="relative overflow-hidden aspect-[4/5]">
               <Image
                 key={selectedColor.id}
                 src={selectedColor.image}
@@ -132,7 +132,7 @@ export default function ShopProduct() {
                 priority
               />
               <div className="absolute top-6 left-6 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full">
-                <p className="text-[8px] uppercase tracking-[0.4em] text-gold font-bold">
+                <p className="text-[8px] uppercase tracking-[0.4em] text-[#636B2F] font-bold">
                   {selectedColor.tag}
                 </p>
               </div>
@@ -148,13 +148,13 @@ export default function ShopProduct() {
                   aria-label={c.color}
                   className={`w-10 h-10 rounded-full border-2 transition-all duration-300 ${
                     selectedColor.id === c.id
-                      ? 'scale-110 ring-2 ring-gold ring-offset-2'
+                      ? 'scale-110 ring-2 ring-[#636B2F] ring-offset-2'
                       : 'hover:scale-105'
                   }`}
                   style={{ backgroundColor: c.hex, borderColor: c.border }}
                 />
               ))}
-              <p className="text-xs text-charcoal/50 font-light ml-2">
+              <p className="text-xs text-[#2D2926]/50 font-light ml-2">
                 {selectedColor.color}
               </p>
             </div>
@@ -162,20 +162,20 @@ export default function ShopProduct() {
 
           {/* Details */}
           <div className="lg:sticky lg:top-28">
-            <p className="text-[9px] uppercase tracking-[0.5em] text-charcoal/40 mb-3 font-semibold">
+            <p className="text-[9px] uppercase tracking-[0.5em] text-[#2D2926]/40 mb-3 font-semibold">
               Elroisè Wellness Center
             </p>
-            <h2 className="text-3xl md:text-4xl font-light text-charcoal mb-2">
+            <h2 className="text-3xl md:text-4xl font-light text-[#2D2926] mb-2">
               Pilates Grip Socks —{' '}
-              <span className="italic serif text-gold">{selectedColor.color}</span>
+              <span className="font-sora text-[#636B2F]">{selectedColor.color}</span>
             </h2>
-            <p className="text-2xl font-light text-charcoal mb-8">
+            <p className="text-2xl font-light text-[#2D2926] mb-8">
               ₦{fmt(PRICE)}
             </p>
 
-            <div className="w-12 h-[1px] bg-gold/40 mb-8" />
+            <div className="w-12 h-[1px] bg-[#636B2F]/40 mb-8" />
 
-            <p className="text-sm text-charcoal/60 font-light leading-loose mb-10">
+            <p className="text-sm text-[#2D2926]/60 font-light leading-loose mb-10">
               {selectedColor.description}
             </p>
 
@@ -183,9 +183,9 @@ export default function ShopProduct() {
               {features.map((feat) => (
                 <li
                   key={feat}
-                  className="flex items-start space-x-3 text-sm text-charcoal/65 font-light"
+                  className="flex items-start space-x-3 text-sm text-[#2D2926]/65 font-light"
                 >
-                  <Check size={14} className="text-gold mt-0.5 shrink-0" />
+                  <Check size={14} className="text-[#636B2F] mt-0.5 shrink-0" />
                   <span>{feat}</span>
                 </li>
               ))}
@@ -193,7 +193,7 @@ export default function ShopProduct() {
 
             {/* Size */}
             <div className="mb-8">
-              <p className="text-[9px] uppercase tracking-[0.4em] text-charcoal/50 font-semibold mb-4">
+              <p className="text-[9px] uppercase tracking-[0.4em] text-[#2D2926]/50 font-semibold mb-4">
                 Select Size
               </p>
               <div className="flex space-x-3">
@@ -203,8 +203,8 @@ export default function ShopProduct() {
                     onClick={() => setSelectedSize(size)}
                     className={`px-5 py-3 text-[9px] uppercase tracking-widest font-semibold border rounded-sm transition-all duration-300 ${
                       selectedSize === size
-                        ? 'bg-charcoal text-white border-charcoal'
-                        : 'bg-transparent text-charcoal/60 border-charcoal/20 hover:border-gold hover:text-gold'
+                        ? 'bg-[#2D2926] text-white border-[#2D2926]'
+                        : 'bg-transparent text-[#2D2926]/60 border-[#2D2926]/20 hover:border-[#636B2F] hover:text-[#636B2F]'
                     }`}
                   >
                     {size}
@@ -212,7 +212,7 @@ export default function ShopProduct() {
                 ))}
               </div>
               {!selectedSize && (
-                <p className="text-[9px] text-gold/70 mt-2 font-light">
+                <p className="text-[9px] text-[#636B2F]/70 mt-2 font-light">
                   Please select a size to continue
                 </p>
               )}
@@ -220,22 +220,22 @@ export default function ShopProduct() {
 
             {/* Quantity */}
             <div className="mb-10">
-              <p className="text-[9px] uppercase tracking-[0.4em] text-charcoal/50 font-semibold mb-4">
+              <p className="text-[9px] uppercase tracking-[0.4em] text-[#2D2926]/50 font-semibold mb-4">
                 Quantity
               </p>
               <div className="flex items-center space-x-4">
                 <button
                   onClick={() => setQty((q) => Math.max(1, q - 1))}
-                  className="w-10 h-10 border border-charcoal/20 rounded-sm text-charcoal hover:border-gold hover:text-gold transition-colors text-lg font-light"
+                  className="w-10 h-10 border border-[#2D2926]/20 rounded-sm text-[#2D2926] hover:border-[#636B2F] hover:text-[#636B2F] transition-colors text-lg font-light"
                 >
                   −
                 </button>
-                <span className="text-lg font-light text-charcoal w-6 text-center">
+                <span className="text-lg font-light text-[#2D2926] w-6 text-center">
                   {qty}
                 </span>
                 <button
                   onClick={() => setQty((q) => q + 1)}
-                  className="w-10 h-10 border border-charcoal/20 rounded-sm text-charcoal hover:border-gold hover:text-gold transition-colors text-lg font-light"
+                  className="w-10 h-10 border border-[#2D2926]/20 rounded-sm text-[#2D2926] hover:border-[#636B2F] hover:text-[#636B2F] transition-colors text-lg font-light"
                 >
                   +
                 </button>
@@ -250,8 +250,8 @@ export default function ShopProduct() {
                 added
                   ? 'bg-green-600 text-white'
                   : selectedSize
-                  ? 'bg-charcoal text-white hover:bg-gold'
-                  : 'bg-charcoal/20 text-charcoal/40 cursor-not-allowed'
+                  ? 'bg-[#2D2926] text-white hover:bg-[#636B2F]'
+                  : 'bg-[#2D2926]/20 text-[#2D2926]/40 cursor-not-allowed'
               }`}
             >
               {added ? (
@@ -267,7 +267,7 @@ export default function ShopProduct() {
               )}
             </button>
 
-            <p className="text-[9px] text-charcoal/35 text-center mt-6 tracking-wide font-light">
+            <p className="text-[9px] text-[#2D2926]/35 text-center mt-6 tracking-wide font-light">
               Hand wash cold · Do not tumble dry · Lay flat to dry
             </p>
           </div>
@@ -275,13 +275,13 @@ export default function ShopProduct() {
       </section>
 
       {/* All colorways */}
-      <section className="py-20 px-8 md:px-20 border-t border-charcoal/8 max-w-7xl mx-auto">
+      <section className="py-20 px-8 md:px-20 border-t border-[#2D2926]/8 max-w-7xl mx-auto">
         <div className="mb-12">
-          <p className="text-[9px] uppercase tracking-[0.5em] text-gold font-semibold mb-3">
+          <p className="text-[9px] uppercase tracking-[0.5em] text-[#636B2F] font-semibold mb-3">
             The Collection
           </p>
-          <h2 className="text-3xl md:text-4xl font-light text-charcoal">
-            All <span className="italic serif">Colorways</span>
+          <h2 className="text-3xl md:text-4xl font-light text-[#2D2926]">
+            All <span className="font-sora">Colorways</span>
           </h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -292,10 +292,10 @@ export default function ShopProduct() {
                 handleColorSelect(c)
                 window.scrollTo({ top: 0, behavior: 'smooth' })
               }}
-              className={`text-left group border rounded-2xl overflow-hidden transition-all duration-500 hover:shadow-xl ${
+              className={`text-left group border overflow-hidden transition-all duration-500 ${
                 selectedColor.id === c.id
-                  ? 'border-gold shadow-lg'
-                  : 'border-charcoal/10 hover:border-gold/40'
+                  ? 'border-[#636B2F] shadow-lg'
+                  : 'border-[#2D2926]/10 hover:border-[#636B2F]/40'
               }`}
             >
               <div className="relative h-64 overflow-hidden">
@@ -309,7 +309,7 @@ export default function ShopProduct() {
               </div>
               <div className="p-6 bg-white">
                 <div className="flex items-center justify-between mb-2">
-                  <p className="text-xs uppercase tracking-[0.3em] text-charcoal/40 font-semibold">
+                  <p className="text-xs uppercase tracking-[0.3em] text-[#2D2926]/40 font-semibold">
                     {c.tag}
                   </p>
                   <div
@@ -317,8 +317,8 @@ export default function ShopProduct() {
                     style={{ backgroundColor: c.hex, borderColor: c.border }}
                   />
                 </div>
-                <h3 className="text-lg font-light text-charcoal mb-1">{c.color}</h3>
-                <p className="text-sm text-charcoal/50 font-light">₦{fmt(PRICE)}</p>
+                <h3 className="text-lg font-light text-[#2D2926] mb-1">{c.color}</h3>
+                <p className="text-sm text-[#2D2926]/50 font-light">₦{fmt(PRICE)}</p>
               </div>
             </button>
           ))}
@@ -331,19 +331,19 @@ export default function ShopProduct() {
 
           {/* Size guide */}
           <div>
-            <p className="text-[9px] uppercase tracking-[0.5em] text-gold font-semibold mb-4">
+            <p className="text-[9px] uppercase tracking-[0.5em] text-[#636B2F] font-semibold mb-4">
               Size Guide
             </p>
-            <h3 className="text-2xl font-light text-charcoal mb-8 italic serif">
+            <h3 className="text-2xl font-light text-[#2D2926] mb-8 font-sora">
               Find your fit.
             </h3>
-            <table className="w-full text-sm font-light text-charcoal/70">
+            <table className="w-full text-sm font-light text-[#2D2926]/70">
               <thead>
-                <tr className="border-b border-charcoal/10">
+                <tr className="border-b border-[#2D2926]/10">
                   {['Size', 'Shoe Size (EU)', 'Shoe Size (UK)'].map((h) => (
                     <th
                       key={h}
-                      className="text-left text-[9px] uppercase tracking-widest py-3 text-charcoal/40 font-semibold"
+                      className="text-left text-[9px] uppercase tracking-widest py-3 text-[#2D2926]/40 font-semibold"
                     >
                       {h}
                     </th>
@@ -356,8 +356,8 @@ export default function ShopProduct() {
                   ['M / L', '39 – 42', '6 – 8'],
                   ['XL / XXL', '43 – 46', '9 – 11'],
                 ].map(([size, eu, uk]) => (
-                  <tr key={size} className="border-b border-charcoal/8">
-                    <td className="py-4 font-semibold text-charcoal">{size}</td>
+                  <tr key={size} className="border-b border-[#2D2926]/8">
+                    <td className="py-4 font-semibold text-[#2D2926]">{size}</td>
                     <td className="py-4">{eu}</td>
                     <td className="py-4">{uk}</td>
                   </tr>
@@ -368,10 +368,10 @@ export default function ShopProduct() {
 
           {/* Care */}
           <div>
-            <p className="text-[9px] uppercase tracking-[0.5em] text-gold font-semibold mb-4">
+            <p className="text-[9px] uppercase tracking-[0.5em] text-[#636B2F] font-semibold mb-4">
               Care Instructions
             </p>
-            <h3 className="text-2xl font-light text-charcoal mb-8 italic serif">
+            <h3 className="text-2xl font-light text-[#2D2926] mb-8 font-sora">
               Keep them pristine.
             </h3>
             <ul className="space-y-4">
@@ -384,14 +384,14 @@ export default function ShopProduct() {
               ].map(([instruction, note], i) => (
                 <li
                   key={instruction}
-                  className="flex items-start space-x-4 pb-4 border-b border-charcoal/8"
+                  className="flex items-start space-x-4 pb-4 border-b border-[#2D2926]/8"
                 >
-                  <span className="text-[9px] uppercase tracking-widest text-gold font-bold mt-0.5 w-5 shrink-0">
+                  <span className="text-[9px] uppercase tracking-widest text-[#636B2F] font-bold mt-0.5 w-5 shrink-0">
                     {String(i + 1).padStart(2, '0')}
                   </span>
                   <div>
-                    <p className="text-sm text-charcoal font-light">{instruction}</p>
-                    <p className="text-[11px] text-charcoal/40 mt-0.5 font-light">{note}</p>
+                    <p className="text-sm text-[#2D2926] font-light">{instruction}</p>
+                    <p className="text-[11px] text-[#2D2926]/40 mt-0.5 font-light">{note}</p>
                   </div>
                 </li>
               ))}

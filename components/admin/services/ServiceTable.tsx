@@ -2,13 +2,13 @@
 
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { Pencil, Plus } from 'lucide-react'
+import { Pencil, Plus, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import ServiceDialog from './ServiceDialog'
-import { toggleServiceActive } from '@/app/(admin)/admin/(dashboard)/services/actions'
+import { toggleServiceActive, deleteService } from '@/app/(admin)/admin/(dashboard)/services/actions'
 import type {
   ServiceWithPractitioners,
   PractitionerOption,
@@ -50,6 +50,8 @@ export default function ServiceTable({ services, practitioners }: Props) {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editingService, setEditingService] = useState<ServiceWithPractitioners | null>(null)
   const [togglingId, setTogglingId] = useState<string | null>(null)
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
 
   const filtered = services
     .filter(s =>
@@ -85,6 +87,21 @@ export default function ServiceTable({ services, practitioners }: Props) {
     })
   }
 
+  function handleDelete(service: ServiceWithPractitioners) {
+    setDeletingId(service.id)
+    setConfirmDeleteId(null)
+    startTransition(async () => {
+      const result = await deleteService(service.id)
+      setDeletingId(null)
+      if (result.success) {
+        toast.success(`"${service.name}" deleted`)
+        router.refresh()
+      } else {
+        toast.error(result.error)
+      }
+    })
+  }
+
   return (
     <>
       {/* Toolbar */}
@@ -94,13 +111,13 @@ export default function ServiceTable({ services, practitioners }: Props) {
           placeholder="Search by name…"
           value={search}
           onChange={e => setSearch(e.target.value)}
-          className="h-8 flex-1 min-w-0 rounded-lg border border-input bg-transparent px-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring/50 focus:border-ring"
+          className="flex-1 min-w-0 border border-input bg-transparent px-4 py-2.5 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring/50 focus:border-ring"
         />
         <div className="flex gap-2 shrink-0">
           <select
             value={categoryFilter}
             onChange={e => setCategoryFilter(e.target.value as typeof categoryFilter)}
-            className="h-8 rounded-lg border border-input bg-transparent px-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring/50"
+            className="border border-input bg-transparent px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring/50"
           >
             <option value="all">All categories</option>
             <option value="pilates">Pilates</option>
@@ -110,7 +127,7 @@ export default function ServiceTable({ services, practitioners }: Props) {
           <select
             value={statusFilter}
             onChange={e => setStatusFilter(e.target.value as typeof statusFilter)}
-            className="h-8 rounded-lg border border-input bg-transparent px-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring/50"
+            className="border border-input bg-transparent px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring/50"
           >
             <option value="all">All statuses</option>
             <option value="active">Active</option>
@@ -124,7 +141,7 @@ export default function ServiceTable({ services, practitioners }: Props) {
       </div>
 
       {/* Table */}
-      <div className="rounded-lg border border-border overflow-hidden">
+      <div className="border border-border overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -213,14 +230,48 @@ export default function ServiceTable({ services, practitioners }: Props) {
                       />
                     </td>
                     <td className="px-4 py-3 text-right">
-                      <Button
-                        variant="ghost"
-                        size="icon-sm"
-                        onClick={() => openEdit(service)}
-                        aria-label={`Edit ${service.name}`}
-                      >
-                        <Pencil className="size-3.5" />
-                      </Button>
+                      {confirmDeleteId === service.id ? (
+                        <div className="flex items-center justify-end gap-1.5">
+                          <span className="text-xs text-muted-foreground mr-1">Delete?</span>
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            className="h-6 px-2 text-xs"
+                            onClick={() => handleDelete(service)}
+                            disabled={deletingId === service.id}
+                          >
+                            {deletingId === service.id ? 'Deleting…' : 'Yes'}
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-6 px-2 text-xs"
+                            onClick={() => setConfirmDeleteId(null)}
+                          >
+                            Cancel
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="flex items-center justify-end gap-0.5">
+                          <Button
+                            variant="ghost"
+                            size="icon-sm"
+                            onClick={() => openEdit(service)}
+                            aria-label={`Edit ${service.name}`}
+                          >
+                            <Pencil className="size-3.5" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon-sm"
+                            onClick={() => setConfirmDeleteId(service.id)}
+                            aria-label={`Delete ${service.name}`}
+                            className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                          >
+                            <Trash2 className="size-3.5" />
+                          </Button>
+                        </div>
+                      )}
                     </td>
                   </tr>
                 ))
