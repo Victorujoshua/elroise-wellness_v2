@@ -258,6 +258,7 @@ export type Database = {
           verified_at: string | null
           raw_response: Json | null
           created_at: string
+          refunded_amount_kobo: number
         }
         Insert: {
           id?: string
@@ -270,6 +271,7 @@ export type Database = {
           verified_at?: string | null
           raw_response?: Json | null
           created_at?: string
+          refunded_amount_kobo?: number
         }
         Update: Partial<Database['public']['Tables']['payments']['Insert']>
         Relationships: []

@@ -217,15 +217,23 @@ export async function processRefund(
     return { success: false, error: `Refund amount must be between ₦1 and ₦${Math.floor(payment.amount_kobo / 100).toLocaleString()}.` }
   }
 
+  const isPartial = refundAmountKobo < payment.amount_kobo
+
   try {
-    const isPartial = refundAmountKobo < payment.amount_kobo
     await refundPaystackPayment(payment.paystack_reference, isPartial ? refundAmountKobo : undefined)
   } catch (err) {
     console.error('[refund] Paystack refund failed:', err)
     return { success: false, error: 'Paystack refund request failed. Please try again or process manually.' }
   }
 
-  await db.from('payments').update({ status: 'refunded' }).eq('id', payment.id)
+  // Partial refunds keep the original status so remaining (unrefunded) amount
+  // still counts toward revenue — only refunded_amount_kobo is subtracted.
+  await db.from('payments')
+    .update({
+      status: isPartial ? payment.status : 'refunded',
+      refunded_amount_kobo: refundAmountKobo,
+    })
+    .eq('id', payment.id)
   await db.from('appointments').update({ status: 'cancelled' }).eq('id', appointmentId)
 
   await db.from('audit_log').insert({

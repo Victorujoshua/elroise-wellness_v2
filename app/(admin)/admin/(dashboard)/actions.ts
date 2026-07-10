@@ -90,7 +90,7 @@ export async function getDashboardData(): Promise<DashboardData> {
 
     // 4. Revenue: week appointments with their payments (sum in JS)
     db.from('appointments')
-      .select('payments(amount_kobo, status)')
+      .select('payments(amount_kobo, status, refunded_amount_kobo)')
       .gte('appointment_date', weekStart)
       .lte('appointment_date', weekEnd)
       .neq('status', 'cancelled'),
@@ -123,15 +123,15 @@ export async function getDashboardData(): Promise<DashboardData> {
       .limit(20),
   ])
 
-  // Revenue: sum only status='success' payments
-  type PaymentRow = { amount_kobo: number; status: string }
+  // Revenue: sum paid statuses (Paystack, cash, POS), net of any partial refunds
+  type PaymentRow = { amount_kobo: number; status: string; refunded_amount_kobo: number | null }
   let weekRevenueNaira = 0
   if (weekRevenueRes.status === 'fulfilled' && weekRevenueRes.value.data) {
     weekRevenueNaira =
       (weekRevenueRes.value.data as unknown as { payments: PaymentRow[] | null }[])
         .flatMap(a => a.payments ?? [])
-        .filter(p => p.status === 'success')
-        .reduce((sum, p) => sum + p.amount_kobo, 0) / 100
+        .filter(p => ['success', 'cash', 'pos'].includes(p.status))
+        .reduce((sum, p) => sum + (p.amount_kobo - (p.refunded_amount_kobo ?? 0)), 0) / 100
   }
 
   // Shape today's appointments
