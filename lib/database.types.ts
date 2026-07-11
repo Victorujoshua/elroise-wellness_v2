@@ -72,6 +72,7 @@ export type Database = {
           color_hex: string | null
           is_active: boolean
           sort_order: number
+          buffer_minutes: number
           created_at: string
           updated_at: string
         }
@@ -88,6 +89,7 @@ export type Database = {
           color_hex?: string | null
           is_active?: boolean
           sort_order?: number
+          buffer_minutes?: number
           created_at?: string
           updated_at?: string
         }

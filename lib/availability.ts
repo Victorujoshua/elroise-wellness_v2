@@ -1,9 +1,8 @@
 import { createClient } from '@supabase/supabase-js'
 import type { Database } from './database.types'
 
-const SLOT_INTERVAL_MINUTES = 30
-const BUFFER_HOURS          = 2
-const BUSINESS_TZ           = 'Africa/Lagos'
+const BUFFER_HOURS = 2
+const BUSINESS_TZ  = 'Africa/Lagos'
 
 export type Slot = string // 'HH:MM'
 
@@ -40,15 +39,16 @@ function minutesToTime(minutes: number): string {
 }
 
 function generateCandidates(
-  startMin: number,
-  endMin: number,
+  startMin:    number,
+  endMin:      number,
   durationMin: number,
+  intervalMin: number,
 ): number[] {
   const slots: number[] = []
   let cur = startMin
   while (cur + durationMin <= endMin) {
     slots.push(cur)
-    cur += SLOT_INTERVAL_MINUTES
+    cur += intervalMin
   }
   return slots
 }
@@ -98,12 +98,17 @@ export async function getAvailableSlots({
   // ── 1. Service ────────────────────────────────────────────────
   const { data: service, error: svcErr } = await supabase
     .from('services')
-    .select('id, duration_minutes')
+    .select('id, duration_minutes, buffer_minutes')
     .eq('id', serviceId)
     .eq('is_active', true)
     .single()
 
   if (svcErr || !service) return []
+
+  // Slot grid spacing = this service's own duration + turnover buffer.
+  // Buffer defaults to 0, so services without one configured keep exact
+  // duration-width spacing (not the old fixed 15/30-min grid).
+  const slotIntervalMinutes = service.duration_minutes + service.buffer_minutes
 
   // ── 2. Eligible practitioners ─────────────────────────────────
   const { data: links } = await supabase
@@ -153,7 +158,7 @@ export async function getAvailableSlots({
 
     supabase
       .from('appointments')
-      .select('practitioner_id, start_time, end_time')
+      .select('practitioner_id, start_time, end_time, services(buffer_minutes)')
       .in('practitioner_id', practitionerIds)
       .eq('appointment_date', date)
       .in('status', ['pending', 'confirmed']),
@@ -167,7 +172,12 @@ export async function getAvailableSlots({
   const shifts    = shiftsRes.data    ?? []
   const overrides = overridesRes.data ?? []
   const timeOff   = timeOffRes.data   ?? []
-  const appts     = apptsRes.data     ?? []
+  const appts     = (apptsRes.data ?? []) as unknown as {
+    practitioner_id: string
+    start_time:      string
+    end_time:        string
+    services:        { buffer_minutes: number } | null
+  }[]
 
   const isToday = date === todayString()
   // Earliest minute a slot may start (today only)
@@ -200,16 +210,18 @@ export async function getAvailableSlots({
       shiftEnd   = timeToMinutes(shift.end_time)
     }
 
-    // Existing bookings for overlap detection
+    // Existing bookings for overlap detection. `end` includes the booked
+    // service's turnover buffer — the practitioner isn't free again until
+    // the buffer elapses, even though the appointment itself ended earlier.
     const bookedBlocks = appts
       .filter(a => a.practitioner_id === pid)
       .map(a => ({
         start: timeToMinutes(a.start_time),
-        end:   timeToMinutes(a.end_time),
+        end:   timeToMinutes(a.end_time) + (a.services?.buffer_minutes ?? 0),
       }))
 
     // Generate candidates and filter
-    const validSlots = generateCandidates(shiftStart, shiftEnd, service.duration_minutes)
+    const validSlots = generateCandidates(shiftStart, shiftEnd, service.duration_minutes, slotIntervalMinutes)
       .filter(slotStart => {
         // 2-hour same-day buffer
         if (slotStart < cutoffMinutes) return false
