@@ -156,12 +156,32 @@ export async function createAdminBooking(input: AdminBookingInput): Promise<Resu
     )
 
     if (rpcErr) {
-      const isSlotTaken =
-        (rpcErr.code === 'P0001' && rpcErr.message === 'SLOT_TAKEN') ||
-        rpcErr.code === '23505'
-      if (isSlotTaken) return { success: false, error: 'This slot is already booked.' }
       console.error('[admin-booking] RPC error:', rpcErr)
-      return { success: false, error: 'Failed to create appointment.' }
+
+      // Handle specific RPC exceptions (raised via RAISE EXCEPTION 'CODE')
+      if (rpcErr.code === 'P0001') {
+        const errorMessages: Record<string, string> = {
+          DUPLICATE_BOOKING:  'This client already has a booking at this time.',
+          SLOT_FULL:          'This class is fully booked.',
+          PRACTITIONER_BUSY:  'The practitioner has a conflicting booking at this time.',
+          SLOT_TAKEN:         'This slot is already booked.',
+          SERVICE_NOT_FOUND:  'Selected service not found.',
+          CREDIT_NOT_FOUND:   'The package credit could not be found.',
+          CREDIT_EXHAUSTED:   'This package has no remaining sessions.',
+        }
+
+        const specificMessage = errorMessages[rpcErr.message]
+        if (specificMessage) {
+          return { success: false, error: specificMessage }
+        }
+      }
+
+      // Unique constraint violation (belt-and-suspenders for old index if it existed)
+      if (rpcErr.code === '23505') {
+        return { success: false, error: 'This slot is already booked.' }
+      }
+
+      return { success: false, error: 'Failed to create appointment. Please try again.' }
     }
 
     const apptRow = (rpcRows as { appointment_id: string; client_id: string }[] | null)?.[0]

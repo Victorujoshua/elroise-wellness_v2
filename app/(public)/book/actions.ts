@@ -130,6 +130,8 @@ export async function createAppointment(
       },
     )
     if (rpcErr) {
+      console.error('[booking] RPC error:', rpcErr)
+
       // PH-4: Slot conflict — refund automatically (our fault, not theirs)
       const isSlotTaken =
         (rpcErr.code === 'P0001' && rpcErr.message === 'SLOT_TAKEN') ||
@@ -146,7 +148,29 @@ export async function createAppointment(
         }
       }
 
-      console.error('[booking] RPC error:', rpcErr)
+      // Other specific RPC exceptions (Session 1 concurrent-bookings).
+      // Payment is already captured at this point and none of these are
+      // auto-refunded (only the race-condition case above is confidently
+      // "our fault" alone — e.g. DUPLICATE_BOOKING is the client's own
+      // overlapping booking), so every message keeps the "contact us if
+      // charged" framing the generic fallback already used, rather than
+      // silently dropping it for a more specific-but-payment-silent one.
+      if (rpcErr.code === 'P0001') {
+        const errorMessages: Record<string, string> = {
+          DUPLICATE_BOOKING: 'You already have a booking at this time. Please contact us if you were charged.',
+          SLOT_FULL:         'This class just filled up. Please contact us if you were charged.',
+          PRACTITIONER_BUSY: 'This time is no longer available. Please contact us if you were charged.',
+          SERVICE_NOT_FOUND: 'This service is no longer available. Please contact us if you were charged.',
+          CREDIT_NOT_FOUND:  'We could not find your package credit. Please contact us if you were charged.',
+          CREDIT_EXHAUSTED:  'Your package has no remaining sessions. Please contact us if you were charged.',
+        }
+
+        const specificMessage = errorMessages[rpcErr.message]
+        if (specificMessage) {
+          return { success: false, error: specificMessage }
+        }
+      }
+
       return {
         success: false,
         error: 'Failed to create appointment. Please contact us if you were charged.',
