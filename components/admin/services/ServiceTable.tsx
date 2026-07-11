@@ -200,6 +200,11 @@ export default function ServiceTable({ services, practitioners }: Props) {
                     </td>
                     <td className="px-4 py-3 text-right tabular-nums whitespace-nowrap">
                       {service.duration_minutes} min
+                      {service.buffer_minutes > 0 && (
+                        <div className="text-xs text-muted-foreground font-normal">
+                          +{service.buffer_minutes}m buffer
+                        </div>
+                      )}
                     </td>
                     <td className="px-4 py-3 text-right tabular-nums whitespace-nowrap">
                       {fmt(service.single_price_naira)}

@@ -153,7 +153,7 @@ export async function getAvailableSlots({
 
     supabase
       .from('appointments')
-      .select('practitioner_id, start_time, end_time')
+      .select('practitioner_id, start_time, end_time, services(buffer_minutes)')
       .in('practitioner_id', practitionerIds)
       .eq('appointment_date', date)
       .in('status', ['pending', 'confirmed']),
@@ -167,7 +167,12 @@ export async function getAvailableSlots({
   const shifts    = shiftsRes.data    ?? []
   const overrides = overridesRes.data ?? []
   const timeOff   = timeOffRes.data   ?? []
-  const appts     = apptsRes.data     ?? []
+  const appts     = (apptsRes.data ?? []) as unknown as {
+    practitioner_id: string
+    start_time:      string
+    end_time:        string
+    services:        { buffer_minutes: number } | null
+  }[]
 
   const isToday = date === todayString()
   // Earliest minute a slot may start (today only)
@@ -200,12 +205,14 @@ export async function getAvailableSlots({
       shiftEnd   = timeToMinutes(shift.end_time)
     }
 
-    // Existing bookings for overlap detection
+    // Existing bookings for overlap detection. `end` includes the booked
+    // service's turnover buffer — the practitioner isn't free again until
+    // the buffer elapses, even though the appointment itself ended earlier.
     const bookedBlocks = appts
       .filter(a => a.practitioner_id === pid)
       .map(a => ({
         start: timeToMinutes(a.start_time),
-        end:   timeToMinutes(a.end_time),
+        end:   timeToMinutes(a.end_time) + (a.services?.buffer_minutes ?? 0),
       }))
 
     // Generate candidates and filter

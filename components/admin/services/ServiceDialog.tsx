@@ -38,6 +38,7 @@ function getDefaults(service: ServiceWithPractitioners | null): ServiceFormData 
       category: 'pilates',
       description: '',
       duration_minutes: 60,
+      buffer_minutes: 0,
       single_price_naira: 0,
       has_package: false,
       package_price_naira: null,
@@ -54,6 +55,7 @@ function getDefaults(service: ServiceWithPractitioners | null): ServiceFormData 
     category: service.category,
     description: service.description ?? '',
     duration_minutes: service.duration_minutes,
+    buffer_minutes: service.buffer_minutes,
     single_price_naira: service.single_price_naira,
     has_package: service.package_price_naira != null,
     package_price_naira: service.package_price_naira,
@@ -224,6 +226,25 @@ export default function ServiceDialog({ open, onClose, service, practitioners }:
                 <p className="text-xs text-destructive">{errors.duration_minutes.message}</p>
               )}
             </div>
+          </div>
+
+          {/* Buffer time */}
+          <div className="space-y-1.5">
+            <Label htmlFor="svc-buffer">Buffer time (minutes)</Label>
+            <Input
+              id="svc-buffer"
+              type="number"
+              min={0}
+              max={120}
+              className="max-w-40"
+              {...register('buffer_minutes', { valueAsNumber: true })}
+            />
+            <p className="text-xs text-muted-foreground">
+              Turnover time after each booking. Applies to this practitioner&rsquo;s next slot.
+            </p>
+            {errors.buffer_minutes && (
+              <p className="text-xs text-destructive">{errors.buffer_minutes.message}</p>
+            )}
           </div>
 
           {/* Row 3: Single Price + Sort Order */}

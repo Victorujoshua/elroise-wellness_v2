@@ -28,6 +28,7 @@ export async function saveService(
     category: d.category,
     description: d.description || null,
     duration_minutes: d.duration_minutes,
+    buffer_minutes: d.buffer_minutes,
     single_price_naira: d.single_price_naira,
     package_price_naira: d.has_package ? (d.package_price_naira ?? null) : null,
     package_session_count: d.has_package ? (d.package_session_count ?? null) : null,
