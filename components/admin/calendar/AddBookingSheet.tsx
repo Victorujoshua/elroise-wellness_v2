@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useTransition, useEffect } from 'react'
-import { ChevronLeft, Plus } from 'lucide-react'
+import { ChevronLeft, Plus, Search, X } from 'lucide-react'
 import { toast } from 'sonner'
 import {
   Sheet,
@@ -23,6 +23,7 @@ import { Label } from '@/components/ui/label'
 import { cn } from '@/lib/utils'
 import { getAvailability } from '@/app/(public)/book/actions'
 import { createAdminBooking } from '@/app/(admin)/admin/(dashboard)/calendar/adminBookingActions'
+import { searchClients, type ClientSearchResult } from '@/app/(admin)/admin/(dashboard)/clients/searchAction'
 import type { PractitionerSlots } from '@/lib/availability'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -36,34 +37,36 @@ export type ServiceOption = {
   package_session_count: number | null
 }
 
-type Step = 'details' | 'slot' | 'payment' | 'done'
+type Step = 'find-client' | 'details' | 'slot' | 'payment' | 'done'
 type PayMethod = 'cash' | 'pos' | 'paystack' | 'none'
 
 type State = {
-  step:         Step
-  serviceId:    string
-  date:         string
-  name:         string
-  email:        string
-  phone:        string
-  notes:        string
-  availability: PractitionerSlots[]
-  availError:   string | null
-  pid:          string
-  pName:        string
-  slot:         string
-  endTime:      string
-  tier:         'single' | 'package'
-  payMethod:    PayMethod
-  bookError:    string | null
-  apptId:       string
+  step:               Step
+  existingClientId:   string | null
+  serviceId:          string
+  date:               string
+  name:               string
+  email:              string
+  phone:              string
+  notes:              string
+  availability:       PractitionerSlots[]
+  availError:         string | null
+  pid:                string
+  pName:              string
+  slot:               string
+  endTime:            string
+  tier:               'single' | 'package'
+  payMethod:          PayMethod
+  bookError:          string | null
+  apptId:             string
 }
 
 function mkInitial(defaultDate: string, services: ServiceOption[]): State {
   return {
-    step:         'details',
-    serviceId:    services[0]?.id ?? '',
-    date:         defaultDate,
+    step:             'find-client',
+    existingClientId: null,
+    serviceId:        services[0]?.id ?? '',
+    date:             defaultDate,
     name: '', email: '', phone: '', notes: '',
     availability: [],
     availError:   null,
@@ -91,10 +94,11 @@ function fmtTime(t: string) {
 }
 
 const STEP_LABELS: Record<Step, string> = {
-  details: 'Step 1 of 3 — Details',
-  slot:    'Step 2 of 3 — Select slot',
-  payment: 'Step 3 of 3 — Payment',
-  done:    'Booking created',
+  'find-client': 'Step 1 of 4 — Find or add client',
+  details:       'Step 2 of 4 — Details',
+  slot:          'Step 3 of 4 — Select slot',
+  payment:       'Step 4 of 4 — Payment',
+  done:          'Booking created',
 }
 
 // ── Main component ────────────────────────────────────────────────────────────
@@ -136,8 +140,30 @@ export default function AddBookingSheet({ open, onClose, defaultDate, services }
           </SheetClose>
         </SheetHeader>
 
+        {/* Selected-client chip */}
+        {state.existingClientId && !['find-client', 'done'].includes(state.step) && (
+          <div className="flex items-center gap-2 border-b bg-[#F9F6F2] px-5 py-2 text-xs shrink-0">
+            <span className="text-muted-foreground">Booking for:</span>
+            <span className="font-medium">{state.name}</span>
+            <button
+              type="button"
+              onClick={() => set({
+                step: 'find-client', existingClientId: null,
+                name: '', email: '', phone: '',
+              })}
+              className="ml-auto flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <X className="size-3" />
+              deselect
+            </button>
+          </div>
+        )}
+
         {/* Body */}
         <div className="flex-1 overflow-y-auto px-5 py-5">
+          {state.step === 'find-client' && (
+            <FindClientStep set={set} />
+          )}
           {state.step === 'details' && (
             <DetailsStep state={state} set={set} services={services} />
           )}
@@ -153,6 +179,135 @@ export default function AddBookingSheet({ open, onClose, defaultDate, services }
         </div>
       </SheetContent>
     </Sheet>
+  )
+}
+
+// ── Step 0: Find client ──────────────────────────────────────────────────────
+
+function FindClientStep({ set }: { set: (p: Partial<State>) => void }) {
+  const [query, setQuery]         = useState('')
+  const [results, setResults]     = useState<ClientSearchResult[]>([])
+  const [isSearching, setIsSearching] = useState(false)
+
+  useEffect(() => {
+    if (query.trim().length < 2) {
+      setResults([])
+      setIsSearching(false)
+      return
+    }
+
+    setIsSearching(true)
+    const timer = setTimeout(async () => {
+      try {
+        const res = await searchClients(query)
+        setResults(res)
+      } catch (err) {
+        console.error('[client-search] error:', err)
+        setResults([])
+      } finally {
+        setIsSearching(false)
+      }
+    }, 300)
+
+    return () => clearTimeout(timer)
+  }, [query])
+
+  function handleClientSelected(client: ClientSearchResult) {
+    set({
+      existingClientId: client.id,
+      name:             client.full_name,
+      email:            client.email,
+      phone:            client.phone,
+      step:             'details',
+    })
+  }
+
+  function handleAddNewClient() {
+    set({ existingClientId: null, step: 'details' })
+  }
+
+  return (
+    <div className="space-y-5">
+      <div className="space-y-1.5">
+        <Label>Search existing client</Label>
+        <div className="relative">
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground pointer-events-none" />
+          <Input
+            type="text"
+            placeholder="Search by name, email, or phone"
+            className="pl-9"
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+            autoFocus
+          />
+        </div>
+        <p className="text-xs text-muted-foreground">Type at least 2 characters</p>
+      </div>
+
+      <div className="min-h-[200px]">
+        {isSearching && (
+          <div className="text-sm text-muted-foreground">Searching…</div>
+        )}
+
+        {!isSearching && query.trim().length >= 2 && results.length === 0 && (
+          <div className="text-sm text-muted-foreground">No matching clients found</div>
+        )}
+
+        {!isSearching && results.length > 0 && (
+          <div className="space-y-2">
+            {results.map(client => (
+              <ClientResultCard
+                key={client.id}
+                client={client}
+                onSelect={() => handleClientSelected(client)}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div className="flex items-center gap-3">
+        <div className="h-px flex-1 bg-border" />
+        <span className="text-xs text-muted-foreground">or</span>
+        <div className="h-px flex-1 bg-border" />
+      </div>
+
+      <button
+        type="button"
+        onClick={handleAddNewClient}
+        className="w-full py-3 border border-[#2D2926] rounded hover:bg-[#F9F6F2] transition-colors text-sm font-medium"
+      >
+        Add new client
+      </button>
+    </div>
+  )
+}
+
+function ClientResultCard({
+  client,
+  onSelect,
+}: {
+  client:   ClientSearchResult
+  onSelect: () => void
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onSelect}
+      className="w-full text-left p-4 border border-input rounded hover:border-[#636B2F] hover:bg-[#F9F6F2] transition-colors"
+    >
+      <div className="font-medium text-sm">{client.full_name}</div>
+      <div className="text-xs text-muted-foreground flex items-center gap-2 mt-1">
+        <span>{client.email}</span>
+        <span className="opacity-50">•</span>
+        <span>{client.phone || 'No phone'}</span>
+      </div>
+      {client.last_visit_date && (
+        <div className="text-xs text-muted-foreground mt-1">
+          Last visit: {fmtDate(client.last_visit_date)}
+        </div>
+      )}
+    </button>
   )
 }
 
@@ -282,6 +437,15 @@ function DetailsStep({
       >
         {isPending ? 'Checking…' : 'Check availability →'}
       </Button>
+
+      <button
+        onClick={() => set({ step: 'find-client' })}
+        disabled={isPending}
+        className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+      >
+        <ChevronLeft className="size-3" />
+        Back to search
+      </button>
     </div>
   )
 }
@@ -399,6 +563,7 @@ function PaymentStep({
       payment_method:     state.payMethod,
       paystack_reference: paystackRef,
       amount_naira:       amount,
+      existing_client_id: state.existingClientId ?? undefined,
       client: {
         full_name: state.name,
         email:     state.email,

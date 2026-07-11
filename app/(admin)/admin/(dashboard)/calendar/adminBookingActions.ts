@@ -33,6 +33,7 @@ const schema = z.object({
   payment_method:     z.enum(['cash', 'pos', 'paystack', 'none']),
   paystack_reference: z.string().optional(),
   amount_naira:       z.number().int().nonnegative(),
+  existing_client_id: z.string().uuid().optional(),
   client: z.object({
     full_name: z.string().min(2),
     email:     z.string().email(),
@@ -55,7 +56,7 @@ export async function createAdminBooking(input: AdminBookingInput): Promise<Resu
   const {
     service_id, service_name, appointment_date, start_time, end_time,
     practitioner_id, pricing_tier, payment_method, paystack_reference,
-    amount_naira, client,
+    amount_naira, existing_client_id, client,
   } = parsed.data
 
   try {
@@ -68,6 +69,19 @@ export async function createAdminBooking(input: AdminBookingInput): Promise<Resu
       .single()
 
     if (!svc?.is_active) return { success: false, error: 'This service is no longer active.' }
+
+    // Existing client selected from search — verify it still exists before
+    // proceeding. The RPC itself upserts by email (see 0011), so as long as
+    // `client.email` still matches this row it will resolve to the same
+    // client_id without needing to pass the id through the RPC directly.
+    if (existing_client_id) {
+      const { data: existingClient } = await db
+        .from('clients')
+        .select('id')
+        .eq('id', existing_client_id)
+        .maybeSingle()
+      if (!existingClient) return { success: false, error: 'Selected client not found.' }
+    }
 
     // Paystack path — verify before any writes
     let paystackRef: string | null = null
@@ -119,10 +133,21 @@ export async function createAdminBooking(input: AdminBookingInput): Promise<Resu
       return { success: false, error: 'Failed to create appointment.' }
     }
 
-    const apptId = (rpcRows as { appointment_id: string }[] | null)?.[0]?.appointment_id
+    const apptRow = (rpcRows as { appointment_id: string; client_id: string }[] | null)?.[0]
+    const apptId = apptRow?.appointment_id
     if (!apptId) {
       console.error('[admin-booking] RPC returned no appointment row:', rpcRows)
       return { success: false, error: 'Failed to create appointment.' }
+    }
+
+    // Non-fatal telemetry: if the email was edited after selecting an
+    // existing client, the RPC's upsert-by-email may resolve to a
+    // different (or new) client row than the one that was selected.
+    if (existing_client_id && apptRow?.client_id !== existing_client_id) {
+      console.warn(
+        '[admin-booking] existing_client_id did not match RPC-resolved client_id — email may have been edited:',
+        { existing_client_id, resolved: apptRow?.client_id },
+      )
     }
 
     // Payment row — cash/pos get a synthetic reference; none skips entirely
@@ -144,7 +169,7 @@ export async function createAdminBooking(input: AdminBookingInput): Promise<Resu
       action:      'create',
       entity_type: 'appointment',
       entity_id:   apptId,
-      changes:     { source: 'admin', payment_method } as unknown as Json,
+      changes:     { source: 'admin', payment_method, existing_client_id: existing_client_id ?? null } as unknown as Json,
     })
 
     // ── Fetch supplemental data for emails (parallel) ─────────────────────────
