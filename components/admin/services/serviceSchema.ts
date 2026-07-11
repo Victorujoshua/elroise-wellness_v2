@@ -10,6 +10,7 @@ export const serviceSchema = z.object({
   description: z.string().optional(),
   duration_minutes: z.number().int().min(1, 'At least 1 minute'),
   buffer_minutes: z.number().int().min(0, 'Must be non-negative').max(120, 'Max 120 minutes'),
+  max_concurrent: z.number().int().min(1, 'At least 1').max(20, 'Max 20'),
   single_price_naira: z.number().int().min(0, 'Must be non-negative'),
   has_package: z.boolean(),
   package_price_naira: z.number().int().min(0).nullable().optional(),

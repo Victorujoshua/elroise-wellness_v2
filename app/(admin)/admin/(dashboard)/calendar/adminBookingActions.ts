@@ -5,7 +5,38 @@ import { z } from 'zod'
 import { createAuthClient, getSupabaseServiceClient } from '@/lib/supabase/server'
 import { verifyPaystackPayment } from '@/lib/paystack'
 import { sendTransactional } from '@/lib/loops'
+import { getAvailableSlotsWithCapacity, type PractitionerSlotsWithCapacity } from '@/lib/availability'
 import type { Json } from '@/lib/database.types'
+
+// ── getAvailabilityWithCapacity ─────────────────────────────────────────────
+// Admin-only counterpart to the public getAvailability (book/actions.ts).
+// Uses getAvailableSlotsWithCapacity instead of getAvailableSlots so group
+// service slots carry spots_taken/spots_total for the admin picker.
+
+const availabilitySchema = z.object({
+  serviceId: z.string().uuid(),
+  date:      z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be YYYY-MM-DD'),
+})
+
+type AvailabilityWithCapacityResult =
+  | { success: true; data: PractitionerSlotsWithCapacity[] }
+  | { success: false; error: string }
+
+export async function getAvailabilityWithCapacity(
+  serviceId: string,
+  date: string,
+): Promise<AvailabilityWithCapacityResult> {
+  const parsed = availabilitySchema.safeParse({ serviceId, date })
+  if (!parsed.success) return { success: false, error: 'Invalid parameters.' }
+
+  try {
+    const data = await getAvailableSlotsWithCapacity(parsed.data)
+    return { success: true, data }
+  } catch (err) {
+    console.error('[admin-availability] Unexpected error:', err)
+    return { success: false, error: 'Unable to load availability. Please try again.' }
+  }
+}
 
 // Date/time formatters — duplicated from public booking flow.
 // TODO: extract to lib/formatters.ts once branches are unified.
