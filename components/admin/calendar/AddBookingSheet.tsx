@@ -21,10 +21,9 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { cn } from '@/lib/utils'
-import { getAvailability } from '@/app/(public)/book/actions'
-import { createAdminBooking } from '@/app/(admin)/admin/(dashboard)/calendar/adminBookingActions'
+import { createAdminBooking, getAvailabilityWithCapacity } from '@/app/(admin)/admin/(dashboard)/calendar/adminBookingActions'
 import { searchClients, type ClientSearchResult } from '@/app/(admin)/admin/(dashboard)/clients/searchAction'
-import type { PractitionerSlots } from '@/lib/availability'
+import type { PractitionerSlotsWithCapacity, SlotWithCapacity } from '@/lib/availability'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -49,7 +48,7 @@ type State = {
   email:              string
   phone:              string
   notes:              string
-  availability:       PractitionerSlots[]
+  availability:       PractitionerSlotsWithCapacity[]
   availError:         string | null
   pid:                string
   pName:              string
@@ -340,7 +339,7 @@ function DetailsStep({
     if (Object.keys(e).length) { setErrors(e); return }
     setErrors({})
     startTransition(async () => {
-      const res = await getAvailability(state.serviceId, state.date)
+      const res = await getAvailabilityWithCapacity(state.serviceId, state.date)
       if (!res.success) {
         set({ availError: res.error })
         return
@@ -461,12 +460,9 @@ function SlotStep({
   set:     (p: Partial<State>) => void
   service: ServiceOption | undefined
 }) {
-  function handleSelect(pid: string, pName: string, slot: string) {
-    if (!service) return
-    const [h, m] = slot.split(':').map(Number)
-    const endMin = h * 60 + m + service.duration_minutes
-    const et = `${String(Math.floor(endMin / 60)).padStart(2, '0')}:${String(endMin % 60).padStart(2, '0')}`
-    set({ step: 'payment', pid, pName, slot, endTime: et })
+  function handleSelect(pid: string, pName: string, slot: SlotWithCapacity) {
+    if (slot.is_full) return
+    set({ step: 'payment', pid, pName, slot: slot.start_time, endTime: slot.end_time })
   }
 
   return (
@@ -491,20 +487,38 @@ function SlotStep({
                 {p.practitioner_name}
               </p>
               <div className="flex flex-wrap gap-2">
-                {p.slots.map(slot => (
-                  <button
-                    key={slot}
-                    onClick={() => handleSelect(p.practitioner_id, p.practitioner_name, slot)}
-                    className={cn(
-                      'px-3 py-1.5 rounded-md border text-xs font-medium transition-colors',
-                      state.slot === slot && state.pid === p.practitioner_id
-                        ? 'bg-[#2D2926] text-white border-[#2D2926]'
-                        : 'border-input hover:border-[#2D2926]/40 hover:bg-muted',
-                    )}
-                  >
-                    {fmtTime(slot)}
-                  </button>
-                ))}
+                {p.slots.map(slot => {
+                  const isSelected = state.slot === slot.start_time && state.pid === p.practitioner_id
+                  const isGroup    = slot.spots_total > 1
+                  return (
+                    <button
+                      key={slot.start_time}
+                      type="button"
+                      disabled={slot.is_full}
+                      onClick={() => handleSelect(p.practitioner_id, p.practitioner_name, slot)}
+                      className={cn(
+                        'flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-md border text-xs font-medium transition-colors',
+                        slot.is_full
+                          ? 'border-input bg-muted text-muted-foreground/50 cursor-not-allowed'
+                          : isSelected
+                          ? 'bg-[#2D2926] text-white border-[#2D2926]'
+                          : 'border-input hover:border-[#2D2926]/40 hover:bg-muted',
+                      )}
+                    >
+                      <span>{fmtTime(slot.start_time)}</span>
+                      {isGroup && (
+                        <span
+                          className={cn(
+                            'text-[10px] font-normal',
+                            !slot.is_full && isSelected ? 'text-white/70' : 'text-muted-foreground',
+                          )}
+                        >
+                          {slot.is_full ? '(Full)' : `${slot.spots_taken} of ${slot.spots_total} spots`}
+                        </span>
+                      )}
+                    </button>
+                  )
+                })}
               </div>
             </div>
           ))}

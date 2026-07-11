@@ -39,6 +39,7 @@ function getDefaults(service: ServiceWithPractitioners | null): ServiceFormData 
       description: '',
       duration_minutes: 60,
       buffer_minutes: 0,
+      max_concurrent: 1,
       single_price_naira: 0,
       has_package: false,
       package_price_naira: null,
@@ -56,6 +57,7 @@ function getDefaults(service: ServiceWithPractitioners | null): ServiceFormData 
     description: service.description ?? '',
     duration_minutes: service.duration_minutes,
     buffer_minutes: service.buffer_minutes,
+    max_concurrent: service.max_concurrent,
     single_price_naira: service.single_price_naira,
     has_package: service.package_price_naira != null,
     package_price_naira: service.package_price_naira,
@@ -244,6 +246,25 @@ export default function ServiceDialog({ open, onClose, service, practitioners }:
             </p>
             {errors.buffer_minutes && (
               <p className="text-xs text-destructive">{errors.buffer_minutes.message}</p>
+            )}
+          </div>
+
+          {/* Max concurrent bookings */}
+          <div className="space-y-1.5">
+            <Label htmlFor="svc-max-concurrent">Max concurrent bookings</Label>
+            <Input
+              id="svc-max-concurrent"
+              type="number"
+              min={1}
+              max={20}
+              className="max-w-40"
+              {...register('max_concurrent', { valueAsNumber: true })}
+            />
+            <p className="text-xs text-muted-foreground">
+              1 for 1-on-1 services. Higher for group classes (e.g., 6 for Mat Pilates).
+            </p>
+            {errors.max_concurrent && (
+              <p className="text-xs text-destructive">{errors.max_concurrent.message}</p>
             )}
           </div>
 
