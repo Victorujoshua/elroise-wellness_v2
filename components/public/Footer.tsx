@@ -127,7 +127,7 @@ export default function Footer() {
               </div>
               <div className="flex items-center gap-3">
                 <HugeiconsIcon icon={CallIcon} size={16} color="currentColor" strokeWidth={1.5} className="shrink-0 text-[#636B2F]" />
-                <a href="tel:08067014037" className="hover:text-white transition-colors duration-200">08067014037</a>
+                <a href="tel:09076142845" className="hover:text-white transition-colors duration-200">09076142845</a>
               </div>
               <div className="flex items-center gap-3">
                 <HugeiconsIcon icon={Mail01Icon} size={16} color="currentColor" strokeWidth={1.5} className="shrink-0 text-[#636B2F]" />

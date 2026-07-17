@@ -64,10 +64,10 @@ export default function ContactPage() {
                     Inquiries
                   </h4>
                   <a
-                    href="tel:08067014037"
+                    href="tel:09076142845"
                     className="text-lg font-light text-[#2D2926] hover:text-[#636B2F] transition-colors block"
                   >
-                    08067014037
+                    09076142845
                   </a>
                   <a
                     href="mailto:elroisewellnesscenter@gmail.com"
