@@ -53,6 +53,22 @@ function generateCandidates(
   return slots
 }
 
+// Fixed-timetable candidates (services.class_start_times). A time is only
+// a candidate when the shift covers it start-to-finish; everything else
+// (booking overlap, group capacity) is filtered downstream exactly as for
+// generated candidates.
+function generateFixedCandidates(
+  times:       string[],
+  startMin:    number,
+  endMin:      number,
+  durationMin: number,
+): number[] {
+  return times
+    .map(timeToMinutes)
+    .filter(t => t >= startMin && t + durationMin <= endMin)
+    .sort((a, b) => a - b)
+}
+
 // Shift times and appointment times are stored as Lagos local time.
 // Server runs in UTC, so we must derive "now" in the business timezone
 // before comparing against slot minutes or checking whether today is the target date.
@@ -98,7 +114,7 @@ export async function getAvailableSlots({
   // ── 1. Service ────────────────────────────────────────────────
   const { data: service, error: svcErr } = await supabase
     .from('services')
-    .select('id, duration_minutes, buffer_minutes')
+    .select('id, duration_minutes, buffer_minutes, class_start_times')
     .eq('id', serviceId)
     .eq('is_active', true)
     .single()
@@ -220,8 +236,12 @@ export async function getAvailableSlots({
         end:   timeToMinutes(a.end_time) + (a.services?.buffer_minutes ?? 0),
       }))
 
-    // Generate candidates and filter
-    const validSlots = generateCandidates(shiftStart, shiftEnd, service.duration_minutes, slotIntervalMinutes)
+    // Generate candidates (fixed timetable if configured, else generated) and filter
+    const candidateMinutes = service.class_start_times.length > 0
+      ? generateFixedCandidates(service.class_start_times, shiftStart, shiftEnd, service.duration_minutes)
+      : generateCandidates(shiftStart, shiftEnd, service.duration_minutes, slotIntervalMinutes)
+
+    const validSlots = candidateMinutes
       .filter(slotStart => {
         // 2-hour same-day buffer
         if (slotStart < cutoffMinutes) return false
@@ -276,7 +296,7 @@ export async function getAvailableSlotsWithCapacity({
 
   const { data: service, error: svcErr } = await supabase
     .from('services')
-    .select('id, duration_minutes, buffer_minutes, max_concurrent')
+    .select('id, duration_minutes, buffer_minutes, max_concurrent, class_start_times')
     .eq('id', serviceId)
     .eq('is_active', true)
     .single()
@@ -384,7 +404,11 @@ export async function getAvailableSlotsWithCapacity({
 
     const slots: SlotWithCapacity[] = []
 
-    for (const slotStart of generateCandidates(shiftStart, shiftEnd, service.duration_minutes, slotIntervalMinutes)) {
+    const candidateMinutes = service.class_start_times.length > 0
+      ? generateFixedCandidates(service.class_start_times, shiftStart, shiftEnd, service.duration_minutes)
+      : generateCandidates(shiftStart, shiftEnd, service.duration_minutes, slotIntervalMinutes)
+
+    for (const slotStart of candidateMinutes) {
       if (slotStart < cutoffMinutes) continue
       const slotEnd = slotStart + service.duration_minutes
 

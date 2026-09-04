@@ -36,6 +36,7 @@ export async function saveService(
     color_hex: d.color_hex,
     is_active: d.is_active,
     sort_order: d.sort_order,
+    class_start_times: d.class_start_times,
   }
 
   let serviceId: string

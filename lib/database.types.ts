@@ -74,6 +74,7 @@ export type Database = {
           sort_order: number
           buffer_minutes: number
           max_concurrent: number
+          class_start_times: string[]
           created_at: string
           updated_at: string
         }
@@ -92,6 +93,7 @@ export type Database = {
           sort_order?: number
           buffer_minutes?: number
           max_concurrent?: number
+          class_start_times?: string[]
           created_at?: string
           updated_at?: string
         }

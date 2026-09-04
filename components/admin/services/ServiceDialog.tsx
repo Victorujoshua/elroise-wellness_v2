@@ -25,7 +25,7 @@ import {
 } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
-import { serviceSchema, slugify } from './serviceSchema'
+import { serviceSchema, slugify, parseClassStartTimes, formatClassStartTimes } from './serviceSchema'
 import type { ServiceFormData } from './serviceSchema'
 import { saveService } from '@/app/(admin)/admin/(dashboard)/services/actions'
 import type { ServiceWithPractitioners, PractitionerOption } from '@/app/(admin)/admin/(dashboard)/services/actions'
@@ -48,6 +48,7 @@ function getDefaults(service: ServiceWithPractitioners | null): ServiceFormData 
       is_active: true,
       sort_order: 0,
       practitioner_ids: [],
+      class_start_times: [],
     }
   }
   return {
@@ -66,6 +67,7 @@ function getDefaults(service: ServiceWithPractitioners | null): ServiceFormData 
     is_active: service.is_active,
     sort_order: service.sort_order,
     practitioner_ids: service.practitioner_ids,
+    class_start_times: service.class_start_times,
   }
 }
 
@@ -81,6 +83,8 @@ export default function ServiceDialog({ open, onClose, service, practitioners }:
   const [isPending, startTransition] = useTransition()
   const [serverError, setServerError] = useState<string | null>(null)
   const [slugTouched, setSlugTouched] = useState(false)
+  const [classTimesText, setClassTimesText] = useState('')
+  const [classTimesError, setClassTimesError] = useState<string | null>(null)
 
   const {
     register,
@@ -101,6 +105,8 @@ export default function ServiceDialog({ open, onClose, service, practitioners }:
     reset(getDefaults(service))
     setSlugTouched(false)
     setServerError(null)
+    setClassTimesText(formatClassStartTimes(service?.class_start_times ?? []))
+    setClassTimesError(null)
   }, [service, reset])
 
   // Auto-generate slug from name when creating
@@ -139,6 +145,18 @@ export default function ServiceDialog({ open, onClose, service, practitioners }:
     })
   }
 
+  function handleFormSubmit(e: React.FormEvent<HTMLFormElement>) {
+    const parsed = parseClassStartTimes(classTimesText)
+    if (!parsed.ok) {
+      e.preventDefault()
+      setClassTimesError(parsed.error)
+      return
+    }
+    setClassTimesError(null)
+    setValue('class_start_times', parsed.times, { shouldValidate: false })
+    handleSubmit(onSubmit)(e)
+  }
+
   return (
     <Dialog open={open} onOpenChange={v => { if (!v) onClose() }}>
       <DialogContent
@@ -162,7 +180,7 @@ export default function ServiceDialog({ open, onClose, service, practitioners }:
         {/* Scrollable form body */}
         <form
           id="service-form"
-          onSubmit={handleSubmit(onSubmit)}
+          onSubmit={handleFormSubmit}
           className="flex-1 overflow-y-auto px-5 py-5 space-y-5"
         >
           {/* Row 1: Name + Slug */}
@@ -265,6 +283,27 @@ export default function ServiceDialog({ open, onClose, service, practitioners }:
             </p>
             {errors.max_concurrent && (
               <p className="text-xs text-destructive">{errors.max_concurrent.message}</p>
+            )}
+          </div>
+
+          {/* Class start times */}
+          <div className="space-y-1.5">
+            <Label htmlFor="svc-class-times">Class start times</Label>
+            <Input
+              id="svc-class-times"
+              value={classTimesText}
+              onChange={e => {
+                setClassTimesText(e.target.value)
+                if (classTimesError) setClassTimesError(null)
+              }}
+              placeholder="10:00, 11:00, 12:00"
+            />
+            <p className="text-xs text-muted-foreground">
+              Leave empty for normal availability. Enter fixed times for classes that run to
+              a timetable, e.g. 10:00, 11:00, 12:00
+            </p>
+            {classTimesError && (
+              <p className="text-xs text-destructive">{classTimesError}</p>
             )}
           </div>
 

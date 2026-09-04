@@ -19,6 +19,7 @@ export const serviceSchema = z.object({
   is_active: z.boolean(),
   sort_order: z.number().int().min(0),
   practitioner_ids: z.array(z.string()),
+  class_start_times: z.array(z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, 'Invalid time')),
 })
 
 export type ServiceFormData = z.infer<typeof serviceSchema>
@@ -28,4 +29,25 @@ export function slugify(str: string): string {
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '')
+}
+
+const TIME_HHMM = /^([01]\d|2[0-3]):[0-5]\d$/
+
+export function parseClassStartTimes(
+  text: string,
+): { ok: true; times: string[] } | { ok: false; error: string } {
+  const parts = text.split(',').map(s => s.trim()).filter(Boolean)
+  if (parts.length === 0) return { ok: true, times: [] }
+
+  for (const part of parts) {
+    if (!TIME_HHMM.test(part)) {
+      return { ok: false, error: `Invalid time "${part}". Use 24-hour HH:MM, e.g. 10:00` }
+    }
+  }
+
+  return { ok: true, times: [...new Set(parts)].sort() }
+}
+
+export function formatClassStartTimes(times: string[]): string {
+  return times.map(t => t.slice(0, 5)).join(', ')
 }
